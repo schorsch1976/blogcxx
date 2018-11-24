@@ -1,28 +1,63 @@
 ############################################################################
-# CURL
-find_package(CURL)
-IF(NOT ${CURL_FOUND})
-	MESSAGE(FATAL_ERROR "CURL not Found: Set in in the ADVANCED SETTINGS")
-ENDIF(NOT ${CURL_FOUND})
-include_directories(${CURL_INCLUDE_DIRS})
+# Options
+############################################################################
+OPTION(WITH_DEBUG_LOG "Use the Debug Log" OFF)
+if (WITH_DEBUG_LOG)
+	ADD_DEFINITIONS(-DWITH_DEBUGLOG)
+endif (WITH_DEBUG_LOG)
+
+############################################################################
+# Plugins
+############################################################################
+OPTION(WITH_PLUGINS "With plugins" OFF)
+IF (WITH_PLUGINS)
+	ADD_DEFINITIONS(-DWITH_PLUGINS)
+
+	SET(TP_SRCS ${TP_SRCS}
+		../3rdparty/duktape/duktape/src/duktape.c
+	)
+	INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/3rdparty/duktape/duktape/src)
+	INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/3rdparty/duktape/dukglue/include)
+ENDIF (WITH_PLUGINS)
+
+############################################################################
+# Objects embedded
+############################################################################
+OPTION(WITH_OEMBED "With objects embedded" OFF)
+if (WITH_OEMBED)
+	ADD_DEFINITIONS(-DWITH_OEMBED)
+
+	find_package(CURL)
+	IF(NOT ${CURL_FOUND})
+		MESSAGE(FATAL_ERROR "CURL not Found: Set in in the ADVANCED SETTINGS")
+	ENDIF(NOT ${CURL_FOUND})
+	INCLUDE_DIRECTORIES(${CURL_INCLUDE_DIRS})
+
+	SET(TP_SRCS ${TP_SRCS}
+		../3rdparty/curl/HTTPDownloader.cpp
+	)
+
+	SET(LIBS ${LIBS}
+		${CURL_LIBRARY}
+	)
+
+ENDIF(WITH_OEMBED)
 
 ############################################################################
 # FreeBSD and Darwin
 ############################################################################
 IF (${FREEBSD} OR ${DARWIN})
   # FreeBSD/Darwin could use /usr/local/
-  include_directories(/usr/local/include)
+  INCLUDE_DIRECTORIES(/usr/local/include)
   link_directories(/usr/local/lib)
 ENDIF(${FREEBSD} OR ${DARWIN})
 
 ############################################################################
 # 3rdParty includes provided by blogcpp
 ############################################################################
-include_directories(${CMAKE_SOURCE_DIR}/3rdparty)
-include_directories(${CMAKE_SOURCE_DIR}/3rdparty/icu/include)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/3rdparty)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/3rdparty/icu/include)
 
-include_directories(${CMAKE_SOURCE_DIR}/3rdparty/duktape/duktape/src)
-include_directories(${CMAKE_SOURCE_DIR}/3rdparty/duktape/dukglue/include)
 
 IF(CMAKE_CL_64)
 	link_directories(${CMAKE_SOURCE_DIR}/3rdparty/icu/lib64)
@@ -31,12 +66,10 @@ ELSE(CMAKE_CL_64)
 ENDIF(CMAKE_CL_64)
 
 ############################################################################
-# 3rd Party Sources from blogcpp
+# 3rd Party Sources from blogcpp that are always needed
 ############################################################################
-SET(TP_SRCS
+SET(TP_SRCS ${TP_SRCS}
     # included in src
-    ../3rdparty/duktape/duktape/src/duktape.c
-    ../3rdparty/curl/HTTPDownloader.cpp
     ../3rdparty/XML/tinyxml2.cpp
 )
 
@@ -65,9 +98,6 @@ add_executable(blogcpp ${BLOGCPP_SRCS} ${TP_SRCS})
 ############################################################################
 
 # common
-SET(LIBS 
-    ${CURL_LIBRARY}
-)
 
 IF(UNIX)
     OPTION(USE_CLANG_STDCPP_LIB "Use libc++" ON)

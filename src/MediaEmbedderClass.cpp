@@ -182,14 +182,14 @@ bool MediaEmbedder::addOEmbeds(std::string& inputline) {
             if (!oembed.Error()) {
                 tinyxml2::XMLElement* htmlElement = parentElem->FirstChildElement("html");
                 if (oembed.Error()) {
-                    throw std::exception("No <html> element found.");
+                    throw std::runtime_error("No <html> element found.");
                 }
                 else {
                     parsedline = htmlElement->GetText();
                 }
             }
             else {
-                throw std::exception("No <oembed> element found.");
+                throw std::runtime_error("No <oembed> element found.");
             }
 
 #ifdef WITH_DEBUGLOG
