@@ -1,0 +1,6 @@
+build
+*.kdev4
+.hg
+debug.txt
+.hgtags
+

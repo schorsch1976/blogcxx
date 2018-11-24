@@ -1,0 +1,63 @@
+############################################################################
+# CURL
+find_package(CURL)
+IF(NOT ${CURL_FOUND})
+	MESSAGE(FATAL_ERROR "CURL not Found: Set in in the ADVANCED SETTINGS")
+ENDIF(NOT ${CURL_FOUND})
+include_directories(${CURL_INCLUDE_DIRS})
+
+############################################################################
+# FreeBSD and Darwin
+############################################################################
+IF (${FREEBSD} OR ${DARWIN})
+  # FreeBSD/Darwin could use /usr/local/
+  include_directories(/usr/local/include)
+  link_directories(/usr/local/lib)
+ENDIF(${FREEBSD} OR ${DARWIN})
+
+############################################################################
+# 3rdParty includes provided by blogcpp
+############################################################################
+include_directories(${CMAKE_SOURCE_DIR}/3rdparty)
+include_directories(${CMAKE_SOURCE_DIR}/3rdparty/icu/include)
+
+#link_directories(${CMAKE_SOURCE_DIR}/3rdparty/icu/)
+#link_directories(${CMAKE_SOURCE_DIR}/3rdparty/icu/)
+
+############################################################################
+# 3rd Party Sources from blogcpp
+############################################################################
+SET(TP_SRCS
+    # included in src
+    ../3rdparty/duktape/duktape/src/duktape.c
+    ../3rdparty/curl/HTTPDownloader.cpp
+    ../3rdparty/XML/tinyxml2.cpp
+)
+
+############################################################################
+# blogcpp sources
+############################################################################
+SET(BLOGCPP_SRCS
+    DebugClass.cpp
+    ContentsGeneratorClass.cpp
+    EmojiParserClass.cpp
+    ExcerptExtractorClass.cpp
+    MarkdownParserClass.cpp
+    MediaEmbedderClass.cpp
+    CommentIntegrationClass.cpp
+    PluginClass.cpp
+    RSSGeneratorClass.cpp
+    MarkdownWrapperClass.cpp
+    TemplateWrapperClass.cpp
+    blogcpp.cpp
+)
+
+add_executable(blogcpp ${BLOGCPP_SRCS} ${TP_SRCS})
+
+IF (${FREEBSD} OR ${DARWIN})
+  target_link_libraries(blogcpp ${CURL_LIBRARY} icui18n icuuc -lc++ -lc++experimental -lthr)
+ENDIF (${FREEBSD} OR  ${DARWIN})
+
+IF (${LINUX})
+  target_link_libraries(blogcpp ${CURL_LIBRARY} icui18n icuuc -lstdc++ -lstdc++fs -lpthread)
+ENDIF (${LINUX})
