@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Just Another Blog</title>
+        <link>file://C:/Entwicklung/Projekte/blogcpp/blog-default/outdir/</link>
+        <lastBuildDate>Tue, 04 Dec 2018 18:57:13 </lastBuildDate>
+        <item>
+            <title>Howto use blogcpp</title>
+            <description><![CDATA[<p>A static blog generator, written in C++17. First things first:</p>]]></description>
+            <link>file://C:/Entwicklung/Projekte/blogcpp/blog-default/outdir//site\posts/2018/11/howto-use-blogcpp</link>
+            <pubDate>Thu, 22 Nov 2018 19:10:04 </pubDate>
+        </item>
+    </channel>
+</rss>

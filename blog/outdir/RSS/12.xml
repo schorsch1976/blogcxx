@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>schorsch-tech.de</title>
+        <link>file://C:/Entwicklung/Projekte/blogcpp/blog/outdir/</link>
+        <lastBuildDate>Mo, 03 Dez 2018 17:13:27 </lastBuildDate>
+        <item>
+            <title>Changes in 10-alpha</title>
+            <description><![CDATA[<p>blogcpp was heavyly rewritten because there were internal source code difficulties. It didnt' handle it well when there was no site dir or it was executed in an empty directory. </p>
+
+]]></description>
+            <link>file://C:/Entwicklung/Projekte/blogcpp/blog/outdir//site\posts/2018/12/10-alpha</link>
+            <pubDate>So, 02 Dez 2018 13:03:40 </pubDate>
+        </item>
+    </channel>
+</rss>

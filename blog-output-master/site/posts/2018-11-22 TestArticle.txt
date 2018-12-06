@@ -1,0 +1,10 @@
+Author: Georg
+Title: TestArticle
+Slug: testarticle
+Date: 2018-11-22 13:03:40
+Tags: download
+Categories: blog
+Series: test
+
+----------
+Test Article

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Testblog: 'bsd' Category RSS Feed</title>
+        <link>http://bsd.schorsch-tech.de/blog</link>
+        <description>powered by blogcpp</description>
+        <lastBuildDate>Wed, 28 Nov 2018 21:45:25 +0100</lastBuildDate>
+        <item>
+            <title>Hallo</title>
+            <description><![CDATA[
+]]></description>
+            <link>http://bsd.schorsch-tech.de/blog/posts/2018/11/hallo</link>
+            <pubDate>Thu, 22 Nov 2018 19:10:04 +0100</pubDate>
+        </item>
+    </channel>
+</rss>

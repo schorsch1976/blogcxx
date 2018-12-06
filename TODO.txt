@@ -1,4 +1,0 @@
-# Must be at least one
-- /allcats
-- /latestposts 
-- /comments
