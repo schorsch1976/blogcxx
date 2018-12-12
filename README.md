@@ -10,9 +10,9 @@ This is my public (but not main repository). It is the just used to publish rele
 
 ## Fork
 As blogcpp is licenced under WTFPL2, i fork it and do what
-the fuck i want. As i rewrote so big chunks, i licence blogcxx
+the f*ck i want. As i rewrote so big chunks, i licence blogcxx
 under [GPLv3](https://www.gnu.org/licenses/gpl-3.0.txt).
-I thing GPL has done much more good than harm
+I think GPL has done much more good than harm
 to the open source movement.
 
 WTFPL 2 and GPL3 are compatible.
@@ -69,7 +69,6 @@ The latest released version is version 1-alpha
 ### what i am not sure if it works
 - highlight programming languages. The generated code looks correct.
 - OEmbed. WITHOUT OEMBED set, the simple Media Embedder seems to work.
-- pagination prepared but not tested
 - Emoji Parser reimplemented but needs futher testing.
   Build regexes in Emojiparser just once and keep state in a
   static (once_flag protected) varaiable.
@@ -133,6 +132,10 @@ The latest released version is version 1-alpha
 - Articles can be parsed with hardbreaks on to format code and so on
   Hardbreaks: On (default is off)
 - a folder ``images`` gets copied into the outdir.
+- colorize output for warn/error/fatal messages.
+  - yellow = warning
+  - red    = error
+  - cyan   = fatal
 
 ## Features changed compared to blogcpp
 - cxxopts replaced by boost::program_options (users dont care)
@@ -149,14 +152,11 @@ The latest released version is version 1-alpha
 - Installation option for blogcxx added
 
 ## Features removed compared to blogcpp
-
 - js plugins: I think they are unneeded and were used to work around the
   codequality of blogcpp. If you need them, i could create a pluginsystem.
   This pluginsystem would have a js plugin that loads your js plugins.
 
 ## Future plans
-
-- colorize output for warn/error/fatal messages.
 - remove inja/json to be able to compile with a c++11 compiler.
 - remove tinyxml2 and use the templating engine
 

@@ -35,6 +35,18 @@ namespace expr = logging::expressions;
 namespace attributes = logging::attributes;
 
 // ----------------------------------------------------------------------------
+// enum for colorizing the output on the consoloe
+// ----------------------------------------------------------------------------
+enum class Color
+{
+	std = 0,
+	blue,
+	yellow,
+	cyan,
+	red
+};
+
+// ----------------------------------------------------------------------------
 // typesave format a message with boost::format
 // ----------------------------------------------------------------------------
 
@@ -54,7 +66,7 @@ std::string Format(boost::format &f, T v, Args... args)
 namespace logging = boost::log;
 
 // access to the two loggers
-boost::log::sources::logger_mt &ConsoleLogger();
+boost::log::sources::logger_mt &ConsoleLogger(Debug::impl::Color color);
 boost::log::sources::severity_logger_mt<Debug::Level> &FileLogger();
 
 enum class MsgType
@@ -63,12 +75,13 @@ enum class MsgType
 	Log
 };
 BOOST_LOG_ATTRIBUTE_KEYWORD(msg_type, "MsgType", MsgType)
+BOOST_LOG_ATTRIBUTE_KEYWORD(color, "Color", Color)
 
 template <typename T, typename... Args>
-void PRINT(const T &fmt, Args... args)
+void PRINT(const Color color, const T &fmt, Args... args)
 {
 	boost::format f(boost::locale::translate(fmt));
-	BOOST_LOG(ConsoleLogger()) << Format(f, args...);
+	BOOST_LOG(ConsoleLogger(color)) << Format(f, args...);
 }
 
 template <Debug::Level lvl, typename T, typename... Args>
@@ -78,12 +91,25 @@ void LOG_IMPL(const T &fmt, Args... args)
 	if (lvl == Debug::Level::warning || lvl == Debug::Level::error ||
 		lvl == Debug::Level::fatal)
 	{
-		impl::PRINT(fmt, args...);
+		Color color = Color::std;
+		switch (lvl)
+		{
+		case Debug::Level::fatal:
+			color = Color::cyan;
+			break;
+		case Debug::Level::error:
+			color = Color::red;
+			break;
+		case Debug::Level::warning:
+			color = Color::yellow;
+			break;
+		default:
+			break;
+		}
+		impl::PRINT(color, fmt, args...);
 	}
-#ifdef WITH_DEBUGLOG
 	boost::format f(boost::locale::translate(fmt));
 	BOOST_LOG_SEV(FileLogger(), lvl) << Format(f, args...);
-#endif
 }
 
 template <Debug::Level lvl, typename T, typename... Args>

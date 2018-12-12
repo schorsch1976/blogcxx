@@ -74,7 +74,7 @@ void LOG_FATAL(const T &fmt, Args... args)
 template <typename T, typename... Args>
 void PRINT(const T &fmt, Args... args)
 {
-	Debug::impl::PRINT(fmt, args...);
+	Debug::impl::PRINT(Debug::impl::Color::std, fmt, args...);
 }
 
 template <typename T, typename... Args>
