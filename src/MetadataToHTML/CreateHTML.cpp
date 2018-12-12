@@ -23,7 +23,7 @@
 
 #include "TemplateWrapper.h"
 
-TemplateData GenerateCommonTemplateData(const TemplateWrapper &engine, ,
+TemplateData GenerateCommonTemplateData(const TemplateWrapper &engine,
 										const ConstMetadata &merged,
 										const ConfigCollection &cfgs)
 {
@@ -201,14 +201,14 @@ TemplateData GenerateCommonTemplateData(const TemplateWrapper &engine, ,
 	if (cfgs.commenttype() && cfgs.commentdata())
 	{
 		TemplateData header;
-		header.Set({"header"}, true);
+		header.Set({"header"}, "header");
 		header.Set({"commentdata"}, *cfgs.commentdata());
 		std::string header_data = engine.Render(
 			cfgs.commentdir() / std::string(*cfgs.commenttype() + ".txt"),
 			header);
 
 		TemplateData body;
-		body.Set({ "body" }, true);
+		body.Set({ "body" }, "body");
 		body.Set({ "commentdata" }, *cfgs.commentdata());
 		std::string body_data = engine.Render(
 			cfgs.commentdir() / std::string(*cfgs.commenttype() + ".txt"),
@@ -243,8 +243,8 @@ void CreateHTML(const ConstMetadata &merged, const ConfigCollection &cfgs)
 	// generate common Template data
 	LOG_DEBUG("Generating common Template data (sidebars, categories, series "
 			  "and tags).");
-	TemplateData common_tpl_data{GenerateCommonTemplateData(merged, cfgs)};
 	TemplateWrapper engine({cfgs.tpldir(), cfgs.commentdir()});
+	TemplateData common_tpl_data{ GenerateCommonTemplateData(engine, merged, cfgs) };
 
 	PRINT("Writing %1% posts and %2% pages with %3% threads ...",
 		  merged.all_posts.size(), merged.all_pages.size(), cfgs.num_threads());
