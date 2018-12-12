@@ -24,6 +24,7 @@
 			{% endfor %}
 		{% endif %}
         <script src="{{ baseurl }}/static/blogcxx.js"></script>
+        {{ default(comments-header, "") }}
         {{ default(headscripts, "") }}
     </head>
     <body>

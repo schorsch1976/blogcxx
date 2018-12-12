@@ -1,0 +1,10 @@
+{% if exists("header") %}
+
+{% endif %}
+
+{% if exists("body") %}
+
+		<div class="commento"></div>
+        <script defer src="{%commentdata%}/commento.min.js" data-div="#commento"></script>
+
+{% endif %}

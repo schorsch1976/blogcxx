@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "Shared/filesystem.h"
 #include "Shared/variant.h"
@@ -49,7 +50,7 @@ class TemplateWrapper
 {
 public:
 	// store all templates in memory
-	explicit TemplateWrapper(fs::path templ_directory,
+	explicit TemplateWrapper(std::vector<fs::path> templ_directories,
 							 fs::path tmpl_ext = ".txt");
 	~TemplateWrapper(); // needed because the compiler fire wall
 

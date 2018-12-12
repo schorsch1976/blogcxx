@@ -1,0 +1,20 @@
+{% if exists("header") %}
+
+{% endif %}
+
+{% if exists("body") %}
+
+		<div id="hashover" class="comments"></div>
+        <script type="text/javascript">
+          (function() {
+            var s = document.createElement('script'),
+                t = document.getElementsByTagName('link')[0];
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = "{%commentdata%}/hashover.js";
+            t.parentNode.insertBefore(s, t);
+          })();
+        </script>
+        <noscript>Please enable JavaScript to view the comments.</noscript>
+
+{% endif %}

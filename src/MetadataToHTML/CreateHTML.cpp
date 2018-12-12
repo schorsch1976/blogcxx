@@ -23,7 +23,8 @@
 
 #include "TemplateWrapper.h"
 
-TemplateData GenerateCommonTemplateData(const ConstMetadata &merged,
+TemplateData GenerateCommonTemplateData(const TemplateWrapper &engine, ,
+										const ConstMetadata &merged,
 										const ConfigCollection &cfgs)
 {
 	int i = 0;
@@ -196,6 +197,31 @@ TemplateData GenerateCommonTemplateData(const ConstMetadata &merged,
 		}
 	}
 
+	// render the comment templates
+	if (cfgs.commenttype() && cfgs.commentdata())
+	{
+		TemplateData header;
+		header.Set({"header"}, true);
+		header.Set({"commentdata"}, *cfgs.commentdata());
+		std::string header_data = engine.Render(
+			cfgs.commentdir() / std::string(*cfgs.commenttype() + ".txt"),
+			header);
+
+		TemplateData body;
+		body.Set({ "body" }, true);
+		body.Set({ "commentdata" }, *cfgs.commentdata());
+		std::string body_data = engine.Render(
+			cfgs.commentdir() / std::string(*cfgs.commenttype() + ".txt"),
+			body);
+
+		ret.Set({ "comments-header" }, header_data);
+		ret.Set({ "comments-body" }, body_data);
+		}
+	else
+	{
+		ret.Set({ "comments-header" }, "<!-- No comments -->");
+		ret.Set({ "comments-body" }, "<!-- No comments -->");
+	}
 	return ret;
 }
 
@@ -218,7 +244,7 @@ void CreateHTML(const ConstMetadata &merged, const ConfigCollection &cfgs)
 	LOG_DEBUG("Generating common Template data (sidebars, categories, series "
 			  "and tags).");
 	TemplateData common_tpl_data{GenerateCommonTemplateData(merged, cfgs)};
-	TemplateWrapper engine(cfgs.tpldir());
+	TemplateWrapper engine({cfgs.tpldir(), cfgs.commentdir()});
 
 	PRINT("Writing %1% posts and %2% pages with %3% threads ...",
 		  merged.all_posts.size(), merged.all_pages.size(), cfgs.num_threads());
@@ -322,26 +348,24 @@ void CreateHTML(const ConstMetadata &merged, const ConfigCollection &cfgs)
 	}
 
 	// add copy static files
-	creator.Add("CopyStaticFiles", [&cfgs]()
-	{
+	creator.Add("CopyStaticFiles", [&cfgs]() {
 		PRINT("Copy static files.");
 
 		fs::create_directories(cfgs.outdir_root() / cfgs.rel_path_static());
 
 		CopyDirectory(cfgs.tpldir() / cfgs.rel_path_static(),
-			cfgs.outdir_root() / cfgs.rel_path_static());
+					  cfgs.outdir_root() / cfgs.rel_path_static());
 	});
 
 	// add copy static images
-	creator.Add("CopyImages", [&cfgs]()
-	{
+	creator.Add("CopyImages", [&cfgs]() {
 		if (fs::exists(cfgs.indir() / cfgs.rel_path_images()))
 		{
 			PRINT("Copying images.");
 			fs::create_directories(cfgs.outdir_root() / cfgs.rel_path_images());
 
 			CopyDirectory(cfgs.indir() / cfgs.rel_path_images(),
-				cfgs.outdir_root() / cfgs.rel_path_images());
+						  cfgs.outdir_root() / cfgs.rel_path_images());
 		}
 	});
 

@@ -41,6 +41,7 @@
     <div id="permalink">Permanent link to this post: <a href="{{ permalink }}">{{ permalink }}</a></div>
   </div>
 
+  {{ default(comments-body, "") }}
 </div>
 
 {% include "footer.txt" %}

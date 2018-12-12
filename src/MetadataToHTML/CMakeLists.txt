@@ -1,7 +1,4 @@
 SET(SRCS
-	CommentIntegrationClass.cpp
-	CommentIntegrationClass.h
-
 	CreateHTML.cpp
 	CreateHTML.h
 

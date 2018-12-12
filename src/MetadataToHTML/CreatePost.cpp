@@ -73,9 +73,6 @@ void CreatePost(SingleItem::ConstPtr s, const ConstArchive &series,
 	// permalink
 	data.Set({"permalink"}, cfgs.url(cfgs.rel_path_posts(si.s_slug)));
 
-	// comments
-	data.Set({"comments"}, "comments-todo");
-
 	// tags of this post
 	int i = 0;
 	data.Set({"tags_title"}, "Tags");

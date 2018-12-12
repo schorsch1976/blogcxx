@@ -106,6 +106,8 @@ public:
 
 	fs::path outdir_root() const;
 
+	fs::path commentdir() const;
+
 	fs::path rel_path_archive() const;
 	fs::path rel_path_archive_year(const tm &time) const;
 	fs::path rel_path_archive_year_month(const tm &time) const;

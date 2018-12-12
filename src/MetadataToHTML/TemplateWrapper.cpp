@@ -195,39 +195,42 @@ struct TemplateWrapper::impl
 #endif
 };
 
-TemplateWrapper::TemplateWrapper(fs::path templ_directory, fs::path tmpl_ext)
+TemplateWrapper::TemplateWrapper(std::vector<fs::path> templ_directories, fs::path tmpl_ext)
 {
 	mp_impl = std::make_unique<impl>();
 
 	// read all templates into the environment
-	for (fs::directory_iterator end_dir_it, it(templ_directory);
-		 it != end_dir_it; ++it)
+	for (auto& templ_directory : templ_directories)
 	{
-		const fs::path &path = it->path();
-		if (!fs::is_regular_file(path))
+		for (fs::directory_iterator end_dir_it, it(templ_directory);
+			it != end_dir_it; ++it)
 		{
-			continue;
-		}
+			const fs::path &path = it->path();
+			if (!fs::is_regular_file(path))
+			{
+				continue;
+			}
 
-		auto e = path.extension();
-		if (path.extension() != tmpl_ext)
-		{
-			continue;
-		}
+			auto e = path.extension();
+			if (path.extension() != tmpl_ext)
+			{
+				continue;
+			}
 
 #ifndef TEST_OLDER_COMPILERS
-		try
-		{
-			inja::Template tpl = mp_impl->m_env.parse_template(path.string());
-			mp_impl->m_tpl[path] = tpl;
-			mp_impl->m_env.include_template(path.filename().string(), tpl);
-		}
-		catch (const std::exception &ex)
-		{
-			THROW_FATAL("TemplateWrapper: File: '%1%' - Error: %2%",
-						path.string(), ex.what());
-		}
+			try
+			{
+				inja::Template tpl = mp_impl->m_env.parse_template(path.string());
+				mp_impl->m_tpl[path] = tpl;
+				mp_impl->m_env.include_template(path.filename().string(), tpl);
+			}
+			catch (const std::exception &ex)
+			{
+				THROW_FATAL("TemplateWrapper: File: '%1%' - Error: %2%",
+					path.string(), ex.what());
+			}
 #endif
+		}
 	}
 }
 

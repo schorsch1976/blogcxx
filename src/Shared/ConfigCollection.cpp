@@ -161,6 +161,13 @@ fs::path ConfigCollection::outdir_root() const
 	return ret;
 }
 
+fs::path ConfigCollection::commentdir() const
+{
+	fs::path ret = { "comments" };
+	return ret;
+}
+
+
 fs::path ConfigCollection::rel_path_archive() const
 {
 	return fs::path("archives");

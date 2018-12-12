@@ -97,6 +97,12 @@ namespace po = boost::program_options;
 #include "template-templates-default-static-styles-css.h"
 #include "template-templates-default-static-vanillajs-png.h"
 
+#include "comments-comments-commento-txt.h"
+#include "comments-comments-discourse-txt.h"
+#include "comments-comments-disqus-txt.h"
+#include "comments-comments-hashover-txt.h"
+#include "comments-comments-isso-txt.h"
+
 #include "template-README-md.h"
 
 void CheckTemplates(const ConfigCollection &cfgs)
@@ -117,9 +123,10 @@ void CheckTemplates(const ConfigCollection &cfgs)
 			answer = lowercase(answer);
 			if (lowercase(answer) == translate("y"))
 			{
-				PRINT("Generating default template at '%1%.",
+				PRINT("Generating default template and comments at '%1%.",
 					  cfgs.tpldir().string());
 				fs::create_directories(cfgs.tpldir());
+				fs::create_directories(cfgs.commentdir());
 				fs::create_directories(cfgs.tpldir() / cfgs.rel_path_static());
 
 				// clang-format off
@@ -130,6 +137,12 @@ void CheckTemplates(const ConfigCollection &cfgs)
 				write_file(cfgs.tpldir() / "page.txt", bin2cxx_page.data(), bin2cxx_page.size());
 				write_file(cfgs.tpldir() / "post.txt", bin2cxx_post.data(), bin2cxx_post.size());
 				write_file(cfgs.tpldir() / "sidebar.txt", bin2cxx_sidebar.data(), bin2cxx_sidebar.size());
+
+				write_file(cfgs.commentdir() / "commento.txt", bin2cxx_commento.data(), bin2cxx_commento.size());
+				write_file(cfgs.commentdir() / "discourse.txt", bin2cxx_discourse.data(), bin2cxx_discourse.size());
+				write_file(cfgs.commentdir() / "disqus.txt", bin2cxx_disqus.data(), bin2cxx_disqus.size());
+				write_file(cfgs.commentdir() / "hashover.txt", bin2cxx_hashover.data(), bin2cxx_hashover.size());
+				write_file(cfgs.commentdir() / "isso.txt", bin2cxx_isso.data(), bin2cxx_isso.size());
 
 				fs::path stat = cfgs.tpldir() / "static";
 				write_file(stat / "blogcxx.js", bin2cxx_blogcxx.data(), bin2cxx_blogcxx.size());
