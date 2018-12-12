@@ -23,11 +23,6 @@ ENDIF(WITH_OEMBED)
 ############################################################################
 # 3rdParty includes provided by blogcxx
 ############################################################################
-SET(SRCS ${SRCS}
-	XML/tinyxml2.cpp
-	XML/tinyxml2.h
-)
-
 IF(MARKDOWN_CMARK)
 	set(PROJECT_VERSION_MAJOR 0)
 	set(PROJECT_VERSION_MINOR 28)
@@ -180,5 +175,3 @@ IF(MARKDOWN_CMARK_GFM)
 
 ENDIF(MARKDOWN_CMARK_GFM)
 
-
-ADD_LIBRARY(3rdparty	${SRCS})

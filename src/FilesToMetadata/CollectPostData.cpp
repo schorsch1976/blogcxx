@@ -232,7 +232,7 @@ void Slugify(Metadata &merged)
 
 			if (si->s_slug.empty())
 			{
-				si->s_slug = createBasicSlug(si->s_filename.string());
+				si->s_slug = createBasicSlug(*si);
 			}
 			count_doublicate_slugs[si->s_slug] += 1;
 			all_slug_names.push_back(si->s_slug);

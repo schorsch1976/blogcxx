@@ -85,6 +85,8 @@ namespace po = boost::program_options;
 #include "template-templates-default-static-styles-css.h"
 #include "template-templates-default-static-vanillajs-png.h"
 
+#include "template-templates-RSS-txt.h"
+
 #include "comments-comments-commento-txt.h"
 #include "comments-comments-discourse-txt.h"
 #include "comments-comments-disqus-txt.h"
@@ -125,6 +127,8 @@ void CheckTemplates(const ConfigCollection &cfgs)
 				write_file(cfgs.tpldir() / "page.txt", bin2cxx_page.data(), bin2cxx_page.size());
 				write_file(cfgs.tpldir() / "post.txt", bin2cxx_post.data(), bin2cxx_post.size());
 				write_file(cfgs.tpldir() / "sidebar.txt", bin2cxx_sidebar.data(), bin2cxx_sidebar.size());
+
+				write_file(cfgs.tpldir().parent_path() / "RSS.txt", bin2cxx_RSS.data(), bin2cxx_RSS.size());
 
 				write_file(cfgs.commentdir() / "commento.txt", bin2cxx_commento.data(), bin2cxx_commento.size());
 				write_file(cfgs.commentdir() / "discourse.txt", bin2cxx_discourse.data(), bin2cxx_discourse.size());

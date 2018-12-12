@@ -13,14 +13,29 @@
 #include <iomanip>
 #include <regex>
 
-std::string createBasicSlug(std::string input)
+std::string createBasicSlug(const SingleItem &si)
 {
 	// Creates a basic slug.
 	// Mainly used for category/tag/archive slugs.
 	std::string ret;
 
+	std::string start;
+	if (si.s_slug.empty())
+	{
+		start = si.s_title;
+	}
+	else
+	{
+		start = si.s_slug;
+	}
+	if (start.empty())
+	{
+		THROW_FATAL(
+			"createBasicSlug: Item has no slug and no title: File: '%1%'",
+			si.s_filename.string());
+	}
 	// Lowercase:
-	std::string uinput = boost::locale::to_lower(input);
+	std::string uinput = boost::locale::to_lower(start);
 
 	// Umlauts/diacritics -> ASCII:
 	ret = boost::locale::normalize(uinput, boost::locale::norm_nfd);

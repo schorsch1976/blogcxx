@@ -26,7 +26,7 @@ void CmdNewArticle(const ConfigCollection &cfgs)
 
 	title = trim(title);
 	ContentsGenerator(ItemType::Post, cfgs.indir_posts(), cfgs.author(), title,
-					  createBasicSlug(title))
+					  hyphenise(title))
 		.generate();
 
 	PRINT("Your blog post has been created in '%1%'",

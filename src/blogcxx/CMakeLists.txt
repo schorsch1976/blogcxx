@@ -40,6 +40,8 @@ GENERATE_CXX(blogcxx template templates/default/static/manifest.json)
 GENERATE_CXX(blogcxx template templates/default/static/styles.css)
 GENERATE_CXX(blogcxx template templates/default/static/vanillajs.png)
 
+GENERATE_CXX(blogcxx template templates/RSS.txt)
+
 GENERATE_CXX(blogcxx comments comments/commento.txt)
 GENERATE_CXX(blogcxx comments comments/discourse.txt)
 GENERATE_CXX(blogcxx comments comments/disqus.txt)
@@ -53,9 +55,8 @@ GENERATE_CXX(blogcxx template README.md)
 ############################################################################
 SET(LIBS
 	FilesToMetadata
-	MetadataToHTML
+	MetadataToHTMLAndRSS
 	Shared
-	3rdparty
 	${BLOG_CXX_LIBS}
 )
 

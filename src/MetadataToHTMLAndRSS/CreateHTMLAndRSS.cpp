@@ -244,7 +244,7 @@ void CreateHTMLAndRSS(const ConstMetadata &merged, const ConfigCollection &cfgs)
 	// generate common Template data
 	LOG_DEBUG("Generating common Template data (sidebars, categories, series "
 			  "and tags).");
-	TemplateWrapper engine({cfgs.tpldir(), cfgs.commentdir()});
+	TemplateWrapper engine({cfgs.tpldir(), cfgs.commentdir(), cfgs.tpl_RSS().parent_path()});
 	TemplateData common_tpl_data{ GenerateCommonTemplateData(engine, merged, cfgs) };
 
 	PRINT("Writing %1% posts and %2% pages with %3% threads ...",
@@ -395,7 +395,7 @@ void CreateHTMLAndRSS(const ConstMetadata &merged, const ConfigCollection &cfgs)
 				CreateRSS(outfile, cfgs.sitetitle(), ar.second, cfgs, engine);
 			};
 
-			creator.Add(ar.first.path.string(), fo);
+			creator.Add("RSS/" + ar.first.path.string(), fo);
 		}
 
 		// RSS: total feed
@@ -407,7 +407,7 @@ void CreateHTMLAndRSS(const ConstMetadata &merged, const ConfigCollection &cfgs)
 				CreateRSS(outfile, cfgs.sitetitle(), posts, cfgs, engine);
 			};
 
-			creator.Add("RSS.xml", fo);
+			creator.Add("RSS/RSS.xml", fo);
 		}
 	}
 

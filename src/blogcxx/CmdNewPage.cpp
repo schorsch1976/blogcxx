@@ -25,7 +25,7 @@ void CmdNewPage(const ConfigCollection &cfgs)
 
 	title = trim(title);
 	ContentsGenerator(ItemType::Page, cfgs.indir_pages(), cfgs.author(), title,
-					  createBasicSlug(title.c_str()))
+					  hyphenise(title))
 		.generate();
 
 	PRINT("Your page has been created in '%1%'", cfgs.indir_pages().string());

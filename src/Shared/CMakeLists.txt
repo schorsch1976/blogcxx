@@ -43,4 +43,28 @@ SET(SRCS
 	TextParseAll.h
 )
 
+IF(MARKDOWN_BLOGCPP)
+	SET(SRCS    ${SRCS}
+		MarkdownParserClass.cpp
+		MarkdownParserClass.h
+		MarkdownReturnClass.h
+		MarkdownWrapperClass.cpp
+		MarkdownWrapperClass.h
+
+		TextParseAllBlogCpp.cpp
+	)
+ENDIF(MARKDOWN_BLOGCPP)
+
+IF(MARKDOWN_CMARK)
+	SET(SRCS    ${SRCS}
+		TextParseAllCMark.cpp
+	)
+ENDIF(MARKDOWN_CMARK)
+
+IF(MARKDOWN_CMARK_GFM)
+	SET(SRCS    ${SRCS}
+		TextParseAllCMarkGfm.cpp
+	)
+ENDIF(MARKDOWN_CMARK_GFM)
+
 ADD_LIBRARY(Shared ${SRCS})

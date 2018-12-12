@@ -22,18 +22,21 @@ void CreateRSS(const fs::path outfile, const std::string title,
 	{
 		const SingleItem &post = *ar[i];
 
-
-		std::string desc = TextParseAll(post, cfgs, !cfgs.fullfeed(),
-			false /* no markdown */).first;
+		std::string desc =
+			TextParseAll(post, cfgs, !cfgs.fullfeed(), false /* no markdown */)
+				.first;
 
 		data.Set({"items", i, "title"}, post.s_title);
-		data.Set({ "items", i, "description" }, desc);
-		data.Set({ "items", i, "link" }, cfgs.url(cfgs.rel_path_posts(post.s_slug)));
+		data.Set({"items", i, "description"}, desc);
+		data.Set({"items", i, "link"},
+				 cfgs.url(cfgs.rel_path_posts(post.s_slug)));
 
 		std::ostringstream pubdata;
 		pubdata << std::put_time(&post.time, "%a, %d %b %Y %T %z");
-		data.Set({ "items", i, "pubDate" }, pubdata.str());
+		data.Set({"items", i, "pubDate"}, pubdata.str());
 	}
+
+	LOG_DEBUG("RSS: %1%", data.to_string());
 
 	std::string rendered = engine.Render(cfgs.tpl_RSS(), data);
 	if (rendered.empty())
