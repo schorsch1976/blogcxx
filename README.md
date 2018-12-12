@@ -70,13 +70,11 @@ The latest released version is 1-alpha
 ### what i am not sure if it works
 - highlight programming languages. The generated code looks correct.
 - OEmbed. WITHOUT OEMBED set, the simple Media Embedder seems to work.
-- Emoji Parser reimplemented but needs futher testing.
-  Build regexes in Emojiparser just once and keep state in a
-  static (once_flag protected) varaiable.
 - comments (create an own template that gets loaded and parsed instead of
   poluting the source code with html. The job ob the template engine is
   separation of html and control.)
-- colorize output for warn/error/fatal messages.
+- colorize output for warn/error/fatal messages. (on windows, linux works)
+- ExcerptParser seems confused
 
 ---
 
