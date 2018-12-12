@@ -96,6 +96,13 @@ void CreatePost(SingleItem::ConstPtr s, const ConstArchive &series,
 		++i;
 	}
 
+	// disable comments, if requested
+	if (!si.b_comments)
+	{
+		data.Set({ "comments-header" }, "<!-- No comments -->");
+		data.Set({ "comments-body" }, "<!-- No comments -->");
+	}
+
 	// and the text
 	std::string text;
 	std::vector<std::string> used_highlight_languages;

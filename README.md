@@ -163,6 +163,7 @@ The latest released version is version 1-alpha
 - js plugins: I think they are unneeded and were used to work around the
   codequality of blogcpp. If you need them, i could create a pluginsystem.
   This pluginsystem would have a js plugin that loads your js plugins.
+- google+ comment system: google+ [closes soon](https://en.wikipedia.org/wiki/Google%2B#Shutdown_of_consumer_version)
 
 ## Future plans
 - remove inja/json to be able to compile with a c++11 compiler.
@@ -581,8 +582,6 @@ repository). Currently supported are:
 -  [Hashover](https://github.com/jacobwb/hashover-next)
    (``comments = hashover``, you need to set your ``commentdata`` to
    your *Hashover* folder) -- currently, version 2.0 only
--  Google Plus comments (``comments = google``, no additional settings
-   required)
 -  [Discourse](http://discourse.org) (``comments = discourse``, you
    need to set your ``commentdata`` to your *Discourse* domain)
 -  [Commento](https://gitlab.com/commento/commento-ce) (``comments = commento``,
