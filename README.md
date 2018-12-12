@@ -109,10 +109,6 @@ The latest released version is version 1-alpha
 -  Article series: If you have articles which continue other articles,
    you can just add them to the same series and ``blogcxx`` will make
    them refer to each other.
--  blogcxx can now create a howto page if no blog exists yet.
-   It also contails the default template for that issue. The internal tool
-   bin2cxx creates cpp and h files that the cxx arrays get included in
-   the executable.
 
 ## Features added compared to blogcpp
 
@@ -132,10 +128,15 @@ The latest released version is version 1-alpha
 - Articles can be parsed with hardbreaks on to format code and so on
   Hardbreaks: On (default is off)
 - a folder ``images`` gets copied into the outdir.
-- colorize output for warn/error/fatal messages.
+- colorize output for warn/error/fatal messages. This works on Unix and Win10+
+  - white  = standard
   - yellow = warning
   - red    = error
   - cyan   = fatal
+-  blogcxx can now create a howto page if no blog exists yet.
+   It also contails the default template for that issue. The internal tool
+   bin2cxx creates cpp and h files that the cxx arrays get included in
+   the executable.
 
 ## Features changed compared to blogcpp
 - cxxopts replaced by boost::program_options (users dont care)
