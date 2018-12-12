@@ -1,6 +1,6 @@
 SET(SRCS
-	CreateHTML.cpp
-	CreateHTML.h
+	CreateHTMLAndRSS.cpp
+	CreateHTMLAndRSS.h
 
 	CreateArchive.cpp
 	CreateArchive.h
@@ -14,8 +14,11 @@ SET(SRCS
 	CreateIndex.cpp
 	CreateIndex.h
 
+	CreateRSS.cpp
+	CreateRSS.h
+
 	TemplateWrapper.cpp
 	TemplateWrapper.h
 )
 
-ADD_LIBRARY(MetadataToHTML ${SRCS})
+ADD_LIBRARY(MetadataToHTMLAndRSS ${SRCS})

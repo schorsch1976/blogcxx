@@ -5,7 +5,7 @@
 #include "CreatePage.h"
 
 #include "Shared/Helpers.h"
-#include "SharedHTML-RSS/TextParseAll.h"
+#include "Shared/TextParseAll.h"
 
 void CreatePage(SingleItem::ConstPtr s, int page_index,
 				const ConfigCollection &cfgs, const TemplateWrapper &engine,

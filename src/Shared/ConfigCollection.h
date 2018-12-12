@@ -99,6 +99,7 @@ public:
 	fs::path tpl_archiv() const;
 	fs::path tpl_post() const;
 	fs::path tpl_page() const;
+	fs::path tpl_RSS() const;
 
 	fs::path indir() const;
 	fs::path indir_posts() const;

@@ -7,50 +7,39 @@
                    Flow of operation
 
 
-                   +-----------------------------------------------------------+
-                   |                                                           |
-FilesToMetadata    |  CollectPostData                                          |   1 Thread
-                   |                                                           |
-                   +-----------------------------------------------------------+
-                   |                                                           |
-                   |  GatherAllFiles                                           |   1 Thread
-                   |                                                           |
-                   +-------------------------+---------------------------------+
-                   |                         |                                 |
-                   |  Pages                  |             Posts               |   2 Threads
-                   |                         |                                 |
-                   +-------------------------+---------------------------------+
-                   |                                                           |
-                   |                 Check for Files                           |
-                   |                 CheckMetadata                             |   1 Thread
-                   |                 CheckArchives                             |
-                   |                                                           |
-                   +--------------------------+--------------------------------+
+                   +----------------------------------------------------------------------------+
+                   |                                                                            |
+FilesToMetadata    |  CollectPostData                                                           |    1 Thread
+                   |                                                                            |
+                   +----------------------------------------------------------------------------+
+                   |                                                                            |
+                   |  GatherAllFiles                                                            |    1 Thread
+                   |                                                                            |
+                   +-------------------------+--------------------------------------------------+
+                   |                         |                                                  |
+                   |  Pages                  |             Posts                                |    2 Threads
+                   |                         |                                                  |
+                   +-------------------------+--------------------------------------------------+
+                   |                                                                            |
+                   |                 Check for Files                                            |
+                   |                 CheckMetadata                                              |    1 Thread
+                   |                 CheckArchi^es                                              |
+                   |                                                                            |
+                   +--------------------------+-------------------------------------------------+
                                               |
                      (Here flows Metadata)    |
                                               |
-                   +--------------------------v--------------------------------+
-                   |                                                           |
-MetadataToHTML     |  CmdGenerateMetadata                                      |   1 Thread
-                   |                                                           |
-                   +------------+-------------+----------------+---------------+
-                   |            |             |                |               |
-                   | CreatePost | CreatePages | CreateArchives |  CreateIndex  |   num-threads
-                   |            |             |                |               |
-                   |            |             |                |               |
-                   +------------+-------------+----------------+---------------+
-                                              |
-                    (Here flows Metadata)     |
-                                              |
-                   +--------------------------v--------------------------------+
-MetadataToRSS      |                                                           |
-                   |  CreateRSS                                                |   1 Thread
-                   |                                                           |
-                   +-----------------------------------------------------------+
-                   |                                                           |
-                   |  RSSGenerator (n times in parallel)                       |   num-threads
-                   |                                                           |
-                   +-----------------------------------------------------------+
+                   +--------------------------v-------------------------------------------------+
+                   |                                                                            |
+MetadataToHTML     |  CmdGenerateMetadata                                                       |    1 Thread
+                   |                                                                            |
+                   +------------+-------------+----------------+--------------+-----------------+
+                   |            |             |                |              |                 |
+                   | CreatePost | CreatePages | CreateArchives |  CreateIndex | CreateRSS       |    num+threads
+                   |            |             |                |              |                 |
+                   |            |             |                |              |                 |
+                   +------------+-------------+----------------+--------------+-----------------+
+
 
 */
 // clang-format on
@@ -76,8 +65,7 @@ namespace po = boost::program_options;
 #include "CmdNewArticle.h"
 #include "CmdNewPage.h"
 
-#include "MetadataToHTML/CreateHTML.h"
-#include "MetadataToRSS/CreateRSS.h"
+#include "MetadataToHTMLAndRSS/CreateHTMLAndRSS.h"
 
 // include the generated h files from the GENERATE_CXX stage
 // this is the default template and the HOWTO
@@ -217,8 +205,7 @@ void GenerateData(const ConfigCollection &cfgs)
 			ConstMetadata metadata(CmdGenerateMetadata(cfgs));
 
 			// now create the HTMLs and RSS
-			CreateHTML(metadata, cfgs);
-			CreateRSS(metadata, cfgs);
+			CreateHTMLAndRSS(metadata, cfgs);
 			run = false;
 		}
 		catch (const NoFilesFound &)

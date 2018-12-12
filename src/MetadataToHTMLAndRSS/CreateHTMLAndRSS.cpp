@@ -4,14 +4,14 @@
 
 #include "Shared/Debug.h"
 
-#include "CreateHTML.h"
+#include "CreateHTMLAndRSS.h"
 
 #include "Shared/AsyncWorker.h"
 #include "Shared/Helpers.h"
 #include "Shared/constants.h"
 #include "Shared/filesystem.h"
-#include "SharedHTML-RSS/CleanupDirectory.h"
-#include "SharedHTML-RSS/CopyDirectory.h"
+#include "Shared/CleanupDirectory.h"
+#include "Shared/CopyDirectory.h"
 
 #include <algorithm>
 #include <chrono>
@@ -20,6 +20,7 @@
 #include "CreateIndex.h"
 #include "CreatePage.h"
 #include "CreatePost.h"
+#include "CreateRSS.h"
 
 #include "TemplateWrapper.h"
 
@@ -225,7 +226,7 @@ TemplateData GenerateCommonTemplateData(const TemplateWrapper &engine,
 	return ret;
 }
 
-void CreateHTML(const ConstMetadata &merged, const ConfigCollection &cfgs)
+void CreateHTMLAndRSS(const ConstMetadata &merged, const ConfigCollection &cfgs)
 {
 	if (!fs::exists(cfgs.outdir_root()))
 	{
@@ -368,6 +369,47 @@ void CreateHTML(const ConstMetadata &merged, const ConfigCollection &cfgs)
 						  cfgs.outdir_root() / cfgs.rel_path_images());
 		}
 	});
+
+	// RSS: archive feeds
+	{
+		fs::path feed_out_dir = cfgs.outdir_root() / cfgs.rel_path_feed();
+		if (!fs::exists(feed_out_dir))
+		{
+			// Create the RSS directory.
+			LOG_WARN("Directory %1% is missing. Creating it.",
+				feed_out_dir.string());
+			fs::create_directories(feed_out_dir);
+		}
+
+		for (auto &ar : merged.archives)
+		{
+			// no RSS feeds for Year and Year/month
+			if (ar.first.type == ArchiveType::Year ||
+				ar.first.type == ArchiveType::YearMonth)
+			{
+				continue;
+			}
+
+			std::function<void()> fo = [&cfgs, &engine, ar, feed_out_dir]() {
+				fs::path outfile = feed_out_dir / cfgs.feed_file(ar.first);
+				CreateRSS(outfile, cfgs.sitetitle(), ar.second, cfgs, engine);
+			};
+
+			creator.Add(ar.first.path.string(), fo);
+		}
+
+		// RSS: total feed
+		{
+			auto posts = merged.all_posts;
+
+			std::function<void()> fo = [&cfgs, &engine, posts, feed_out_dir]() {
+				fs::path outfile = feed_out_dir / "RSS.xml";
+				CreateRSS(outfile, cfgs.sitetitle(), posts, cfgs, engine);
+			};
+
+			creator.Add("RSS.xml", fo);
+		}
+	}
 
 	auto result = creator.GetResults();
 

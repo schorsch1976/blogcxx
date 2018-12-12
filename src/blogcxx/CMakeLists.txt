@@ -54,8 +54,6 @@ GENERATE_CXX(blogcxx template README.md)
 SET(LIBS
 	FilesToMetadata
 	MetadataToHTML
-	MetadataToRSS
-	SharedHTML-RSS
 	Shared
 	3rdparty
 	${BLOG_CXX_LIBS}

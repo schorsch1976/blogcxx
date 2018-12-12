@@ -6,7 +6,7 @@
 
 #include "Shared/constants.h"
 #include "Shared/Helpers.h"
-#include "SharedHTML-RSS/TextParseAll.h"
+#include "Shared/TextParseAll.h"
 
 std::string to_target_index(size_t page)
 {

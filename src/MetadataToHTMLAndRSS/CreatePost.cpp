@@ -6,7 +6,7 @@
 
 #include "Shared/Helpers.h"
 #include "Shared/constants.h"
-#include "SharedHTML-RSS/TextParseAll.h"
+#include "Shared/TextParseAll.h"
 
 void CreatePost(SingleItem::ConstPtr s, const ConstArchive &series,
 				const ConfigCollection &cfgs, const TemplateWrapper &engine,

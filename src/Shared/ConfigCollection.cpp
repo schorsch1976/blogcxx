@@ -139,6 +139,10 @@ fs::path ConfigCollection::tpl_archiv() const
 }
 fs::path ConfigCollection::tpl_post() const { return tpldir() / "post.txt"; }
 fs::path ConfigCollection::tpl_page() const { return tpldir() / "page.txt"; }
+fs::path ConfigCollection::tpl_RSS() const
+{
+	return fs::path("templates") / "RSS.txt";
+}
 
 fs::path ConfigCollection::indir() const
 {
@@ -163,10 +167,9 @@ fs::path ConfigCollection::outdir_root() const
 
 fs::path ConfigCollection::commentdir() const
 {
-	fs::path ret = { "comments" };
+	fs::path ret = {"comments"};
 	return ret;
 }
-
 
 fs::path ConfigCollection::rel_path_archive() const
 {

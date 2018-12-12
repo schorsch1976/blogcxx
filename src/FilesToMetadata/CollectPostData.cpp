@@ -8,7 +8,7 @@
 #include "Shared/Helpers.h"
 #include "Shared/constants.h"
 
-#include "SharedHTML-RSS/Slug.h"
+#include "Shared/Slug.h"
 
 #include <regex>
 

@@ -6,7 +6,7 @@
 #include "ContentsGenerator.h"
 #include "Shared/Debug.h"
 
-#include "SharedHTML-RSS/EmojiParserClass.h"
+#include "Shared/EmojiParserClass.h"
 
 ContentsGenerator::ContentsGenerator(ItemType type, fs::path input_folder,
 									 std::string author, std::string title,

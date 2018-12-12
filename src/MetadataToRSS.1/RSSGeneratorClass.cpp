@@ -6,8 +6,8 @@
 #include "RSSGeneratorClass.h"
 #include "Shared/Debug.h"
 #include "Shared/Helpers.h"
-#include "SharedHTML-RSS/ExcerptExtractorClass.h"
-#include "SharedHTML-RSS/TextParseAll.h"
+#include "Shared/ExcerptExtractorClass.h"
+#include "Shared/TextParseAll.h"
 
 #include <iomanip>
 

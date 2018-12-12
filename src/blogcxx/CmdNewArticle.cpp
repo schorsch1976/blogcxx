@@ -9,7 +9,7 @@
 #include "ContentsGenerator.h"
 #include "Shared/Debug.h"
 #include "Shared/Helpers.h"
-#include "SharedHTML-RSS/Slug.h"
+#include "Shared/Slug.h"
 
 void CmdNewArticle(const ConfigCollection &cfgs)
 {
