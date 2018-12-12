@@ -4,4 +4,4 @@
 
 #include <string>
 
-std::string createBasicSlug(const SingleItem& si);
+std::string createBasicSlug(const SingleItem &si);

@@ -46,6 +46,7 @@ MetadataToHTML     |  CmdGenerateMetadata                                       
 
 #include <system_error>
 #include <fstream>
+#include <chrono>
 
 #include <boost/optional/optional_io.hpp>
 #include <boost/program_options.hpp>
@@ -527,8 +528,14 @@ int main(int argc, char **argv)
 		debug_status.SetVerbosity(work_cfg.verbosity());
 
 		// set the global locale
+		LOG_INFO("Set locale to '%1%'", work_cfg.locale());
+
 		boost::locale::generator gen;
-		std::locale::global(gen(cfgs.cfg_locale));
+		std::locale::global(gen(work_cfg.locale()));
+
+		std::setlocale(LC_ALL, work_cfg.locale().c_str());
+		std::setlocale(LC_NUMERIC, work_cfg.locale().c_str());
+		std::setlocale(LC_TIME, work_cfg.locale().c_str());
 
 		// now the "real commands"
 		if (vm.count("new-article"))
@@ -543,8 +550,16 @@ int main(int argc, char **argv)
 		// no additional command: generate
 		else
 		{
+			auto start_time = std::chrono::steady_clock::now();
 			PRINT("Using configuration file: %1%", cfg_file_name);
 			GenerateData(work_cfg);
+			auto end_time = std::chrono::steady_clock::now();
+
+			LOG_INFO("Generation of all data took %1% milliseconds.",
+					std::chrono::duration_cast<std::chrono::milliseconds>(end_time -
+																		start_time)
+						.count());
+
 		}
 		return EXIT_SUCCESS;
 	}

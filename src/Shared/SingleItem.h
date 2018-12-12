@@ -54,7 +54,8 @@ public:
 	bool b_emoji;		  // Could be "Off" if this item must not have emojis.
 	bool b_sticky;		  // Could be "On" if the article should be sticky.
 	bool b_comments;	  // Could be "Off" if this item must not have comments.
-	bool b_hardbreaks;	  // Could be "On" if this item should be trated with hardbreaks
+	bool b_hardbreaks;	// Could be "On" if this item should be trated with
+						  // hardbreaks
 	std::string s_ogimage; // An optional OpenGraph image URL.
 
 	std::string

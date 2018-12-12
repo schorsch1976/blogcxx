@@ -50,7 +50,7 @@ void CreateArchive(const fs::path rel_path, const ConstArchive &ar,
 							si.s_filename.string(), BUGTRACKER);
 		}
 		data.Set({"entries", i, "item"}, si.s_title);
-		data.Set({ "entries", i, "metadata" }, dateToPrint(si.time));
+		data.Set({"entries", i, "metadata"}, dateToPrint(si.time));
 		++i;
 	}
 

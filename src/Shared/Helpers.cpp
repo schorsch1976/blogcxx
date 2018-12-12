@@ -207,12 +207,6 @@ std::vector<std::string> vectorSplit(std::string inputstring,
 	return ret;
 }
 
-bool vectorSort(std::string a, std::string b)
-{
-	// Sorting helper for string vectors (alphabetically).
-	return a < b;
-}
-
 // -----------------------------
 // Date/Time Helpers
 // -----------------------------

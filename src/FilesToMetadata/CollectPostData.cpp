@@ -408,8 +408,8 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 	// entirely.
 	std::stringstream ss_output;
 	std::string s_cats, s_tags, s_datetime, s_change_datetime, s_author,
-		s_title, s_slug, s_markdown, s_hardbreaks, s_emoji, s_sticky, s_comments,
-		s_ogimage, s_series;
+		s_title, s_slug, s_markdown, s_hardbreaks, s_emoji, s_sticky,
+		s_comments, s_ogimage, s_series;
 	int i_position = 0;
 #ifdef WITH_PLUGINS
 	std::string s_plugins;
@@ -447,7 +447,7 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 	std::regex re_markdown("^Markdown\\s*:[\\s\\t]*(.*?)$",
 						   std::regex_constants::icase);
 	std::regex re_hardbreaks("^Hardbreaks\\s*:[\\s\\t]*(.*?)$",
-						   std::regex_constants::icase);
+							 std::regex_constants::icase);
 	std::regex re_emoji("^Emoji\\s*:[\\s\\t]*(.*?)$",
 						std::regex_constants::icase);
 	std::regex re_sticky("^Sticky\\s*:[\\s\\t]*(.*?)$",
@@ -516,7 +516,8 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 			{
 				s_markdown = match.str(1);
 			}
-			else if (regex_match(line, match, re_hardbreaks) && match.size() > 1)
+			else if (regex_match(line, match, re_hardbreaks) &&
+					 match.size() > 1)
 			{
 				s_hardbreaks = match.str(1);
 			}
@@ -615,7 +616,8 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 	si.b_hardbreaks = (lowercase(s_hardbreaks) == "on");
 
 	// emojis: Default on
-	si.b_emoji = cfgs.emojis() && (lowercase(s_emoji) != "off") && cfgs.emojis();
+	si.b_emoji =
+		cfgs.emojis() && (lowercase(s_emoji) != "off") && cfgs.emojis();
 
 	// sticky: default: off
 	si.b_sticky = (lowercase(s_sticky) == "on");

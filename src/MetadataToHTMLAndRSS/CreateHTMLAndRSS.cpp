@@ -7,11 +7,11 @@
 #include "CreateHTMLAndRSS.h"
 
 #include "Shared/AsyncWorker.h"
+#include "Shared/CleanupDirectory.h"
+#include "Shared/CopyDirectory.h"
 #include "Shared/Helpers.h"
 #include "Shared/constants.h"
 #include "Shared/filesystem.h"
-#include "Shared/CleanupDirectory.h"
-#include "Shared/CopyDirectory.h"
 
 #include <algorithm>
 #include <chrono>
@@ -209,19 +209,19 @@ TemplateData GenerateCommonTemplateData(const TemplateWrapper &engine,
 			header);
 
 		TemplateData body;
-		body.Set({ "body" }, "body");
-		body.Set({ "commentdata" }, *cfgs.commentdata());
+		body.Set({"body"}, "body");
+		body.Set({"commentdata"}, *cfgs.commentdata());
 		std::string body_data = engine.Render(
 			cfgs.commentdir() / std::string(*cfgs.commenttype() + ".txt"),
 			body);
 
-		ret.Set({ "comments-header" }, header_data);
-		ret.Set({ "comments-body" }, body_data);
-		}
+		ret.Set({"comments-header"}, header_data);
+		ret.Set({"comments-body"}, body_data);
+	}
 	else
 	{
-		ret.Set({ "comments-header" }, "<!-- No comments -->");
-		ret.Set({ "comments-body" }, "<!-- No comments -->");
+		ret.Set({"comments-header"}, "<!-- No comments -->");
+		ret.Set({"comments-body"}, "<!-- No comments -->");
 	}
 	return ret;
 }
@@ -244,8 +244,10 @@ void CreateHTMLAndRSS(const ConstMetadata &merged, const ConfigCollection &cfgs)
 	// generate common Template data
 	LOG_DEBUG("Generating common Template data (sidebars, categories, series "
 			  "and tags).");
-	TemplateWrapper engine({cfgs.tpldir(), cfgs.commentdir(), cfgs.tpl_RSS().parent_path()});
-	TemplateData common_tpl_data{ GenerateCommonTemplateData(engine, merged, cfgs) };
+	TemplateWrapper engine(
+		{cfgs.tpldir(), cfgs.commentdir(), cfgs.tpl_RSS().parent_path()});
+	TemplateData common_tpl_data{
+		GenerateCommonTemplateData(engine, merged, cfgs)};
 
 	PRINT("Writing %1% posts and %2% pages with %3% threads ...",
 		  merged.all_posts.size(), merged.all_pages.size(), cfgs.num_threads());
@@ -377,7 +379,7 @@ void CreateHTMLAndRSS(const ConstMetadata &merged, const ConfigCollection &cfgs)
 		{
 			// Create the RSS directory.
 			LOG_WARN("Directory %1% is missing. Creating it.",
-				feed_out_dir.string());
+					 feed_out_dir.string());
 			fs::create_directories(feed_out_dir);
 		}
 

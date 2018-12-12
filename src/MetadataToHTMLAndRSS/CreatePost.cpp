@@ -5,8 +5,8 @@
 #include "CreatePost.h"
 
 #include "Shared/Helpers.h"
-#include "Shared/constants.h"
 #include "Shared/TextParseAll.h"
+#include "Shared/constants.h"
 
 void CreatePost(SingleItem::ConstPtr s, const ConstArchive &series,
 				const ConfigCollection &cfgs, const TemplateWrapper &engine,
@@ -98,8 +98,8 @@ void CreatePost(SingleItem::ConstPtr s, const ConstArchive &series,
 	// disable comments, if requested
 	if (!si.b_comments)
 	{
-		data.Set({ "comments-header" }, "<!-- No comments -->");
-		data.Set({ "comments-body" }, "<!-- No comments -->");
+		data.Set({"comments-header"}, "<!-- No comments -->");
+		data.Set({"comments-body"}, "<!-- No comments -->");
 	}
 
 	// and the text

@@ -94,17 +94,17 @@ void LOG_IMPL(const T &fmt, Args... args)
 		Color color = Color::std;
 		switch (lvl)
 		{
-		case Debug::Level::fatal:
-			color = Color::cyan;
-			break;
-		case Debug::Level::error:
-			color = Color::red;
-			break;
-		case Debug::Level::warning:
-			color = Color::yellow;
-			break;
-		default:
-			break;
+			case Debug::Level::fatal:
+				color = Color::cyan;
+				break;
+			case Debug::Level::error:
+				color = Color::red;
+				break;
+			case Debug::Level::warning:
+				color = Color::yellow;
+				break;
+			default:
+				break;
 		}
 		impl::PRINT(color, fmt, args...);
 	}

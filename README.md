@@ -63,7 +63,7 @@ i use boost and added [cmark](https://github.com/commonmark/cmark) and/or
 
 ## Current version
 
-The latest released version is version 1-alpha
+The latest released version is 1-alpha
 
 ---
 
@@ -84,10 +84,8 @@ The latest released version is version 1-alpha
 - metadata in the HTML (opengraphimg, feedmeta)
 - OEmbed
 - spawn $EDITOR on UNIX
-- blog page is not active on index page.
 
 ### TODO list
-- RSS (replace tinyxml2 with inja. we already have a templating engine)
 - download the highlight.js into the static folder
 - WITH_OEMBED: OEmbed (use boost::process to start the subprocess curl or wget.
   This remove the burden from us to compile curl with openssl on windows.
@@ -200,6 +198,7 @@ raw threads. use std::future() and std::async(launch::async,...)
 - Restructure the whole src folder. Split the tasks into manageable
   files that are grouped accordig to their function in the process.
 - use boost::log and boost::format for logging.
+- RSS (replace tinyxml2 with inja. we already have a templating engine)
 
 No more
 

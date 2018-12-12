@@ -23,8 +23,8 @@
 #include <boost/log/utility/setup/file.hpp>
 
 #ifdef _WIN32
-#include <windows.h>
 #include <VersionHelpers.h> // getversion for color output
+#include <windows.h>
 #endif
 
 namespace
@@ -60,25 +60,23 @@ const char *THROWN::what() const throw()
 
 using namespace boost::log;
 
-// see: https://www.boost.org/doc/libs/1_68_0/libs/log/doc/html/log/detailed/expressions.html
+// see:
+// https://www.boost.org/doc/libs/1_68_0/libs/log/doc/html/log/detailed/expressions.html
 // The operator is used when putting the color to log
 struct color_tag;
 
-logging::formatting_ostream& operator<<
-(
-	logging::formatting_ostream& strm,
-	logging::to_log_manip< Color, color_tag > const& manip
-)
+logging::formatting_ostream &
+operator<<(logging::formatting_ostream &strm,
+		   logging::to_log_manip<Color, color_tag> const &manip)
 {
 #ifdef UNIX
 	// https://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
-	static const char* strings[] =
-	{
-		"\033[1;37m",	// std = white
-		"\033[1;34m",	// blue
-		"\033[1;33m",	// yellow
-		"\033[1;36m",	// cyan
-		"\033[1;31m"	// red
+	static const char *strings[] = {
+		"\033[1;37m", // std = white
+		"\033[1;34m", // blue
+		"\033[1;33m", // yellow
+		"\033[1;36m", // cyan
+		"\033[1;31m"  // red
 	};
 
 	Color color = manip.get();
@@ -95,8 +93,7 @@ logging::formatting_ostream& operator<<
 #endif
 #ifdef _WIN32
 	static std::once_flag s_detect_version;
-	std::call_once(s_detect_version, []()
-	{
+	std::call_once(s_detect_version, []() {
 		// https://docs.microsoft.com/de-de/windows/desktop/SysInfo/version-helper-apis
 
 		// just on Win10 is color available
@@ -105,17 +102,17 @@ logging::formatting_ostream& operator<<
 
 	if (sb_color_available)
 	{
-		static const char* strings[] =
-		{
-			"^<ESC^>[37m [37m",	// std = white
-			"^<ESC^>[34m [34m",	// blue
-			"^<ESC^>[33m [33m",	// yellow
-			"^<ESC^>[36m [36m",	// cyan
-			"^<ESC^>[31m [31m"	// red
+		static const char *strings[] = {
+			"^<ESC^>[37m [37m", // std = white
+			"^<ESC^>[34m [34m", // blue
+			"^<ESC^>[33m [33m", // yellow
+			"^<ESC^>[36m [36m", // cyan
+			"^<ESC^>[31m [31m"  // red
 		};
 
 		Color color = manip.get();
-		if (static_cast<std::size_t>(color) < sizeof(strings) / sizeof(*strings))
+		if (static_cast<std::size_t>(color) <
+			sizeof(strings) / sizeof(*strings))
 		{
 			strm << strings[static_cast<int>(color)];
 		}
@@ -155,7 +152,9 @@ Status::Status()
 		// You can manage filtering and formatting through the sink interface
 		sp_console_sink->set_filter(expr::attr<MsgType>("MsgType") ==
 									MsgType::Print);
-		sp_console_sink->set_formatter(expr::stream << expr::attr<Color, color_tag>("Color") << expr::smessage);
+		sp_console_sink->set_formatter(expr::stream
+									   << expr::attr<Color, color_tag>("Color")
+									   << expr::smessage);
 	});
 
 	// setup the debug log file sink

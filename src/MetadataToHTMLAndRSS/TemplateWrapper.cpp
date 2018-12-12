@@ -23,22 +23,10 @@ struct json
 	{
 		return json();
 	}
-	bool is_array() const
-	{
-		return false;
-	}
-	static json array()
-	{
-		return json();
-	}
-	json& operator=(const json&)
-	{
-		return *this;
-	}
-	std::string dump(int) const
-	{
-		return "Dummy";
-	}
+	bool is_array() const { return false; }
+	static json array() { return json(); }
+	json &operator=(const json &) { return *this; }
+	std::string dump(int) const { return "Dummy"; }
 };
 
 #endif
@@ -181,7 +169,6 @@ std::string TemplateData::to_string() const
 	return oss.str();
 }
 
-
 // ----------------------------------------------------------------------------
 // the inja wrapper
 // ----------------------------------------------------------------------------
@@ -195,15 +182,16 @@ struct TemplateWrapper::impl
 #endif
 };
 
-TemplateWrapper::TemplateWrapper(std::vector<fs::path> templ_directories, fs::path tmpl_ext)
+TemplateWrapper::TemplateWrapper(std::vector<fs::path> templ_directories,
+								 fs::path tmpl_ext)
 {
 	mp_impl = std::make_unique<impl>();
 
 	// read all templates into the environment
-	for (auto& templ_directory : templ_directories)
+	for (auto &templ_directory : templ_directories)
 	{
 		for (fs::directory_iterator end_dir_it, it(templ_directory);
-			it != end_dir_it; ++it)
+			 it != end_dir_it; ++it)
 		{
 			const fs::path &path = it->path();
 			if (!fs::is_regular_file(path))
@@ -220,14 +208,15 @@ TemplateWrapper::TemplateWrapper(std::vector<fs::path> templ_directories, fs::pa
 #ifndef TEST_OLDER_COMPILERS
 			try
 			{
-				inja::Template tpl = mp_impl->m_env.parse_template(path.string());
+				inja::Template tpl =
+					mp_impl->m_env.parse_template(path.string());
 				mp_impl->m_tpl[path] = tpl;
 				mp_impl->m_env.include_template(path.filename().string(), tpl);
 			}
 			catch (const std::exception &ex)
 			{
 				THROW_FATAL("TemplateWrapper: File: '%1%' - Error: %2%",
-					path.string(), ex.what());
+							path.string(), ex.what());
 			}
 #endif
 		}

@@ -38,6 +38,7 @@ public:
 
 	void Set(std::vector<TemplateKey> path, const ValueKey &value);
 	std::string to_string() const;
+
 private:
 	friend class TemplateWrapper;
 
