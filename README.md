@@ -89,6 +89,9 @@ The latest released version is 1-alpha
   This remove the burden from us to compile curl with openssl on windows.
   There are prebuild binaries that get updated regulary. Take advantage of it.)
 
+## Future plans
+- remove inja/json to be able to compile with a c++11 compiler.
+
 ---
 
 ## Features common between blogcpp-9 and blogcxx-1
@@ -160,9 +163,6 @@ The latest released version is 1-alpha
   codequality of blogcpp. If you need them, i could create a pluginsystem.
   This pluginsystem would have a js plugin that loads your js plugins.
 - google+ comment system: google+ [closes soon](https://en.wikipedia.org/wiki/Google%2B#Shutdown_of_consumer_version)
-
-## Future plans
-- remove inja/json to be able to compile with a c++11 compiler.
 
 ## Features that might get removed
 - OEmbed
