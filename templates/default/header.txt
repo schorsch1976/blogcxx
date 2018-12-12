@@ -40,7 +40,7 @@
 
             <div id="pagelist">
                 <ul>
-                    <li class="navlink{{ defaultclass }}"><a href="{{ baseurl }}">Blog</a></li>
+                    <li class="navlink {{ defaultclass }}"><a href="{{ baseurl }}">Blog</a></li>
 		{% if exists("pagenav") %}
                     {% for nav in pagenav %}
                     <li class="navlink{{ nav/cssclass }}"><a href="{{ nav/link }}" title="{{ nav/title }}">{{ nav/title }}</a></li>
