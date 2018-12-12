@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #pragma once
 
@@ -58,7 +58,7 @@ bool AsyncWorker<KeyT, RetValT>::Add(
 	auto pos = m_work_to_do.find(key);
 	if (pos != m_work_to_do.end())
 	{
-		LOG_DEBUG("AsyncWorker<>: Key '%1%' already as work registered", key);
+		THROW_FATAL("AsyncWorker<>: Key '%1%' already as work registered", key);
 		return false;
 	}
 
@@ -144,12 +144,11 @@ KeyT AsyncWorker<KeyT, RetValT>::WaitForOne(std::chrono::milliseconds ms) const
 
 		if (!at_least_one_valid)
 		{
-			throw std::runtime_error(
-				"AsyncWorker<>::WaitForOne() No future valid.");
+			THROW_FATAL("AsyncWorker<>::WaitForOne() No future valid.");
 		}
 		std::this_thread::sleep_for(ms);
 	}
 
 	// never reached
-	throw std::runtime_error("AsyncWorker<>::WaitForOne() while loop left");
+	THROW_FATAL("AsyncWorker<>::WaitForOne() while loop left.");
 }

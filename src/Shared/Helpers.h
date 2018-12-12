@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #pragma once
 
@@ -20,7 +20,7 @@ std::string translate(std::string input);
 
 void openWithEditor(fs::path filename);
 std::string read_file(fs::path filename);
-void write_file(fs::path filename, const unsigned char* data, size_t len);
+void write_file(fs::path filename, const unsigned char *data, size_t len);
 void write_file(fs::path filename, const std::string &data);
 
 std::vector<std::string> vectorSplit(std::string inputstring,

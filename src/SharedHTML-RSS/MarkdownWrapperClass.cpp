@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * Markdown-to-HTML wrapper, allowing a more abstract usage of the
  * MarkdownParser.
  */

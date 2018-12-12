@@ -21,18 +21,24 @@
 
   <b>Categories:</b>
   <ul class="catlist">
-    {% for cat in allcats %}<li><a href="{{ cat/URL }}" title="Articles for the category '{{ cat/catname }}'">{{ cat/catname }}</a></li>{% endfor %}
+	{% if exists("allcats") %}
+		{% for cat in allcats %}<li><a href="{{ cat/URL }}" title="Articles for the category '{{ cat/catname }}'">{{ cat/catname }}</a></li>{% endfor %}
+	{% endif %}
   </ul>
 
   <b>Tags:</b>
   <ul class="taglist">
-    {% for tag in alltags %}<li><a href="{{ tag/URL }}" title="Articles tagged {{ tag/tagname }}">{{ tag/tagname }}</a></li>{% endfor %}
+	{% if exists("alltags") %}
+		{% for tag in alltags %}<li><a href="{{ tag/URL }}" title="Articles tagged {{ tag/tagname }}">{{ tag/tagname }}</a></li>{% endfor %}
+	{% endif %}
   </ul>
 
   {% if exists("series") %}
   <b>Series:</b>
   <ul class="serieslist">
-    {% for series in allseries %}<li><a href="{{ baseurl }}/series/{{ series/slug }}" title="Articles in the {{ series/seriesname }} category">{{ series/seriesname }}</a></li>{% endfor %}
+    {% if exists("allseries") %}
+      {% for series in allseries %}<li><a href="{{ baseurl }}/series/{{ series/slug }}" title="Articles in the {{ series/seriesname }} category">{{ series/seriesname }}</a></li>{% endfor %}
+	{% endif %}
   </ul>
   {% endif %}
 

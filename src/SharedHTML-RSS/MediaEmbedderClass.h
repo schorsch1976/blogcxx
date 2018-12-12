@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * Class to add embedded media to the output stream [header].
  */
 

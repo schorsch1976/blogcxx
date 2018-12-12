@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * RSS class [header].
  */
 #pragma once
@@ -9,8 +9,8 @@
 #include <vector>
 
 #include "Shared/ConfigCollection.h"
-#include "Shared/SingleItem.h"
 #include "Shared/Metadata.h"
+#include "Shared/SingleItem.h"
 #include "Shared/filesystem.h"
 
 #include "XML/tinyxml2.h"
@@ -19,8 +19,8 @@ class RSSGenerator
 {
 public:
 	RSSGenerator(fs::path outfile, std::string title,
-		const ConfigCollection &cfgs);
-	void createRSS(const ArchiveData& ad, const ConstArchive& vec);
+				 const ConfigCollection &cfgs);
+	void createRSS(const ConstArchive &vec);
 
 private:
 	std::string title;

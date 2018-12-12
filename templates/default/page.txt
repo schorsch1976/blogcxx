@@ -13,9 +13,11 @@
 
   <div class="post-bags">
     <div class="tags"><b>{{ tags_title }}</b>
+	{% if exists("tags") %}
       {% for tag in tags %}
       <a href="{{ baseurl }}/tags/{{ tag/slug }}">{{ tag/name }}</a>
       {% endfor %}</div>
+	{% endif %}
   </div>
 </div>
 

@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * RSS class.
  */
 
@@ -7,8 +7,9 @@
 #include "Shared/Debug.h"
 #include "Shared/Helpers.h"
 #include "SharedHTML-RSS/ExcerptExtractorClass.h"
-#include "SharedHTML-RSS/MarkdownWrapperClass.h"
 #include "SharedHTML-RSS/TextParseAll.h"
+
+#include <iomanip>
 
 RSSGenerator::RSSGenerator(fs::path outfile, std::string title,
 						   const ConfigCollection &cfgs)
@@ -18,7 +19,7 @@ RSSGenerator::RSSGenerator(fs::path outfile, std::string title,
 	this->outfile = outfile;
 }
 
-void RSSGenerator::createRSS(const ArchiveData& ad, const ConstArchive &vec)
+void RSSGenerator::createRSS(const ConstArchive &vec)
 {
 	// Creates the site's RSS.xml file.
 	// Requires vec to be reverse-sorted (which is probably the case here).
@@ -87,7 +88,9 @@ void RSSGenerator::createRSS(const ArchiveData& ad, const ConstArchive &vec)
 		// In the best case, we don't want to repeat ourselves.
 		ss_text.str("");
 
-		ss_text << TextParseAll(p, own_cfgs, !own_cfgs.fullfeed()).first;
+		ss_text << TextParseAll(p, own_cfgs, !own_cfgs.fullfeed(),
+								false /* no markdown */)
+					   .first;
 
 		tinyxml2::XMLText *pItemDescText = rss.NewText(ss_text.str().c_str());
 		pItemDescText->SetCData(true);

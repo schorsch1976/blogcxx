@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * Markdown-to-HTML class.
  */
 
@@ -60,7 +60,7 @@ void MarkdownParser::parse(const std::string inputline)
 	// Process <inputline> from Markdown, return HTML text.
 	// Reference: http://daringfireball.net/projects/markdown/syntax
 	//
-	// blogcpp currently markdownifies one line at a time, so we need to
+	// blogcxx currently markdownifies one line at a time, so we need to
 	// store whether we're inside an <ol>, <ul>, <code> or <blockquote> area.
 	// We can use the bools in_ul, in_ol, in_blockquote and in_code for that.
 
@@ -305,7 +305,7 @@ void MarkdownParser::parse(const std::string inputline)
 			std::cout << "[Markdown] An error occurred while trying to match a "
 						 "regular expression: "
 					  << e.what() << std::endl;
-			std::cout << "Please file a blogcpp bug so we can investigate and "
+			std::cout << "Please file a blogcxx bug so we can investigate and "
 						 "fix it for you."
 					  << std::endl;
 			std::cout << " --> " << BUGTRACKER << std::endl << std::endl;

@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * Definition of single blog entries.
  */
 
@@ -54,6 +54,7 @@ public:
 	bool b_emoji;		  // Could be "Off" if this item must not have emojis.
 	bool b_sticky;		  // Could be "On" if the article should be sticky.
 	bool b_comments;	  // Could be "Off" if this item must not have comments.
+	bool b_hardbreaks;	  // Could be "On" if this item should be trated with hardbreaks
 	std::string s_ogimage; // An optional OpenGraph image URL.
 
 	std::string
@@ -84,6 +85,7 @@ public:
 		b_emoji = true;
 		b_sticky = true;
 		b_comments = true;
+		b_hardbreaks = false;
 		s_ogimage = "";
 		s_series = "";
 		i_position = 0;

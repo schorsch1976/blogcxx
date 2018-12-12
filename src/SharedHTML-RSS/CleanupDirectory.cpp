@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "CleanupDirectory.h"
 
@@ -14,7 +14,8 @@ void CleanupDirectory(fs::path path)
 	LOG_INFO("Cleaning up your old files ...");
 	if (!fs::exists(path) || !fs::is_directory(path))
 	{
-		LOG_WARN("Directory '%1%' does not exists or is no directory.", path.string());
+		LOG_WARN("Directory '%1%' does not exists or is no directory.",
+				 path.string());
 		return;
 	}
 

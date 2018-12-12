@@ -18,6 +18,9 @@ SET(SRCS
 	Metadata.h
 
 	SingleItem.h
+
+	PrintVersion.cpp
+	PrintVersion.h
 )
 
 ADD_LIBRARY(Shared ${SRCS})

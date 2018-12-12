@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * Class to make using the inja template engine easier.
  */
 
@@ -8,20 +8,36 @@
 #include "Shared/constants.h"
 
 #ifndef TEST_OLDER_COMPILERS
-#include "json.hpp"
 #include "inja.hpp"
+#include "json.hpp"
 
 using json = nlohmann::json;
 #else
 // dummy json
 struct json
 {
-	void operator=(const std::string& v) {}
-	void operator=(const bool& v) {}
+	void operator=(const std::string &v) {}
+	void operator=(const bool &v) {}
 	template <typename T>
 	json operator[](T v)
 	{
 		return json();
+	}
+	bool is_array() const
+	{
+		return false;
+	}
+	static json array()
+	{
+		return json();
+	}
+	json& operator=(const json&)
+	{
+		return *this;
+	}
+	std::string dump(int) const
+	{
+		return "Dummy";
 	}
 };
 
@@ -38,7 +54,7 @@ struct TemplateData::impl
 
 	void Set(json &d, std::vector<TemplateKey> path, const ValueKey &value)
 	{
-#if USE_VARIANT_API==1
+#if USE_VARIANT_API == 1
 		// std::variant
 		// break the recursion
 		if (path.empty())
@@ -80,105 +96,50 @@ struct TemplateData::impl
 							BUGTRACKER);
 		}
 #endif
-#if USE_VARIANT_API==2
+#if USE_VARIANT_API == 2
 		// boost
 		// break the recursion
 		if (path.empty())
 		{
-			if (const std::string* p = boost::get<std::string>(&value))
+			if (const std::string *p = boost::get<std::string>(&value))
 			{
-				d = boost::get<std::string>(value);
+				d = *p;
 			}
-			else if (const boolean* p = boost::get<boolean>(&value))
+			else if (const boolean *p = boost::get<boolean>(&value))
 			{
-				d = boost::get<boolean>(value).value;
+				d = p->value;
 			}
 			else
 			{
 				THROW_FATAL("TemplateData::impl: Unhandled Variant value. "
-					"This is a Bug. Please report it at %1%.",
-					BUGTRACKER);
+							"This is a Bug. Please report it at %1%.",
+							BUGTRACKER);
 			}
-			return;
-		}
-
-		std::vector<TemplateKey> reduced{ path };
-		reduced.erase(reduced.begin());
-
-		const auto& switchdata = path.front();
-		if (const std::string* p = boost::get<std::string>(&switchdata))
-		{
-			Set(d[boost::get<std::string>(switchdata)], reduced, value);
-		}
-		else if (const int* p = boost::get<int>(&switchdata))
-		{
-			Set(d[boost::get<int>(switchdata)], reduced, value);
-		}
-		else
-		{
-			THROW_FATAL("TemplateData::impl: Unhandled Variant value. "
-				"This is a Bug. Please report it at %1%.",
-				BUGTRACKER);
-		}
-#endif
-	}
-
-	void InsertEmptyArray(json &d, std::vector<TemplateKey> path)
-	{
-#if USE_VARIANT_API==1
-		// std::variant
-		// break the recursion
-		if (path.empty())
-		{
 			return;
 		}
 
 		std::vector<TemplateKey> reduced{path};
 		reduced.erase(reduced.begin());
 
-		size_t idx = path.front().index();
-		switch (idx)
+		const auto &switchdata = path.front();
+		if (const std::string *p = boost::get<std::string>(&switchdata))
 		{
-			case 0:
-				InsertEmptyArray(d[std::get<std::string>(path.front())],
-								 reduced);
-				break;
-			case 1:
-				InsertEmptyArray(d[std::get<int>(path.front())], reduced);
-				break;
-			default:
-				THROW_FATAL("TemplateData::impl: Unhandled Variant value. "
-							"This is a Bug. Please report it at %1%.",
-							BUGTRACKER);
+			Set(d[*p], reduced, value);
 		}
-#endif
-#if USE_VARIANT_API==2
-		// boost::variant
-		// break the recursion
-		if (path.empty())
+		else if (const int *p = boost::get<int>(&switchdata))
 		{
-			return;
-		}
-
-		std::vector<TemplateKey> reduced{ path };
-		reduced.erase(reduced.begin());
-
-		const auto& switchdata = path.front();
-		if (const std::string* p = boost::get<std::string>(&switchdata))
-		{
-			InsertEmptyArray(d[boost::get<std::string>(switchdata)],
-				reduced);
-		}
-		else if (const std::string* p = boost::get<std::string>(&switchdata))
-		{
-			InsertEmptyArray(d[boost::get<int>(switchdata)],
-				reduced);
+			// this must be an array
+			if (!d.is_array())
+			{
+				d = json::array();
+			}
+			Set(d[*p], reduced, value);
 		}
 		else
 		{
 			THROW_FATAL("TemplateData::impl: Unhandled Variant value. "
-				"This is a Bug. Please report it at %1%.",
-				BUGTRACKER);
+						"This is a Bug. Please report it at %1%.",
+						BUGTRACKER);
 		}
 #endif
 	}
@@ -213,10 +174,13 @@ void TemplateData::Set(std::vector<TemplateKey> path, const ValueKey &value)
 {
 	mp_impl->Set(mp_impl->data, path, value);
 }
-void TemplateData::InsertEmptyArray(std::vector<TemplateKey> path)
+std::string TemplateData::to_string() const
 {
-	mp_impl->InsertEmptyArray(mp_impl->data, path);
+	std::ostringstream oss;
+	oss << mp_impl->data.dump(4);
+	return oss.str();
 }
+
 
 // ----------------------------------------------------------------------------
 // the inja wrapper
@@ -252,14 +216,16 @@ TemplateWrapper::TemplateWrapper(fs::path templ_directory, fs::path tmpl_ext)
 		}
 
 #ifndef TEST_OLDER_COMPILERS
-		try{
+		try
+		{
 			inja::Template tpl = mp_impl->m_env.parse_template(path.string());
 			mp_impl->m_tpl[path] = tpl;
 			mp_impl->m_env.include_template(path.filename().string(), tpl);
 		}
-		catch(const std::exception& ex)
+		catch (const std::exception &ex)
 		{
-			THROW_FATAL("TemplateWrapper: File: '%1%' - Error: %2%", path.string(), ex.what());
+			THROW_FATAL("TemplateWrapper: File: '%1%' - Error: %2%",
+						path.string(), ex.what());
 		}
 #endif
 	}
@@ -293,13 +259,12 @@ std::string TemplateWrapper::Render(const fs::path &tpl_file,
 	}
 	catch (std::exception &e)
 	{
-		THROW_FATAL("inja error trying to render '%1%' - %2%.",
-					tpl_file.string(), e.what());
+		THROW_FATAL("inja error trying to render '%1%' - %2%.\n   json=%3%",
+					tpl_file.string(), e.what(), data.to_string());
 	}
 	return rendered;
 #else
 	// return dummy data
 	return "TEST_OLDER_COMPILERS";
 #endif
-
 }

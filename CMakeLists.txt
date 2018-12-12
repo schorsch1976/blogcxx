@@ -1,12 +1,18 @@
 IF(WIN32)
-	cmake_minimum_required(VERSION 3.13) # because MSVC and C++17
-	SET(CMAKE_CXX_STANDARD 17)
-	SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+	IF(MSVC)
+		cmake_minimum_required(VERSION 3.13) # because MSVC and C++17
+	ENDIF(MSVC)
+	IF(MSYS)
+		cmake_minimum_required(VERSION 3.12)
+	ENDIF(MSYS)
 ELSE(WIN32)
 	cmake_minimum_required(VERSION 3.7)
 ENDIF(WIN32)
 
-PROJECT(blogcpp C CXX)
+SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+PROJECT(blogcxx C CXX)
 
 #######################################################################
 # Include needed Macros
@@ -14,15 +20,13 @@ PROJECT(blogcpp C CXX)
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/CMake)
 INCLUDE (ConfigureMSVCRuntime)
 INCLUDE (GENERATE_CXX)
+INCLUDE (ExternalProject)
 
 ######################################################################
 # OS
 ######################################################################
 IF (UNIX)
-	SET(CMAKE_CXX_STANDARD 17)
-	SET(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-	MESSAGE(STATUS "This is UNIX (including OS X and CygWin)")
+	MESSAGE(STATUS "This is UNIX")
 	ADD_DEFINITIONS(-DUNIX)
 
 	############################################################################
@@ -90,7 +94,6 @@ IF (MSVC)
 	############################################################################
 	# CPP FLAGS
 	############################################################################
-	#SET(CMAKE_CXX_FLAGS   "--std=c++14 -Wall -Wno-deprecated-declarations ${CMAKE_CXX_FLAGS} -Werror=switch")
 	SET(LIB_CXX_FLAGS "")
 
 	ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
@@ -101,7 +104,24 @@ IF (MSVC)
 	SET(TARGET_BIN_PATH "${CMAKE_INSTALL_PREFIX}/")
 	SET(TARGET_LIB_PATH "${CMAKE_INSTALL_PREFIX}/")
 ENDIF (MSVC)
+IF(MSYS)
+	MESSAGE(STATUS "This is Windows: MSYS")
+	SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations)
+ENDIF(MSYS)
 ENDIF (WIN32)
+
+############################################################################
+# Linkage
+############################################################################
+OPTION(STATIC_LINKING "Link everything static" OFF)
+IF (STATIC_LINKING)
+	ConfigureMSVCRuntime(static)
+
+	SET(Boost_USE_STATIC_LIBS		ON)
+	SET(Boost_USE_STATIC_RUNTIME	ON)
+ELSE (STATIC_LINKING)
+	ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK=1)
+ENDIF (STATIC_LINKING)
 
 ############################################################################
 # Test on older compilers
@@ -114,23 +134,40 @@ ENDIF (TEST_OLDER_COMPILERS)
 ############################################################################
 # markdown
 ############################################################################
-SET(MARKDOWN_API "blogcpp" CACHE STRING "Use this markdown implementation")
-SET_PROPERTY(CACHE MARKDOWN_API PROPERTY STRINGS "blogcpp" "libcmark")
+SET(MARKDOWN_API "libcmark-gfm" CACHE STRING "Use this markdown implementation")
+SET_PROPERTY(CACHE MARKDOWN_API PROPERTY STRINGS "blogcpp" "libcmark" "libcmark-gfm")
 
 IF (MARKDOWN_API STREQUAL "blogcpp")
+	ADD_DEFINITIONS(-DUSE_MARKDOWN_API=1)
+
 	SET(MARKDOWN_BLOGCPP ON)
 	SET(MARKDOWN_CMARK OFF)
+	SET(MARKDOWN_CMARK_GFM OFF)
 ENDIF (MARKDOWN_API STREQUAL "blogcpp")
 
+# libcmark
 IF (MARKDOWN_API STREQUAL "libcmark")
+	ADD_DEFINITIONS(-DUSE_MARKDOWN_API=2)
+
 	SET(MARKDOWN_BLOGCPP OFF)
 	SET(MARKDOWN_CMARK ON)
+	SET(MARKDOWN_CMARK_GFM OFF)
+
 ENDIF (MARKDOWN_API STREQUAL "libcmark")
+
+# libcmark-gfm
+IF (MARKDOWN_API STREQUAL "libcmark-gfm")
+	ADD_DEFINITIONS(-DUSE_MARKDOWN_API=3)
+
+	SET(MARKDOWN_BLOGCPP OFF)
+	SET(MARKDOWN_CMARK OFF)
+	SET(MARKDOWN_CMARK_GFM ON)
+ENDIF (MARKDOWN_API STREQUAL "libcmark-gfm")
 
 ############################################################################
 # variant
 ############################################################################
-SET(VARIANT_API "std::variant" CACHE STRING "Use this variant API")
+SET(VARIANT_API "boost::variant" CACHE STRING "Use this variant API")
 SET_PROPERTY(CACHE VARIANT_API PROPERTY STRINGS "std::variant" "boost::variant")
 
 IF (VARIANT_API STREQUAL "std::variant")
@@ -144,7 +181,7 @@ ENDIF (VARIANT_API STREQUAL "boost::variant")
 ############################################################################
 # filesystem
 ############################################################################
-SET(FILESYSTEM_API "std::filesystem" CACHE STRING "Use this filesystem API")
+SET(FILESYSTEM_API "boost::filesystem" CACHE STRING "Use this filesystem API")
 SET_PROPERTY(CACHE FILESYSTEM_API PROPERTY STRINGS "std::filesystem" "std::experimental::filesystem" "boost::filesystem")
 
 IF (FILESYSTEM_API STREQUAL "std::filesystem")
@@ -169,27 +206,17 @@ IF (FILESYSTEM_API STREQUAL "boost::filesystem")
 ENDIF (FILESYSTEM_API STREQUAL "boost::filesystem")
 
 ############################################################################
-# Linkage
-############################################################################
-OPTION(STATIC_LINKING "Link everything static" OFF)
-IF (STATIC_LINKING)
-	ConfigureMSVCRuntime(static)
-
-	SET(Boost_USE_STATIC_LIBS		ON)
-	SET(Boost_USE_STATIC_RUNTIME	ON)
-ELSE (STATIC_LINKING)
-	ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK=1)
-ENDIF (STATIC_LINKING)
-
-############################################################################
 # Use as much boost as we can to reduce the 3rdparty library count
 ############################################################################
+SET(BOOST_VERSION "1.62.0")
+
+# boost log uses boost::filesystem internaly
 SET(Boost_USE_MULTITHREADED		ON)
-FIND_PACKAGE(Boost "1.62.0" COMPONENTS
+FIND_PACKAGE(Boost ${BOOST_VERSION} COMPONENTS
 	date_time
 	locale
-	program_options
 	filesystem
+	program_options
 	system
 	log
 	log_setup
@@ -205,11 +232,11 @@ LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 SET(BOOST_LIBS
 	${Boost_ATOMIC_LIBRARY}
 	${Boost_CHRONO_LIBRARY}
+	${Boost_FILESYSTEM_LIBRARY}
 	${Boost_REGEX_LIBRARY}
 	${Boost_LOG_LIBRARY}
 	${Boost_LOG_SETUP_LIBRARY}
 	${Boost_DATE_TIME_LIBRARY}
-	${Boost_FILESYSTEM_LIBRARY}
 	${Boost_SYSTEM_LIBRARY}
 	${Boost_THREAD_LIBRARY}
 	${Boost_LOCALE_LIBRARY}
@@ -228,33 +255,34 @@ IF(LINUX)
 ENDIF(LINUX)
 
 
-# if Boost log fail to link, you probaly need to compile your boost with
-# the same BOOST_USE_WINAPI_VERSION as here. You must also use
-# BOOST_ALL_DYN_LINK=1
 IF(WIN32)
-	SET(BOOST_LOG_API "BOOST_WINAPI_VERSION_WIN7" CACHE STRING "Boost Log Backend API")
-	SET_PROPERTY(CACHE BOOST_LOG_API PROPERTY STRINGS BOOST_WINAPI_VERSION_WINXP BOOST_WINAPI_VERSION_WIN7)
+	IF(MSVC)
+		# if Boost log fail to link, you probaly need to compile your boost with
+		# the same BOOST_USE_WINAPI_VERSION as here. You must also use
+		# BOOST_ALL_DYN_LINK=1
+		SET(BOOST_LOG_API "BOOST_WINAPI_VERSION_WIN7" CACHE STRING "Boost Log Backend API")
+		SET_PROPERTY(CACHE BOOST_LOG_API PROPERTY STRINGS BOOST_WINAPI_VERSION_WINXP BOOST_WINAPI_VERSION_WIN7)
 
-	ADD_DEFINITIONS(-DBOOST_USE_WINAPI_VERSION=${BOOST_LOG_API})
-	ADD_DEFINITIONS(-D${Boost_LIB_DIAGNOSTICDEFINITIONS})
+		ADD_DEFINITIONS(-DBOOST_USE_WINAPI_VERSION=${BOOST_LOG_API})
+		ADD_DEFINITIONS(-D${Boost_LIB_DIAGNOSTICDEFINITIONS})
+	ENDIF(MSVC)
 ENDIF(WIN32)
-
-############################################################################
-# Options
-############################################################################
-OPTION(WITH_DEBUG_LOG "Use the Debug Log" ON)
-if (WITH_DEBUG_LOG)
-	ADD_DEFINITIONS(-DWITH_DEBUGLOG)
-endif (WITH_DEBUG_LOG)
 
 ############################################################################
 # Combine the CXX Libs
 ############################################################################
 IF(MARKDOWN_CMARK)
-	SET(BLOG_CXX_LIBS ${BLOG_CXX_LIBS}
+	SET(BLOG_CXX_LIBS    ${BLOG_CXX_LIBS}
 		cmark
 	)
 ENDIF(MARKDOWN_CMARK)
+
+IF(MARKDOWN_CMARK_GFM)
+	SET(BLOG_CXX_LIBS    ${BLOG_CXX_LIBS}
+		cmark-gfm-extensions
+		cmark-gfm
+	)
+ENDIF(MARKDOWN_CMARK_GFM)
 
 IF(UNIX)
 	IF (LINUX)
@@ -300,6 +328,27 @@ IF(UNIX)
 
 ENDIF(UNIX)
 
+IF(WIN32)
+	IF(MSVC)
+		SET(BLOG_CXX_LIBS    ${BLOG_CXX_LIBS}
+			${BOOST_LIBS}
+		)
+	ENDIF(MSVC)
+
+IF(MSYS)
+		FIND_PACKAGE(Iconv REQUIRED)
+		SET(BLOG_CXX_LIBS    ${BLOG_CXX_LIBS}
+			${BOOST_LIBS}
+			${Iconv_LIBRARIES}
+		)
+ENDIF(MSYS)
+
+ENDIF(WIN32)
+
 
 ADD_SUBDIRECTORY(3rdparty)
+
+MESSAGE("CMINC ${CMARK_INCLUDE_DIR}")
+INCLUDE_DIRECTORIES(${CMARK_INCLUDE_DIR})
+
 ADD_SUBDIRECTORY(src)

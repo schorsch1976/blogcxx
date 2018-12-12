@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * Debug logging functionality class [header].
  */
 
@@ -27,12 +27,10 @@ namespace
 using namespace Debug;
 using namespace Debug::impl;
 
-#ifdef WITH_DEBUGLOG
 // the file sink
 typedef sinks::synchronous_sink<sinks::text_file_backend> file_sink_t;
 static boost::shared_ptr<file_sink_t> sp_file_sink;
 static std::once_flag s_once_file;
-#endif
 
 // the console sink (for PRINT and ERRORS)
 typedef sinks::synchronous_sink<sinks::text_ostream_backend> console_sink_t;
@@ -82,8 +80,7 @@ Status::Status()
 		sp_console_sink->set_formatter(expr::stream << expr::smessage);
 	});
 
-// setup the debug log file sink
-#ifdef WITH_DEBUGLOG
+	// setup the debug log file sink
 	std::call_once(s_once_file, [=]() {
 		// Create a backend and initialize it with a stream
 		auto backend = boost::make_shared<sinks::text_file_backend>();
@@ -110,20 +107,18 @@ Status::Status()
 				);
 		// clang-format on
 	});
-#endif
 }
 Status::~Status()
 {
 	boost::shared_ptr<logging::core> core = logging::core::get();
 
-#ifdef WITH_DEBUGLOG
 	if (sp_file_sink)
 	{
 		core->remove_sink(sp_file_sink);
 		sp_file_sink->flush();
 		sp_file_sink.reset();
 	}
-#endif
+
 	if (sp_console_sink)
 	{
 		core->remove_sink(sp_console_sink);

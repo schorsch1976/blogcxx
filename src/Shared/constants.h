@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * Some everyday constant definitions.
  */
 
@@ -7,12 +7,11 @@
 
 #include <string>
 
-#ifdef WITH_DEBUGLOG
 const std::string DEBUGLOGFILE = "debug.txt";
-#endif
-const std::string APP_VERSION = "10-alpha";
-const std::string APP_URL = "https://www.blogcpp.org";
-const std::string BUGTRACKER = "https://bitbucket.org/tux_/blogcpp/issues";
+const std::string APP_VERSION = "1-alpha";
+const std::string APP_URL = "https://blogcxx.de";
+const std::string BUGTRACKER =
+	"https://bitbucket.org/schorsch_76/blogcxx/issues";
 const std::string HEADER_DIVIDER = "----------";
 const std::string NEWLINE =
 	"\n"; // Also on Windows. Modern Notepad will eat it.

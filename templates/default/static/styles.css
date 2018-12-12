@@ -78,6 +78,25 @@ a:hover {
     font-style: italic;
 }
 
+/* Tables */
+table {
+	border-collapse: collapse;
+	text-align: center;
+	width: 80%;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}
+
+/* head */
 h1.posttitle {
     padding: 4px;
     width: 100%;

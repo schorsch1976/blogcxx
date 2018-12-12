@@ -2,7 +2,7 @@
 {% include "sidebar.txt" %}
 <div id="postblock">
   {% for post in posts %}
-  <div class="entry {{ post/altclass }}{{ post/stickyclass }}" id="post-{{ post/count }}">
+  <div class="entry {{ post/altclass }} {{ post/stickyclass }}" id="post-{{ post/count }}">
     <h1 class="posttitle"><a href="{{ post/URL }}">{{ post/title }}</a></h1>
 
     <div class="metadata">published on {{ post/date }} by {{ post/author }}</div>
@@ -16,5 +16,26 @@
   {% endfor %}
 </div>
 
-<div id="paginator">{{ pagination }}</div>
+<div id="paginator">
+
+{% if exists("pagination") %}
+	<center>
+	{% if existsIn(pagination, "prev") %}
+		{% for page in pagination/prev %}
+			<a href={{page/link}}>{{page/text}}</a>&nbsp;
+		{% endfor %}
+	{% endif %}
+
+	{{ pagination/active }}&nbsp;
+
+	{% if existsIn(pagination, "next") %}
+		{% for page in pagination/next %}
+			<a href={{page/link}}>{{page/text}}</a>&nbsp;
+		{% endfor %}
+	{% endif %}
+	</center>
+{% endif %}
+
+</div>
+
 {% include "footer.txt" %}

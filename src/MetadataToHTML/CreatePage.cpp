@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "CreatePage.h"
 
@@ -30,7 +30,6 @@ void CreatePage(SingleItem::ConstPtr s, int page_index,
 	// tags of this post
 	int i = 0;
 	data.Set({"tags_title"}, "Tags");
-	data.InsertEmptyArray({"tags"});
 	for (auto &tag : si.tags)
 	{
 		data.Set({"tags", i, "name"}, tag);
@@ -58,8 +57,7 @@ void CreatePage(SingleItem::ConstPtr s, int page_index,
 	std::string rendered = engine.Render(cfgs.tpl_page(), data);
 	if (rendered.empty())
 	{
-		THROW_FATAL("CreatePage: file '%1%': Rendered data is empty",
-					si.s_filename);
+		THROW_FATAL("CreatePage: file '%1%': Rendered data is empty.");
 	}
 
 	// write the file

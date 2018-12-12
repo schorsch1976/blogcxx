@@ -1,16 +1,31 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "CreateIndex.h"
 
 #include "Shared/Helpers.h"
 #include "SharedHTML-RSS/TextParseAll.h"
 
-void CreateIndex(const ConstArchive &posts, const ConstArchive &pages,
-				 const ConfigCollection &cfgs, const TemplateWrapper &engine,
-				 TemplateData data)
+std::string to_target_index(size_t page)
 {
+	if (page == 0)
+	{
+		return "index.html";
+	}
+	else
+	{
+		return "index-" + std::to_string(page) + ".html";
+	}
+};
+
+void CreateIndex(size_t page, size_t page_count, const ConstArchive &posts,
+				 const ConstArchive &pages, const ConfigCollection &cfgs,
+				 const TemplateWrapper &engine, TemplateData data)
+{
+	PRINT("Creating Index %1% of %2%. (%3%)", page + 1, page_count,
+		  cfgs.tpldir().string());
+
 	data.Set({"title"}, cfgs.sitetitle());
 	data.Set({"date"}, timeNow());
 	data.Set({"changedate"}, timeNow());
@@ -24,12 +39,12 @@ void CreateIndex(const ConstArchive &posts, const ConstArchive &pages,
 	// series
 	data.Set({"series"}, boolean(false));
 
-	// the pages
-	int i = 0;
-	for (auto &post : posts)
+	for (int i = 0; i < static_cast<int>(posts.size()); ++i)
 	{
-		data.Set({"posts", i, "altclass"}, "altclass");
-		data.Set({"posts", i, "stickyclass"}, "stickyclass");
+		SingleItem::ConstPtr post = posts[i];
+
+		data.Set({"posts", i, "altclass"}, i % 2 == 0 ? "even" : "odd");
+		data.Set({"posts", i, "stickyclass"}, post->b_sticky ? "sticky" : "");
 		data.Set({"posts", i, "URL"},
 				 cfgs.url(cfgs.rel_path_posts(post->s_slug)));
 		data.Set({"posts", i, "title"}, post->s_title);
@@ -48,26 +63,48 @@ void CreateIndex(const ConstArchive &posts, const ConstArchive &pages,
 		data.Set({"posts", i, "shortened"}, boolean(true));
 		data.Set({"posts", i, "morelink"},
 				 cfgs.url(cfgs.rel_path_posts(post->s_slug)));
-		++i;
 	}
 
-	LOG_ERROR("Pagination is still empty.");
-	data.Set({"pagination"}, "");
+	// fill the pagination
+	if (page_count > 1)
+	{
+		int prev_index = 0;
+		int next_index = 0;
+		for (size_t p = 0; p < page_count; ++p)
+		{
+			if (p < page)
+			{
+				data.Set({"pagination", "prev", prev_index, "link"},
+						 cfgs.url(to_target_index(p)));
+				data.Set({"pagination", "prev", prev_index, "text"},
+						 std::to_string(p + 1));
+				++prev_index;
+			}
+			else if (p == page)
+			{
+				data.Set({"pagination", "active"}, std::to_string(p + 1));
+			}
+			else
+			{
+				data.Set({"pagination", "next", next_index, "link"},
+						 cfgs.url(to_target_index(p)));
+				data.Set({"pagination", "next", next_index, "text"},
+						 std::to_string(p + 1));
+				++next_index;
+			}
+		}
+	}
 
 	// create the file
-	PRINT("Creating the index.html with the %1% template.",
-		  cfgs.tpldir().string());
-
 	fs::path targetdir{cfgs.outdir_root()};
 	fs::path targetfile{targetdir};
-	targetfile /= "index.html";
+	targetfile /= to_target_index(page);
 
 	std::string rendered = engine.Render(cfgs.tpl_index(), data);
 	if (rendered.empty())
 	{
 		THROW_FATAL("CreateIndex: file '%1%': Rendered data is empty.");
 	}
-
 	// write the file
 	if (!fs::exists(targetdir))
 	{

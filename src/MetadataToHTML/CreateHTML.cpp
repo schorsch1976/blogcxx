@@ -1,7 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
-
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "Shared/Debug.h"
 
@@ -12,6 +11,7 @@
 #include "Shared/constants.h"
 #include "Shared/filesystem.h"
 #include "SharedHTML-RSS/CleanupDirectory.h"
+#include "SharedHTML-RSS/CopyDirectory.h"
 
 #include <algorithm>
 #include <chrono>
@@ -33,7 +33,7 @@ TemplateData GenerateCommonTemplateData(const ConstMetadata &merged,
 	ret.Set({"subtitle"}, cfgs.subtitle() ? *cfgs.subtitle() : "");
 
 	// rsslink
-	ret.Set({"rsslink"}, cfgs.url(cfgs.feeddir()));
+	ret.Set({"rsslink"}, cfgs.url(cfgs.rel_path_feed() / "RSS.xml"));
 	ret.Set({"baseurl"}, cfgs.url(""));
 
 	ret.Set({"hljsver"}, HIGHLIGHT_VER);
@@ -45,25 +45,12 @@ TemplateData GenerateCommonTemplateData(const ConstMetadata &merged,
 	ret.Set({"nextmeta"}, "");
 	ret.Set({"keywordsmeta"}, "");
 
-	ret.Set({"blogcpp"}, APP_URL);
+	ret.Set({"blogcxx"}, APP_URL);
 
 	// pagenav
 	{
-		std::vector<SingleItem::ConstPtr> sorted_page_nav;
-		for (auto &p : merged.all_items)
-		{
-			if (p->type == ItemType::Page)
-			{
-				sorted_page_nav.push_back(p);
-			}
-		}
-		std::sort(std::begin(sorted_page_nav), std::end(sorted_page_nav),
-				  [](const SingleItem::ConstPtr lhs,
-					 const SingleItem::ConstPtr rhs) -> bool {
-					  return lhs->i_position < rhs->i_position;
-				  });
 		i = 0;
-		for (auto &p : sorted_page_nav)
+		for (auto &p : merged.all_pages)
 		{
 			ret.Set({"pagenav", i, "title"}, p->s_title);
 			ret.Set({"pagenav", i, "cssclass"}, "");
@@ -75,19 +62,15 @@ TemplateData GenerateCommonTemplateData(const ConstMetadata &merged,
 
 	// latestposts
 	std::vector<SingleItem::ConstPtr> latest_posts;
-	for (auto &si : merged.all_items)
+	for (auto &si : merged.all_posts)
 	{
-		if (si->type != ItemType::Post)
-		{
-			continue;
-		}
 		latest_posts.push_back(si);
 	}
-	std::sort(std::begin(latest_posts), std::end(latest_posts), time_greater);
-	while (latest_posts.size() > cfgs.maxhistory())
+	while (static_cast<int>(latest_posts.size()) > cfgs.maxhistory())
 	{
 		latest_posts.pop_back();
 	}
+
 	i = 0;
 	for (auto &si : latest_posts)
 	{
@@ -218,30 +201,6 @@ TemplateData GenerateCommonTemplateData(const ConstMetadata &merged,
 
 void CreateHTML(const ConstMetadata &merged, const ConfigCollection &cfgs)
 {
-	LOG_INFO("CreateHTML: Separating posts and pages.");
-	ConstArchive posts;
-	ConstArchive pages;
-	for (SingleItem::ConstPtr c : merged.all_items)
-	{
-		if (c->type == ItemType::Page)
-		{
-			pages.push_back(c);
-		}
-		else if (c->type == ItemType::Post)
-		{
-			posts.push_back(c);
-		}
-		else
-		{
-			THROW_FATAL("CreateHTML: Unknown type in '%1'. "
-						"This should have been found at 'CheckMetadata().'"
-						"Please fill a Bugreport at %2%.",
-						c->s_filename.string(), BUGTRACKER);
-		}
-	}
-	std::sort(std::begin(posts), std::end(posts), time_greater);
-	std::sort(std::begin(pages), std::end(pages), time_greater);
-
 	if (!fs::exists(cfgs.outdir_root()))
 	{
 		LOG_INFO("Creating outdir.");
@@ -261,19 +220,13 @@ void CreateHTML(const ConstMetadata &merged, const ConfigCollection &cfgs)
 	TemplateData common_tpl_data{GenerateCommonTemplateData(merged, cfgs)};
 	TemplateWrapper engine(cfgs.tpldir());
 
-	PRINT("Sorting pages.");
-	std::sort(std::begin(pages), std::end(pages),
-			  [](SingleItem::ConstPtr lhs, SingleItem::ConstPtr rhs) -> bool {
-				  return lhs->i_position < rhs->i_position;
-			  });
-
-	PRINT("Writing %1% posts and %2% pages with %3% threads ...", posts.size(),
-		  pages.size(), cfgs.num_threads());
+	PRINT("Writing %1% posts and %2% pages with %3% threads ...",
+		  merged.all_posts.size(), merged.all_pages.size(), cfgs.num_threads());
 	AsyncWorker<std::string, void> creator(cfgs.num_threads());
 
 	auto start_time = std::chrono::steady_clock::now();
 	int active_page = 0;
-	for (const SingleItem::ConstPtr si : pages)
+	for (const SingleItem::ConstPtr si : merged.all_pages)
 	{
 		std::function<void()> fo = [si, active_page, &cfgs, &engine,
 									&common_tpl_data]() {
@@ -283,7 +236,7 @@ void CreateHTML(const ConstMetadata &merged, const ConfigCollection &cfgs)
 		++active_page;
 	}
 
-	for (const SingleItem::ConstPtr si : posts)
+	for (const SingleItem::ConstPtr si : merged.all_posts)
 	{
 		std::function<void()> fo = [si, &merged, &cfgs, &engine,
 									&common_tpl_data]() {
@@ -307,24 +260,92 @@ void CreateHTML(const ConstMetadata &merged, const ConfigCollection &cfgs)
 			const ArchiveData &ad = c.first;
 			const ConstArchive &ar = c.second;
 
-			CreateArchive(ad.path, ar, cfgs, engine, common_tpl_data);
+			std::string feed_url =
+				cfgs.url(cfgs.rel_path_feed() / cfgs.feed_file(ad));
+			CreateArchive(ad.path, ar, cfgs, engine, feed_url, common_tpl_data);
 		};
 
 		std::string name = c.first.path.string();
 		creator.Add(name, fo);
 	}
 
-	// create Index
-	creator.Add("index.html",
-				[&posts, &pages, &cfgs, &engine, &common_tpl_data]() {
-					CreateIndex(posts, pages, cfgs, engine, common_tpl_data);
-				});
+	// create Index(0-n)
+	{
+		// order the posts, put stickes (ordered by date) to the front
+		ConstArchive sorted_posts = merged.all_posts;
+		std::sort(std::begin(sorted_posts), std::end(sorted_posts),
+				  [](SingleItem::ConstPtr lhs, SingleItem::ConstPtr rhs) {
+					  // both sticky? Just sort by time
+					  if (lhs->b_sticky && rhs->b_sticky)
+					  {
+						  return time_greater(lhs, rhs);
+					  }
+					  // one sticky? Just put the sticky one first
+					  if (lhs->b_sticky && !rhs->b_sticky)
+					  {
+						  return true;
+					  }
+					  if (!lhs->b_sticky && rhs->b_sticky)
+					  {
+						  return false;
+					  }
+
+					  // both non sticky? Just put the newer one first
+					  return time_greater(lhs, rhs);
+				  });
+
+		const size_t max_items = static_cast<size_t>(cfgs.maxitems());
+		const size_t page_count = sorted_posts.size() % max_items != 0
+									  ? sorted_posts.size() / max_items + 1
+									  : sorted_posts.size() / max_items;
+
+		const auto pages = merged.all_pages;
+
+		size_t current_post = 0;
+		for (size_t page = 0; page < page_count; ++page)
+		{
+			ConstArchive posts;
+			for (size_t post = 0;
+				 post < max_items && current_post < sorted_posts.size();
+				 ++post, ++current_post)
+			{
+				posts.push_back(sorted_posts[current_post]);
+			}
+
+			creator.Add("index-" + std::to_string(page) + ".html",
+						[page, page_count, posts, pages, &cfgs, &engine,
+						 &common_tpl_data]() {
+							CreateIndex(page, page_count, posts, pages, cfgs,
+										engine, common_tpl_data);
+						});
+		}
+	}
+
+	// add copy static files
+	creator.Add("CopyStaticFiles", [&cfgs]()
+	{
+		PRINT("Copy static files.");
+
+		fs::create_directories(cfgs.outdir_root() / cfgs.rel_path_static());
+
+		CopyDirectory(cfgs.tpldir() / cfgs.rel_path_static(),
+			cfgs.outdir_root() / cfgs.rel_path_static());
+	});
+
+	// add copy static images
+	creator.Add("CopyImages", [&cfgs]()
+	{
+		if (fs::exists(cfgs.indir() / cfgs.rel_path_images()))
+		{
+			PRINT("Copying images.");
+			fs::create_directories(cfgs.outdir_root() / cfgs.rel_path_images());
+
+			CopyDirectory(cfgs.indir() / cfgs.rel_path_images(),
+				cfgs.outdir_root() / cfgs.rel_path_images());
+		}
+	});
 
 	auto result = creator.GetResults();
-
-	PRINT("Copy static files.");
-	fs::copy(cfgs.tpldir() / cfgs.rel_path_static(),
-			 cfgs.outdir_root() / cfgs.rel_path_static());
 
 	auto end_time = std::chrono::steady_clock::now();
 

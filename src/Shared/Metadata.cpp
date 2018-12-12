@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "Metadata.h"
 
@@ -31,7 +31,7 @@ std::map<T, const ConstArchive> ConvertMap(const std::map<T, Archive> &rhs)
 } // namespace
 
 ConstMetadata::ConstMetadata(const Metadata &rhs)
-	: all_items(Convert(rhs.all_items)),
+	: all_pages(Convert(rhs.all_pages)), all_posts(Convert(rhs.all_posts)),
 
 	  authors(ConvertMap(rhs.authors)), categories(ConvertMap(rhs.categories)),
 	  tags(ConvertMap(rhs.tags)), series(ConvertMap(rhs.series)),

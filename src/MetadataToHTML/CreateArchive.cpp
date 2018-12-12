@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "CreateArchive.h"
 
@@ -9,13 +9,16 @@
 
 void CreateArchive(const fs::path rel_path, const ConstArchive &ar,
 				   const ConfigCollection &cfgs, const TemplateWrapper &engine,
-				   TemplateData data)
+				   std::string feed_url, TemplateData data)
 {
 	// fs::path short_path = fs::relative(rel_path, cfgs.rel_path_archive());
 
 	// pagetitle
 	data.Set({"pagetitle"}, "Archive " + rel_path.string());
 	data.Set({"title"}, "Archive " + rel_path.string());
+
+	// override RSS
+	data.Set({"rsslink"}, feed_url);
 
 	// find latest date in this archive
 	auto pos = std::max_element(ar.begin(), ar.end(), time_smaller);
@@ -47,7 +50,7 @@ void CreateArchive(const fs::path rel_path, const ConstArchive &ar,
 							si.s_filename.string(), BUGTRACKER);
 		}
 		data.Set({"entries", i, "item"}, si.s_title);
-		data.Set({"entries", i, "metadata"}, si.s_title);
+		data.Set({ "entries", i, "metadata" }, dateToPrint(si.time));
 		++i;
 	}
 

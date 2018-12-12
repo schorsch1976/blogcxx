@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * Class to add embedded media to the output stream.
  */
 
@@ -90,9 +90,6 @@ bool MediaEmbedder::addOEmbeds(std::string &inputline)
 	std::string parsedline;
 	HTTPDownloader downloader;
 	std::stringstream ss_link_creator;
-#ifdef WITH_DEBUGLOG
-	std::stringstream ss_debuglog;
-#endif
 
 	parsedline = inputline;
 
@@ -115,12 +112,8 @@ bool MediaEmbedder::addOEmbeds(std::string &inputline)
 	}
 
 	s_weblink = match_url.str(0);
-#ifdef WITH_DEBUGLOG
-	ss_debuglog << "Found a website link: " << s_weblink
-				<< " - looking for OEmbeds...";
-	DebugLog::debuglog(ss_debuglog.str());
-	ss_debuglog.str("");
-#endif
+	LOG_INFO("Found a website link: '%1%'  - looking for OEmbeds...",
+			 match_url.str(0));
 
 	s_weblink_contents = downloader.download(s_weblink);
 	if (s_weblink_contents.empty())

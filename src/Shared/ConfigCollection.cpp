@@ -1,10 +1,11 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "ConfigCollection.h"
 
 #include "Debug.h"
+#include "Helpers.h"
 #include "SingleItem.h"
 #include "constants.h"
 
@@ -30,6 +31,10 @@ ConfigCollection::ConfigCollection(const ConfigCollectionFile &file)
 	{
 		m_url = "file:///" + fs::current_path().string();
 		m_url += "/" + m_file.cfg_outdir + "/";
+	}
+	else
+	{
+		m_url = m_file.cfg_siteurl;
 	}
 	// TODO check the pathes if they are unique
 }
@@ -225,6 +230,18 @@ fs::path ConfigCollection::rel_path_series(const std::string &series) const
 	return p;
 }
 
+fs::path ConfigCollection::rel_path_images() const
+{
+	fs::path ret{"images"};
+	return ret;
+}
+
+fs::path ConfigCollection::rel_path_feed() const
+{
+	fs::path ret{m_file.cfg_feeddir};
+	return ret;
+}
+
 // index: -1 -> no index.html added
 // indes:  0 -> relpath/index.html
 // indes:  n -> relpath/index-n.html
@@ -258,15 +275,42 @@ std::string ConfigCollection::url(const fs::path rel_path, int index) const
 		}
 	}
 
+	if (*ret.rbegin() == '/')
+	{
+		ret.pop_back();
+	}
+
 	// Makes "a/b/c" out of "a//b//////c".
 	std::regex slash("([^:])/+"); // Do not replace "https://".
 	std::string out = std::regex_replace(ret, slash, "$1/");
 	return out;
 }
 
-fs::path ConfigCollection::feeddir() const
+fs::path ConfigCollection::feed_file(const ArchiveData &ad) const
 {
-	fs::path ret{outdir_root()};
-	ret /= m_file.cfg_feeddir;
-	return ret;
+	fs::path outfile;
+
+	switch (ad.type)
+	{
+		case ArchiveType::Author:
+			outfile = "author-";
+			outfile += lowercase(ad.path.stem().string()) + ".xml";
+			break;
+		case ArchiveType::Categories:
+			outfile = "category-";
+			outfile += lowercase(ad.path.stem().string()) + ".xml";
+			break;
+		case ArchiveType::Tags:
+			outfile = "tag-";
+			outfile += lowercase(ad.path.stem().string()) + ".xml";
+			break;
+		case ArchiveType::Series:
+			outfile = "series-";
+			outfile += lowercase(ad.path.stem().string()) + ".xml";
+			break;
+		default:
+			outfile = "RSS.xml";
+	}
+
+	return outfile;
 }

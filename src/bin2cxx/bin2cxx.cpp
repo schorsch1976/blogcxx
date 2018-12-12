@@ -1,7 +1,7 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-* Read an input file and write it as a cxx/h file
-*/
+ * blogcxx :: https://www.blogcxx.de
+ * Read an input file and write it as a cxx/h file
+ */
 
 #include <boost/optional/optional_io.hpp>
 #include <boost/program_options.hpp>
@@ -9,6 +9,7 @@
 namespace po = boost::program_options;
 
 #include "Shared/Debug.h"
+#include "Shared/PrintVersion.h"
 #include "Shared/constants.h"
 #include "Shared/filesystem.h"
 
@@ -74,16 +75,6 @@ void CMode(const std::vector<unsigned char> &buffer, fs::path filename,
 	os << " };\n\n";
 }
 
-void PrintVersion()
-{
-	// Prints version information.
-	PRINT("This is bin2cxx version %1%.\n"
-		  "Url: %2%\n"
-		  "Licensed under the terms of the WTFPL v2.\n"
-		  "See http://wtfpl.net/txt/copying for relevant information.\n\n",
-		  APP_VERSION, APP_URL);
-}
-
 std::string MakeClean(std::string str)
 {
 	str.erase(std::remove(str.begin(), str.end(), '('), str.end());
@@ -139,7 +130,7 @@ int main(int argc, char **argv)
 
 		else if (vm.count("version"))
 		{
-			PrintVersion();
+			PrintVersion("bin2cxx");
 			return EXIT_FAILURE;
 		}
 
@@ -177,7 +168,7 @@ int main(int argc, char **argv)
 				  std::back_inserter(buffer));
 
 		// convert
-		PrintVersion();
+		PrintVersion("bin2cxx");
 		switch (mode)
 		{
 			case 0:

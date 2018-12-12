@@ -9,13 +9,13 @@
         {{ default(feedmeta, "") }}
         {{ default(opengraphmeta, "") }}
         <link rel="stylesheet" href="{{ baseurl }}/static/styles.css" />
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/{{ hljsver }}/styles/default.min.css" />
         <link rel="alternate" type="application/rss+xml" title="{{ sitetitle }} RSS Feed" href="{{ rsslink }}" />
         <link rel="start" href="{{ baseurl }}" />
         {{ default(prevmeta, "") }}
         {{ default(nextmeta, "") }}
         {{ default(keywordsmeta, "") }}
 		{% if exists("highlightdata") %}
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/{{ hljsver }}/styles/default.min.css" />
 			 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/{{ hljsver }}/highlight.min.js"></script>
 			{% for lang in highlightdata %}
 				<script type="text/javascript"
@@ -23,8 +23,7 @@
 				</script>
 			{% endfor %}
 		{% endif %}
-        <script src="{{ baseurl }}/static/blogcpp.js"></script>
-        {{ default(highlightdata, "") }}
+        <script src="{{ baseurl }}/static/blogcxx.js"></script>
         {{ default(headscripts, "") }}
     </head>
     <body>

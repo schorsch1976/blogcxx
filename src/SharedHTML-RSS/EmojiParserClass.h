@@ -1,12 +1,11 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * Emoji parser class [header].
  */
 
 #pragma once
 
 #include <string>
-#include <unordered_map>
 
 class EmojiParser
 {
@@ -15,7 +14,4 @@ public:
 
 	std::string clear(const std::string text);
 	std::string parse(const std::string text);
-
-private:
-	const std::unordered_map<std::string, std::string> emojis;
 };

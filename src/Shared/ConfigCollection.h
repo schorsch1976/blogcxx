@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * Collection of configuration entries to pass around.
  */
 
@@ -10,6 +10,7 @@
 #include <string>
 
 #include "Debug.h"
+#include "Metadata.h"
 #include "filesystem.h"
 
 #if 0
@@ -30,10 +31,6 @@ struct ConfigCollectionFile
 	std::string cfg_author;
 	std::string cfg_indir;
 	std::string cfg_outdir;
-#ifdef WITH_PLUGINS
-	bool cfg_plugins;
-	std::string cfg_plugindir;
-#endif
 	std::string cfg_permalinks;
 	std::string cfg_article_subdir;
 	std::string cfg_page_subdir;
@@ -119,14 +116,16 @@ public:
 	fs::path rel_path_tags(const std::string &cat) const;
 	fs::path rel_path_static() const;
 	fs::path rel_path_series(const std::string &series) const;
+	fs::path rel_path_images() const;
+	fs::path rel_path_feed() const;
+
+	fs::path feed_file(const ArchiveData &ad) const;
 
 	// index: -1 -> no index.html added
 	// indes:  0 -> relpath/index.html
 	// indes:  n -> relpath/index-n.html
 	// url("", int index = -1) -> returns the base url
 	std::string url(const fs::path rel_path, int index = -1) const;
-
-	fs::path feeddir() const;
 
 private:
 	const ConfigCollectionFile &m_file;

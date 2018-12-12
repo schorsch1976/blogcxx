@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * Class to make using the inja template engine easier [header].
  */
 
@@ -8,8 +8,8 @@
 #include <memory>
 #include <string>
 
-#include "Shared/variant.h"
 #include "Shared/filesystem.h"
+#include "Shared/variant.h"
 
 // this is a wrapper to keep c++ from converting everything to a bool
 struct boolean
@@ -36,8 +36,7 @@ public:
 	TemplateData &operator=(const TemplateData &rhs);
 
 	void Set(std::vector<TemplateKey> path, const ValueKey &value);
-	void InsertEmptyArray(std::vector<TemplateKey> path);
-
+	std::string to_string() const;
 private:
 	friend class TemplateWrapper;
 

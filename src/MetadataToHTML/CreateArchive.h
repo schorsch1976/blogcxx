@@ -6,4 +6,4 @@
 
 void CreateArchive(const fs::path rel_path, const ConstArchive &ar,
 				   const ConfigCollection &cfgs, const TemplateWrapper &engine,
-				   TemplateData data);
+				   std::string feed_url, TemplateData data);

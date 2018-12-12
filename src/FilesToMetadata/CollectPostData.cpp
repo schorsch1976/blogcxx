@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "CollectPostData.h"
 
@@ -24,7 +24,7 @@ void MakeUnique(std::vector<T> &v)
 void DetectSeries(Metadata &merged)
 {
 	LOG_DEBUG("DetectSeries: Collecting series...");
-	for (auto &si : merged.all_items)
+	for (auto &si : merged.all_posts)
 	{
 		if (si->s_series.empty() || si->type != ItemType::Post)
 		{
@@ -58,7 +58,7 @@ void DetectArchives(Metadata &merged, const ConfigCollection &cfgs)
 
 	std::map<std::string, Archive> authors;
 
-	for (auto &si : merged.all_items)
+	for (auto &si : merged.all_posts)
 	{
 		years[si->time.tm_year].push_back(si);
 		years_months[std::make_pair(si->time.tm_year, si->time.tm_mon)]
@@ -215,15 +215,15 @@ void Slugify(Metadata &merged)
 	std::vector<std::string> all_slug_names;
 	std::map<std::string, int> count_doublicate_slugs;
 
-	if (merged.all_items.empty())
+	if (merged.all_posts.empty())
 	{
-		LOG_WARN("No items found.");
+		LOG_WARN("No posts found.");
 		return;
 	}
 
 	// count the slug names and collect them
 	{
-		for (auto &si : merged.all_items)
+		for (auto &si : merged.all_posts)
 		{
 			if (si->type != ItemType::Post)
 			{
@@ -267,7 +267,7 @@ void Slugify(Metadata &merged)
 
 		// this is a doublicate. fetch the SingleItems
 		std::vector<SingleItem::Ptr> doublicates;
-		for (auto &si : merged.all_items)
+		for (auto &si : merged.all_posts)
 		{
 			if (si->s_slug == c.first)
 			{
@@ -304,10 +304,14 @@ void CheckArchive(const std::string msg, const Metadata &merged,
 		}
 		for (SingleItem::ConstPtr si : a.second)
 		{
-			auto pos = std::find_if(
-				std::begin(merged.all_items), std::end(merged.all_items),
+			auto pos_posts = std::find_if(
+				std::begin(merged.all_posts), std::end(merged.all_posts),
 				[si](SingleItem::ConstPtr item) -> bool { return si == item; });
-			if (pos == std::end(merged.all_items))
+			auto pos_pages = std::find_if(
+				std::begin(merged.all_pages), std::end(merged.all_pages),
+				[si](SingleItem::ConstPtr item) -> bool { return si == item; });
+			if (pos_posts == std::end(merged.all_posts) &&
+				pos_pages == std::end(merged.all_pages))
 			{
 				THROW_ERROR("This is a bug.\n'%1%' points outside of "
 							"all_items. Please report at %2%",
@@ -317,12 +321,10 @@ void CheckArchive(const std::string msg, const Metadata &merged,
 	}
 }
 
-void CheckMetadata(const Metadata &merged)
+void CheckArchive(const Archive &archive)
 {
-	PRINT("Checking the collected Metadata for consistency.");
-
 	// check items
-	for (const auto &si : merged.all_items)
+	for (const auto &si : archive)
 	{
 		if (si->s_author.empty())
 		{
@@ -371,6 +373,13 @@ void CheckMetadata(const Metadata &merged)
 						si->s_filename.string());
 		}
 	}
+}
+void CheckMetadata(const Metadata &merged)
+{
+	PRINT("Checking the collected Metadata for consistency.");
+
+	CheckArchive(merged.all_posts);
+	CheckArchive(merged.all_pages);
 
 	// check for empty string in metadata
 	LOG_INFO("Checking authors list.");
@@ -399,8 +408,8 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 	// entirely.
 	std::stringstream ss_output;
 	std::string s_cats, s_tags, s_datetime, s_change_datetime, s_author,
-		s_title, s_slug, s_markdown, s_emoji, s_sticky, s_comments, s_ogimage,
-		s_series;
+		s_title, s_slug, s_markdown, s_hardbreaks, s_emoji, s_sticky, s_comments,
+		s_ogimage, s_series;
 	int i_position = 0;
 #ifdef WITH_PLUGINS
 	std::string s_plugins;
@@ -437,6 +446,8 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 					   std::regex_constants::icase);
 	std::regex re_markdown("^Markdown\\s*:[\\s\\t]*(.*?)$",
 						   std::regex_constants::icase);
+	std::regex re_hardbreaks("^Hardbreaks\\s*:[\\s\\t]*(.*?)$",
+						   std::regex_constants::icase);
 	std::regex re_emoji("^Emoji\\s*:[\\s\\t]*(.*?)$",
 						std::regex_constants::icase);
 	std::regex re_sticky("^Sticky\\s*:[\\s\\t]*(.*?)$",
@@ -445,10 +456,6 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 						   std::regex_constants::icase);
 	std::regex re_ogimage("^OpenGraphImage\\s*:[\\s\\t]*(.*?)$",
 						  std::regex_constants::icase);
-#ifdef WITH_PLUGINS
-	std::regex re_plugins("^Plugins\\s*:[\\s\\t]*(.*?)$",
-						  std::regex_constants::icase);
-#endif
 	std::regex re_series("^Series\\s*:[\\s\\t]*(.*?)$",
 						 std::regex_constants::icase);
 	std::regex re_position("^Position\\s*:[\\s\\t]*(\\d*?)$",
@@ -509,6 +516,10 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 			{
 				s_markdown = match.str(1);
 			}
+			else if (regex_match(line, match, re_hardbreaks) && match.size() > 1)
+			{
+				s_hardbreaks = match.str(1);
+			}
 			else if (regex_match(line, match, re_emoji) && match.size() > 1)
 			{
 				s_emoji = match.str(1);
@@ -528,12 +539,6 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 				// Add only valid URLs
 				s_ogimage = match.str(1);
 			}
-#ifdef WITH_PLUGINS
-			else if (regex_match(line, match, re_plugins) && match.size() > 1)
-			{
-				s_plugins = match.str(1);
-			}
-#endif
 			else if (regex_match(line, match, re_series) && match.size() > 1)
 			{
 				s_series = match.str(1);
@@ -549,7 +554,7 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 			LOG_FATAL("An error occurred while trying to match a regular "
 					  "expression: %1%",
 					  e.what());
-			LOG_FATAL("Please file a blogcpp bug so we can investigate and "
+			LOG_FATAL("Please file a blogcxx bug so we can investigate and "
 					  "fix it for you.");
 			LOG_FATAL(" --> %1%", BUGTRACKER);
 			throw;
@@ -602,10 +607,21 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 	si.s_slug = s_slug;
 	si.s_author = s_author;
 	si.s_text = ss_output.str();
+
+	// markdown: default on
 	si.b_markdown = (lowercase(s_markdown) != "off");
-	si.b_emoji = cfgs.emojis() && (lowercase(s_emoji) != "off");
-	si.b_sticky = (lowercase(s_sticky) != "off");
-	si.b_comments = (lowercase(s_comments) != "off");
+
+	// hardbreaks: default off
+	si.b_hardbreaks = (lowercase(s_hardbreaks) == "on");
+
+	// emojis: Default on
+	si.b_emoji = cfgs.emojis() && (lowercase(s_emoji) != "off") && cfgs.emojis();
+
+	// sticky: default: off
+	si.b_sticky = (lowercase(s_sticky) == "on");
+
+	// comments: default on
+	si.b_comments = (lowercase(s_comments) != "off") && cfgs.commenttype();
 	si.s_ogimage = s_ogimage;
 	if (cfgs.series() && type != ItemType::Page)
 	{
@@ -648,41 +664,41 @@ Metadata CollectPostData(const ConfigCollection &cfgs,
 	{
 		if (isFutureDate(c.second->time))
 		{
-			LOG_WARN("Skipping item with future date. %1%", c.second->s_filename.string());
+			LOG_WARN("Skipping item with future date. %1%",
+					 c.second->s_filename.string());
 			continue;
 		}
-		merged.all_items.push_back(c.second);
-
-		// !!! find the si name in the all_items to prevent dangling pointer
-		auto pos = std::find_if(
-			std::begin(merged.all_items), std::end(merged.all_items),
-			[&c](SingleItem::ConstPtr item) -> bool {
-				return c.second->s_filename == item->s_filename;
-			});
-		if (pos == std::end(merged.all_items))
+		switch (c.second->type)
 		{
-			THROW_FATAL("Could not fimd item '%1%' in all items. This is a "
-						"Bug. Please report it at %2%",
-						c.second->s_filename.string(), BUGTRACKER);
+			case ItemType::Post:
+				merged.all_posts.push_back(c.second);
+				break;
+			case ItemType::Page:
+				merged.all_pages.push_back(c.second);
+				break;
+			default:
+				THROW_FATAL("CollectPostData: Got unknown itemtype: THis is a "
+							"bug. Please report it at %1%",
+							BUGTRACKER);
 		}
 
-		// !!si points to the item in the all_items!!!
-		SingleItem::Ptr si = *pos;
+		// !!si points to the item in all_(pages|posts)!!!
+		SingleItem::Ptr si = c.second;
 
-		merged.authors[si->s_author].push_back(si);
-
-		for (const auto &cat : si->cats)
+		// just posts get handled with tags, cats and the author
+		// as pages are most for information like
+		// download, impressum and so on
+		if (si->type == ItemType::Post)
 		{
-			merged.categories[cat].push_back(si);
-		}
-		for (const auto &tag : si->tags)
-		{
-			merged.tags[tag].push_back(si);
-		}
-
-		if (si->type == ItemType::Page && si->s_series.size())
-		{
-			merged.series[si->s_series].push_back(si);
+			merged.authors[si->s_author].push_back(si);
+			for (const auto &cat : si->cats)
+			{
+				merged.categories[cat].push_back(si);
+			}
+			for (const auto &tag : si->tags)
+			{
+				merged.tags[tag].push_back(si);
+			}
 		}
 	}
 
@@ -695,6 +711,15 @@ Metadata CollectPostData(const ConfigCollection &cfgs,
 
 	LOG_DEBUG("DetectArchives.");
 	DetectArchives(merged, cfgs);
+
+	PRINT("Sorting pages.");
+	std::sort(std::begin(merged.all_pages), std::end(merged.all_pages),
+			  [](const SingleItem::ConstPtr lhs, const SingleItem::ConstPtr rhs)
+				  -> bool { return lhs->i_position < rhs->i_position; });
+
+	PRINT("Sorting posts.");
+	std::sort(std::begin(merged.all_posts), std::end(merged.all_posts),
+			  time_greater);
 
 	CheckMetadata(merged);
 

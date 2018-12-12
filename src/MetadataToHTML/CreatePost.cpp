@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "CreatePost.h"
 
@@ -79,7 +79,6 @@ void CreatePost(SingleItem::ConstPtr s, const ConstArchive &series,
 	// tags of this post
 	int i = 0;
 	data.Set({"tags_title"}, "Tags");
-	data.InsertEmptyArray({"tags"});
 	for (auto &tag : si.tags)
 	{
 		data.Set({"tags", i, "name"}, tag);
@@ -91,7 +90,6 @@ void CreatePost(SingleItem::ConstPtr s, const ConstArchive &series,
 	// cats of this post
 	i = 0;
 	data.Set({"cats_title"}, "Categories");
-	data.InsertEmptyArray({"categories"});
 	for (auto &cat : si.cats)
 	{
 		data.Set({"categories", i, "name"}, cat);
@@ -121,7 +119,6 @@ void CreatePost(SingleItem::ConstPtr s, const ConstArchive &series,
 		used_highlight_languages.erase(last,
 									   std::end(used_highlight_languages));
 
-		data.InsertEmptyArray({"highlightdata"});
 		for (std::string lang : used_highlight_languages)
 		{
 			data.Set({"highlightdata", i, "lang"}, lang);
@@ -140,8 +137,7 @@ void CreatePost(SingleItem::ConstPtr s, const ConstArchive &series,
 	std::string rendered = engine.Render(cfgs.tpl_post(), data);
 	if (rendered.empty())
 	{
-		THROW_FATAL("CreatePost: file '%1%': Rendered data is empty",
-					si.s_filename);
+		THROW_FATAL("CreatePost: file '%1%': Rendered data is empty.");
 	}
 
 	// write the file

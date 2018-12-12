@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "Helpers.h"
 
@@ -150,7 +150,7 @@ std::string read_file(fs::path filename)
 	return file_contents;
 }
 
-void write_file(fs::path filename, const unsigned char* data, size_t len)
+void write_file(fs::path filename, const unsigned char *data, size_t len)
 {
 	std::ofstream ofs(filename.string(), std::ios::binary);
 	if (!ofs.is_open())
@@ -158,7 +158,7 @@ void write_file(fs::path filename, const unsigned char* data, size_t len)
 		THROW_FATAL("Could not open file for writing: %1%", filename.string());
 	}
 
-	ofs.write(reinterpret_cast<const char*>(data), len);
+	ofs.write(reinterpret_cast<const char *>(data), len);
 }
 
 void write_file(fs::path filename, const std::string &data)
