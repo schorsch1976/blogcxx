@@ -4,6 +4,7 @@
 
 #include "CreateIndex.h"
 
+#include "Shared/constants.h"
 #include "Shared/Helpers.h"
 #include "SharedHTML-RSS/TextParseAll.h"
 
@@ -26,9 +27,18 @@ void CreateIndex(size_t page, size_t page_count, const ConstArchive &posts,
 	PRINT("Creating Index %1% of %2%. (%3%)", page + 1, page_count,
 		  cfgs.tpldir().string());
 
+	if (posts.empty())
+	{
+		THROW_FATAL("CreateIndex: Posts are empty. This is a bug. Please "
+					"report it at %1%",
+					BUGTRACKER);
+	}
 	data.Set({"title"}, cfgs.sitetitle());
-	data.Set({"date"}, timeNow());
-	data.Set({"changedate"}, timeNow());
+	data.Set({"date"}, dateToPrint((*posts.begin())->time));
+	data.Set({"changedate"}, dateToPrint((*posts.begin())->changetime));
+
+	// blog page is active
+	data.Set({"defaultclass"}, "active");
 
 	// pagetitle
 	data.Set({"pagetitle"}, cfgs.sitetitle());

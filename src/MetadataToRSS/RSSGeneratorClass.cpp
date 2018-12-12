@@ -99,8 +99,8 @@ void RSSGenerator::createRSS(const ConstArchive &vec)
 		pItem->InsertEndChild(pItemDescription);
 
 		tinyxml2::XMLElement *pItemLink = rss.NewElement("link");
-		std::string outputdate =
-			parseTmToPath(p.time, own_cfgs.permalink_format());
+		std::string outputdate = dateToPrint(p.time);
+
 		ss_url.str("");
 		ss_url << own_cfgs.url("") << "/";
 		if (own_cfgs.indir_posts().string() != "/")

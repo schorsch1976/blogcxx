@@ -14,12 +14,14 @@ void CreatePage(SingleItem::ConstPtr s, int page_index,
 	const SingleItem &si = *s;
 
 	data.Set({"title"}, si.s_title);
-	data.Set({"date"}, parseTmToPath(si.time, cfgs.permalink_format()));
-	data.Set({"changedate"},
-			 parseTmToPath(si.changetime, cfgs.permalink_format()));
+	data.Set({"date"}, dateToPrint(si.time));
+	data.Set({"changedate"}, dateToPrint(si.changetime));
 
 	data.Set({"author"}, si.s_author);
-	data.Set({"authorslug"}, "author-slug");
+	data.Set({"author-url"}, cfgs.url(cfgs.rel_path_authors(si.s_author)));
+
+	// blog page is not active
+	data.Set({"defaultclass"}, "");
 
 	// pagetitle
 	data.Set({"pagetitle"}, si.s_title);
