@@ -30,8 +30,8 @@ void CreateIndex(size_t page, size_t page_count, const ConstArchive &posts,
 	data.Set({"date"}, timeNow());
 	data.Set({"changedate"}, timeNow());
 
-	data.Set({"author"}, cfgs.author());
-	data.Set({"authorslug"}, "author-slug");
+	data.Set({ "author" }, si.s_author);
+	data.Set({ "author-url" }, cfgs.url(cfgs.rel_path_authors(si.s_author)));
 
 	// pagetitle
 	data.Set({"pagetitle"}, cfgs.sitetitle());

@@ -19,7 +19,6 @@ void CreatePost(SingleItem::ConstPtr s, const ConstArchive &series,
 	data.Set({"changedate"}, dateToPrint(si.time));
 
 	data.Set({"author"}, si.s_author);
-	data.Set({"authorslug"}, si.s_author);
 	data.Set({"author-url"}, cfgs.url(cfgs.rel_path_authors(si.s_author)));
 
 	// pagetitle

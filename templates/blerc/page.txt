@@ -4,7 +4,7 @@
 <div id="postblock">
   <h1 class="posttitle">{{ title }}</h1>
 
-  <!-- <div class="metadata">published on {{ date }} by <a href="{{ baseurl }}/author/{{ authorslug }}">{{ author }}</a></div> -->
+  <!-- <div class="metadata">published on {{ date }} by <a href="{{ author-url }}">{{ author }}</a></div> -->
   <!-- <div class="metadata">changed on {{ changedate }}</div> -->
 
   <div class="contents">
