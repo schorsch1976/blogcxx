@@ -13,6 +13,7 @@
 #include <sstream>
 
 #include <boost/locale.hpp>
+#include <boost/locale/date_time.hpp>
 
 #include "Debug.h"
 
@@ -251,22 +252,25 @@ void parseDatestringToTm(std::string in_datetime, std::string inputfile,
 std::string dateToPrint(const tm &tm_t, bool shortdate /*= false*/)
 {
 	// we got a global locale
-#if 0
-	// Formats the in-date <tm_t> into a localized time string.
-	std::string s_localeFromConfig = cfgs.cfg_locale;
-#if _MSC_VER && !__INTEL_COMPILER
-	// Oh, Microsoft. :-(
-	// We need to use "en-US" instead of "en_US.utf8" here ...
-	// ref.: https://msdn.microsoft.com/en-us/library/hzz3tw78.aspx
-	s_localeFromConfig = s_localeFromConfig.substr(0, 5);
-	s_localeFromConfig = regex_replace(s_localeFromConfig, regex("_"), "-");
-#endif
-	locale locdate(s_localeFromConfig);
-	ostringstream ss_ret;
-	ss_ret.imbue(locdate);
-#endif
+	using namespace boost::locale;
+	date_time_period_set s;
+	s.add(period::year(tm_t.tm_year + 1900));
+	s.add(period::month(tm_t.tm_mon));
+	s.add(period::hour(tm_t.tm_hour));
+	s.add(period::minute(tm_t.tm_min));
+	s.add(period::second(tm_t.tm_sec));
+
+	date_time dt(s);
+
 	std::ostringstream oss;
-	oss << std::put_time(&tm_t, shortdate ? "%x" : "%c");
+	if (shortdate)
+	{
+		oss << as::date << dt;
+	}
+	else
+	{
+		oss <<as::datetime << dt;
+	}
 
 	return oss.str();
 }

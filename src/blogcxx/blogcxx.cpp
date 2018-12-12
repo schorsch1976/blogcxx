@@ -533,10 +533,6 @@ int main(int argc, char **argv)
 		boost::locale::generator gen;
 		std::locale::global(gen(work_cfg.locale()));
 
-		std::setlocale(LC_ALL, work_cfg.locale().c_str());
-		std::setlocale(LC_NUMERIC, work_cfg.locale().c_str());
-		std::setlocale(LC_TIME, work_cfg.locale().c_str());
-
 		// now the "real commands"
 		if (vm.count("new-article"))
 		{
