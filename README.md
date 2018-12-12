@@ -6,7 +6,8 @@ A static blog generator, written in ``C++17``. It is a fork of [blogcpp](https:/
 
 > git clone https://bitbucket.org/schorsch_76/blogcxx.
 
-This is my public (but not main repository). It is the just used to publish released versions.
+This is my public (but not main repository). It is used to publish released versions and
+for bug/issue tracking.
 
 ## Fork
 As blogcpp is licenced under WTFPL2, i fork it and do what
@@ -75,12 +76,15 @@ The latest released version is version 1-alpha
 - comments (create an own template that gets loaded and parsed instead of
   poluting the source code with html. The job ob the template engine is
   separation of html and control.)
+- colorize output for warn/error/fatal messages.
 
 ---
 
 ### What is not yet working
 - metadata in the HTML (opengraphimg, feedmeta)
 - OEmbed
+- spawn $EDITOR on UNIX
+- blog page is not active on index page.
 
 ### TODO list
 - RSS (replace tinyxml2 with inja. we already have a templating engine)
@@ -91,7 +95,7 @@ The latest released version is version 1-alpha
 
 ---
 
-## Features
+## Features common between blogcpp-9 and blogcxx-1
 
 -  Markdown support: Write your articles and pages in Markdown, get HTML.
 -  Theming support: You don't like the available themes? Well, nor do I.
@@ -99,7 +103,6 @@ The latest released version is version 1-alpha
 -  OEmbed support: Just post an OEmbed-enabled link (e.g. Twitter or
    YouTube) and ``blogcxx`` will embed the media for you.
 -  RSS feeds for new articles, tags and categories.
--  Configurable article permalinks.
 -  Sticky articles: Just put ``Sticky: On`` on top of your article file.
 -  Emoji support: Write ``:-)`` and get a *real* smiling face instead.
 -  Commenting support: Even a static blog needs a community. ;-)
@@ -126,7 +129,8 @@ The latest released version is version 1-alpha
   That means, i18n will be done in no time. All arguments are positional like %1%.
   different languages can rearrange the order of the parameters.
 - Articles can be parsed with hardbreaks on to format code and so on
-  Hardbreaks: On (default is off)
+  Hardbreaks: On (default is off). If hardbreaks are on, If you make new line,
+  the generated html has a new line.
 - a folder ``images`` gets copied into the outdir.
 - colorize output for warn/error/fatal messages. This works on Unix and Win10+
   - white  = standard
@@ -137,10 +141,13 @@ The latest released version is version 1-alpha
    It also contails the default template for that issue. The internal tool
    bin2cxx creates cpp and h files that the cxx arrays get included in
    the executable.
+- You can add your own comment template. No recompilation needed. Just add
+  a new mycomment.txt template to your comments folder.
 
 ## Features changed compared to blogcpp
 - cxxopts replaced by boost::program_options (users dont care)
 - icu replaced by boost::locale (but still used as a backend on Linux) (users dont care)
+- Configurable article permalinks.
 
 ### other good things
 - all compilation is now consistent on all platforms
@@ -162,19 +169,20 @@ The latest released version is version 1-alpha
 - remove tinyxml2 and use the templating engine
 
 ## Features that might get removed
-
 - OEmbed
 
 ---
 
-### Description of the internal changes
+### Description of the internal changes (blogcpp-9 -> blogcxx-1)
 
 In blogcpp global variables were accessed (non const) by multiple threads.
 No separation of collection and generation of html. The concurrency is now
 like [Map and Reduce](https://en.wikipedia.org/wiki/MapReduce). This is the job of the
 
-``template <typename KeyT, typename RetValT>``
-``class AsyncWorker;``
+~~~~~cpp
+template <typename KeyT, typename RetValT>
+class AsyncWorker;
+~~~~~
 
 The KeyT is used to identify the results. The RetValT can be void. No more
 raw threads. use std::future() and std::async(launch::async,...)
@@ -185,7 +193,7 @@ raw threads. use std::future() and std::async(launch::async,...)
 - reduce #ifdef #else #endif over the whole codebase, but still keep the options
   available. This improves readability and maintainable a lot.
 - update inja and use exists() and existsIn() in the templates [Inja 1.1.0-pre](https://github.com/pantor/inja/tree/e44c2372e1b70f79e83e8ecbb10d6f99f679a872)
-- TemplateWrapper does now what it name implies. It totally encapulates
+- TemplateWrapper does now what its name implies. It totally encapulates
   json and the inja handling. It uses the so called PIMPL pattern that is also
   known as compiler firewall.
 - Restructure the whole src folder. Split the tasks into manageable
@@ -194,7 +202,7 @@ raw threads. use std::future() and std::async(launch::async,...)
 
 No more
 
-~~~~~
+~~~~~cpp
     #ifdef WITH_DEBUGLOG
         stringstream ss_debuglog;
         ss_debuglog << "Gathering ...";
@@ -204,7 +212,7 @@ No more
 
 Now it is typesafe and without sstream everywhere
 
-~~~~~
+~~~~~cpp
     // these are variadic templates :-)
     LOG_DEBUG("Gathering files from %1%.", file.string());
 ~~~~~
@@ -214,7 +222,7 @@ Now it is typesafe and without sstream everywhere
 ### What stayed the same between blogcpp and blogcxx?
 - Template design
 - Markdown Parser (but exchangeable with libcmark)
-- Emoji Parser (clear, but parse got reimplemented)
+- Emoji Parser (clear(), but parse got reimplemented)
 - Excerpt Extractor
 - Fileparser (mostly)
 - RSS Generator (mostly)
@@ -234,6 +242,9 @@ Now it is typesafe and without sstream everywhere
 
 Not in 3rdparty directory because it is to big.
 - [boost](https://www.boost.org) (ICU (as Boost::Locale Backend on Linux))
+
+> “...one of the most highly regarded and expertly designed C++ library projects in the world.”
+> — Herb Sutter and Andrei Alexandrescu, C++ Coding Standards
 
 ## Used tools
 
