@@ -163,7 +163,6 @@ The latest released version is 1-alpha
 
 ## Future plans
 - remove inja/json to be able to compile with a c++11 compiler.
-- remove tinyxml2 and use the templating engine
 
 ## Features that might get removed
 - OEmbed
@@ -196,7 +195,7 @@ raw threads. use std::future() and std::async(launch::async,...)
 - Restructure the whole src folder. Split the tasks into manageable
   files that are grouped accordig to their function in the process.
 - use boost::log and boost::format for logging.
-- RSS (replace tinyxml2 with inja. we already have a templating engine)
+- RSS (replaced tinyxml2 with inja. we already have a templating engine)
 
 No more
 
@@ -223,7 +222,6 @@ Now it is typesafe and without sstream everywhere
 - Emoji Parser (clear(), but parse got reimplemented)
 - Excerpt Extractor
 - Fileparser (mostly)
-- RSS Generator (mostly)
 - SingleItem structure (mostly)
 - Syntax in the pages/post files
 
@@ -234,7 +232,6 @@ Now it is typesafe and without sstream everywhere
 ``blogcxx`` uses the following third-party libraries (in ``3rdparty/``):
 - [inja](https://github.com/pantor/inja)
 - [json](https://github.com/nlohmann/json)
-- [TinyXML2](https://github.com/leethomason/tinyxml2)
 - *optional* [cmark 0.28.3](https://github.com/commonmark/cmark)
 - *optional* [cmark-gfm 0.28.3](https://github.com/github/cmark-gfm)
 
