@@ -13,8 +13,16 @@
         {{ default(prevmeta, "") }}
         {{ default(nextmeta, "") }}
         {{ default(keywordsmeta, "") }}
-        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/{{ hljsver }}/highlight.min.js"></script>
-        {{ default(highlightdata, "") }}
+
+		{% if exists("highlightdata") %}
+			 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/{{ hljsver }}/highlight.min.js"></script>
+			{% for lang in highlightdata %}
+				<script type="text/javascript"
+					src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/{{ hljsver }}/languages/{{ lang/lang }}.min.js">
+				</script>
+			{% endfor %}
+		{% endif %}
+
         {{ default(headscripts, "") }}
     </head>
     <body>

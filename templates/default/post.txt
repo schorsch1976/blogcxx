@@ -25,19 +25,24 @@
       {% for tag in tags %}
       <a href="{{ baseurl }}/tags/{{ tag/slug }}">{{ tag/name }}</a>
       {% endfor %}</div>
-    {% if series %}
+    {% if exists("series") %}
     <div id="seriesnav" style="text-align:center">
-      <b>Articles from {{ series }}:</b><br />
+      <b>Articles from {{ series/name }}:</b><br />
       <div style="font-style:italic">{{ title }}</div>
-      <div style="float:left">{{ seriesprevlink }}</div>
-      <div style="float:right">{{ seriesnextlink }}</div>
+{% if existsIn(series, "prev") %}
+      <div style="float:left"><a href="{{ series/prev/url }}">{{ series/prev/name }}</a></div>
+{% endif %}
+
+{% if existsIn(series, "next") %}
+      <div style="float:right"><a href="{{ series/next/url }}">{{ series/next/name }}</a></div>
+{% endif %}
+
       <br style="clear:both" />
     </div>
     {% endif %}
     <div id="permalink">Permanent link to this post: <a href="{{ permalink }}">{{ permalink }}</a></div>
   </div>
 
-  {{ comments }}
-</div>
+  </div>
 
 {% include "footer.txt" %}

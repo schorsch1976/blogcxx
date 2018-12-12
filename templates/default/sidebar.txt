@@ -9,10 +9,10 @@
   <b>Archives:</b>
   <ul class="archives">
     {% for archive in archives %}
-    <li><a href="{{ baseurl }}/archives/{{ archive/year }}" title="Archives for {{ archive/year }}">{{ archive/year }}</a>
+    <li><a href="{{ archive/URL }}" title="Archives for {{ archive/year }}">{{ archive/year }}</a>
       <ul class="months">
         {% for month in archive/months %}
-        <li><a href="{{ baseurl }}/archives/{{ month/month }}" title="Archives for {{ month/month }}">{{ month/month }}</a>
+        <li><a href="{{ month/URL }}" title="Archives for {{ month/month }}">{{ month/month }}</a>
         {% endfor %}
       </ul>
     </li>
@@ -21,15 +21,15 @@
 
   <b>Categories:</b>
   <ul class="catlist">
-    {% for cat in allcats %}<li><a href="{{ baseurl }}/categories/{{ cat/slug }}" title="Articles for the category '{{ cat/catname }}'">{{ cat/catname }}</a></li>{% endfor %}
+    {% for cat in allcats %}<li><a href="{{ cat/URL }}" title="Articles for the category '{{ cat/catname }}'">{{ cat/catname }}</a></li>{% endfor %}
   </ul>
 
   <b>Tags:</b>
   <ul class="taglist">
-    {% for tag in alltags %}<li><a href="{{ baseurl }}/tags/{{ tag/slug }}" title="Articles tagged {{ tag/tagname }}">{{ tag/tagname }}</a></li>{% endfor %}
+    {% for tag in alltags %}<li><a href="{{ tag/URL }}" title="Articles tagged {{ tag/tagname }}">{{ tag/tagname }}</a></li>{% endfor %}
   </ul>
 
-  {% if series %}
+  {% if exists("series") %}
   <b>Series:</b>
   <ul class="serieslist">
     {% for series in allseries %}<li><a href="{{ baseurl }}/series/{{ series/slug }}" title="Articles in the {{ series/seriesname }} category">{{ series/seriesname }}</a></li>{% endfor %}

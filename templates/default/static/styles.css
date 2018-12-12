@@ -251,6 +251,8 @@ div.comments {
     margin-top: 0.6em;
 }
 
+#test { background-color: blue; }
+
 @media (min-width: 48em) {
     /* Responsive? Responsive! */
     #sidebar {
