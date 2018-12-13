@@ -540,6 +540,17 @@ int main(int argc, char **argv)
 		my.select("icu");
 #endif
 		localization_backend_manager::global(my);
+
+		// set the translation sources
+		// https://www.boost.org/doc/libs/1_67_0/libs/locale/doc/html/messages_formatting.html
+		// Specify location of dictionaries
+		// gen.add_messages_path(".");
+		// Specify the encoding of the source string
+		// gen.add_messages_domain("copyrighted/windows-1255");
+		// Generate locales and imbue them to iostream
+		// locale::global(gen(""));
+		// cout.imbue(locale());
+
 		boost::locale::generator gen;
 		std::locale loc{ gen(work_cfg.locale()) };
 		std::locale::global(loc);
