@@ -86,6 +86,7 @@ The latest released version is 1-alpha
 
 ### TODO list
 - download the highlight.js into the static folder
+- config colletion: check the pathes if they are unique
 
 ## Future plans
 - remove inja/json to be able to compile with a c++11 compiler.

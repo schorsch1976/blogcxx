@@ -56,6 +56,8 @@ void CreatePage(SingleItem::ConstPtr s, int page_index,
 	fs::path targetfile{targetdir};
 	targetfile /= "index.html";
 
+	LOG_TRACE("CreatePage: %1%", data.to_string());
+
 	std::string rendered = engine.Render(cfgs.tpl_page(), data);
 	if (rendered.empty())
 	{

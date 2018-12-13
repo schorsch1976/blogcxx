@@ -65,51 +65,33 @@ std::string Format(boost::format &f, T v, Args... args)
 // ----------------------------------------------------------------------------
 namespace logging = boost::log;
 
-// access to the two loggers
-boost::log::sources::logger_mt &ConsoleLogger(Debug::impl::Color color);
-boost::log::sources::severity_logger_mt<Debug::Level> &FileLogger();
+// access to the logger
+boost::log::sources::severity_logger_mt<Debug::Level> &Logger(Debug::impl::Color color);
 
-enum class MsgType
-{
-	Print = 0,
-	Log
-};
-BOOST_LOG_ATTRIBUTE_KEYWORD(msg_type, "MsgType", MsgType)
 BOOST_LOG_ATTRIBUTE_KEYWORD(color, "Color", Color)
-
-template <typename T, typename... Args>
-void PRINT(const Color color, const T &fmt, Args... args)
-{
-	boost::format f(boost::locale::translate(fmt));
-	BOOST_LOG(ConsoleLogger(color)) << Format(f, args...);
-}
 
 template <Debug::Level lvl, typename T, typename... Args>
 void LOG_IMPL(const T &fmt, Args... args)
 {
-	// warning, error and fatal must be seen by the user
-	if (lvl == Debug::Level::warning || lvl == Debug::Level::error ||
-		lvl == Debug::Level::fatal)
+	Color color = Color::std;
+	switch (lvl)
 	{
-		Color color = Color::std;
-		switch (lvl)
-		{
-			case Debug::Level::fatal:
-				color = Color::cyan;
-				break;
-			case Debug::Level::error:
-				color = Color::red;
-				break;
-			case Debug::Level::warning:
-				color = Color::yellow;
-				break;
-			default:
-				break;
-		}
-		impl::PRINT(color, fmt, args...);
+		case Debug::Level::fatal:
+			color = Color::cyan;
+			break;
+		case Debug::Level::error:
+			color = Color::red;
+			break;
+		case Debug::Level::warning:
+			color = Color::yellow;
+			break;
+		default:
+			color = Color::std;
+			break;
 	}
+
 	boost::format f(boost::locale::translate(fmt));
-	BOOST_LOG_SEV(FileLogger(), lvl) << Format(f, args...);
+	BOOST_LOG_SEV(Logger(color), lvl) << Format(f, args...);
 }
 
 template <Debug::Level lvl, typename T, typename... Args>

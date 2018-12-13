@@ -32,7 +32,7 @@ void ContentsGenerator::generate()
 	{
 		case ItemType::Post:
 			filename /= dateToPrint(pt::second_clock::local_time(),
-									time_fmt::date_short) +
+									time_fmt::iso_short) +
 						trim(hyphenise(EmojiParser::clear(title))) + ".txt";
 			contents << createDummyArticle() << first_text;
 			break;
@@ -89,7 +89,7 @@ std::string ContentsGenerator::createDummyPage()
 	ret << "Title: " << title << NEWLINE;
 	ret << "Slug: " << slug << NEWLINE;
 	ret << "Date: "
-		<< dateToPrint(pt::second_clock::local_time(), time_fmt::date_time)
+		<< dateToPrint(pt::second_clock::local_time(), time_fmt::iso_date_time)
 		<< NEWLINE;
 	ret << "Tags: " << NEWLINE;
 	ret << NEWLINE;
@@ -108,7 +108,7 @@ std::string ContentsGenerator::createDummyArticle()
 	ret << "Title: " << title << NEWLINE;
 	ret << "Slug: " << slug << NEWLINE;
 	ret << "Date: "
-		<< dateToPrint(pt::second_clock::local_time(), time_fmt::date_time)
+		<< dateToPrint(pt::second_clock::local_time(), time_fmt::iso_date_time)
 		<< NEWLINE;
 	ret << "Tags: " << NEWLINE;
 	ret << "Categories: " << NEWLINE;

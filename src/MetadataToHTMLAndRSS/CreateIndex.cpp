@@ -107,6 +107,8 @@ void CreateIndex(size_t page, size_t page_count, const ConstArchive &posts,
 	fs::path targetfile{targetdir};
 	targetfile /= to_target_index(page);
 
+	LOG_TRACE("CreateIndex: %1%", data.to_string());
+
 	std::string rendered = engine.Render(cfgs.tpl_index(), data);
 	if (rendered.empty())
 	{

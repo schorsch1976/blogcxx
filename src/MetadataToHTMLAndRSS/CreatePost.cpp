@@ -137,6 +137,8 @@ void CreatePost(SingleItem::ConstPtr s, const ConstArchive &series,
 	fs::path targetfile{targetdir};
 	targetfile /= "index.html";
 
+	LOG_TRACE("CreatePost: %1%", data.to_string());
+
 	std::string rendered = engine.Render(cfgs.tpl_post(), data);
 	if (rendered.empty())
 	{

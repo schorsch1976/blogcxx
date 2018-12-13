@@ -23,7 +23,8 @@ struct ConfigCollectionFile
 {
 	std::string executable;
 	int num_threads;
-	int verbosity;
+	int file_verbosity;
+	int console_verbosity;
 
 	std::string cfg_sitetitle;
 	boost::optional<std::string> cfg_subtitle;
@@ -67,7 +68,8 @@ public:
 	std::string sitetitle() const;
 	const boost::optional<std::string> subtitle() const;
 
-	Debug::Level verbosity() const;
+	Debug::Level file_verbosity() const;
+	Debug::Level console_verbosity() const;
 
 	std::string author() const;
 

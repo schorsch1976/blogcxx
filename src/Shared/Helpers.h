@@ -27,12 +27,14 @@ void write_file(fs::path filename, const std::string &data);
 
 enum class time_fmt
 {
-	date_short,
-	date_time,
-	date_time_rss
+	locale_short,
+	locale_date_time,
+	iso_short,
+	iso_date_time,
+	rss_date_time
 };
 
-std::string dateToPrint(const pt::ptime& time, time_fmt fmt = time_fmt::date_time);
+std::string dateToPrint(const pt::ptime& time, time_fmt fmt = time_fmt::locale_date_time);
 
 bool isFutureDate(pt::ptime time);
 

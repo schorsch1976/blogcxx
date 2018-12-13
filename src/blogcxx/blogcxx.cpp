@@ -432,7 +432,9 @@ int main(int argc, char **argv)
 		commands.add_options()
 			("help,h", 					"Prints this help")
 			("version,v",				"Prints version information.")
-			("verbosity",				po::value<int>(&cfgs.verbosity)->default_value(2),
+			("file-verbosity",			po::value<int>(&cfgs.file_verbosity)->default_value(2),
+										"Quietly generates your site.")
+			("console-verbosity",		po::value<int>(&cfgs.console_verbosity)->default_value(2),
 										"Quietly generates your site.")
 			("new-article,new-post",	"Creates a new article with your $EDITOR.")
 			("new-page",				"Creates a new page with your $EDITOR.")
@@ -523,13 +525,24 @@ int main(int argc, char **argv)
 		ConfigCollection work_cfg(cfgs);
 
 		// Log Verbosity
-		debug_status.SetVerbosity(work_cfg.verbosity());
+		debug_status.SetFileVerbosity(work_cfg.file_verbosity());
+		debug_status.SetConsoleVerbosity(work_cfg.console_verbosity());
 
 		// set the global locale
 		LOG_INFO("Set locale to '%1%'", work_cfg.locale());
 
+		// Set global localization backend
+		using namespace boost::locale;
+		localization_backend_manager my = localization_backend_manager::global();
+#ifdef _WIN32
+		my.select("winapi");
+#else
+		my.select("icu");
+#endif
+		localization_backend_manager::global(my);
 		boost::locale::generator gen;
-		std::locale::global(gen(work_cfg.locale()));
+		std::locale loc{ gen(work_cfg.locale()) };
+		std::locale::global(loc);
 
 		// now the "real commands"
 		if (vm.count("new-article"))

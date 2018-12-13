@@ -51,13 +51,6 @@ static bool sb_color_available = false;
 // public interface
 namespace Debug
 {
-// ----------------------------------------------------------------------------
-// this exception is used to indicate that it was printed by THROW_xxxx
-// ----------------------------------------------------------------------------
-const char *THROWN::what() const throw()
-{
-	return "THROWN by Debug: THROW_(ERROR or DEBUG)";
-}
 
 using namespace boost::log;
 
@@ -72,7 +65,7 @@ operator<<(logging::formatting_ostream &strm,
 {
 	static std::once_flag s_detect_version;
 	std::call_once(s_detect_version, []() {
-		// https://docs.microsoft.com/de-de/windows/desktop/SysInfo/version-helper-apis
+// https://docs.microsoft.com/de-de/windows/desktop/SysInfo/version-helper-apis
 #ifdef _WIN32
 		// just on Win10 is color available
 		sb_color_available = IsWindowsVersionOrGreater(10, 0, 0);
@@ -101,9 +94,9 @@ operator<<(logging::formatting_ostream &strm,
 	};
 #endif
 
+	Color color = manip.get();
 	if (sb_color_available)
 	{
-		Color color = manip.get();
 		if (static_cast<std::size_t>(color) <
 			sizeof(strings) / sizeof(*strings))
 		{
@@ -142,8 +135,6 @@ Status::Status()
 		core->add_sink(sp_console_sink);
 
 		// You can manage filtering and formatting through the sink interface
-		sp_console_sink->set_filter(expr::attr<MsgType>("MsgType") ==
-									MsgType::Print);
 		sp_console_sink->set_formatter(expr::stream
 									   << expr::attr<Color, color_tag>("Color")
 									   << expr::smessage);
@@ -158,10 +149,6 @@ Status::Status()
 		// Wrap it into the frontend and register in the core
 		sp_file_sink.reset(new file_sink_t(backend));
 		core->add_sink(sp_file_sink);
-
-		// the verbosity gets added later
-		sp_file_sink->set_filter(expr::attr<MsgType>("MsgType") ==
-								 MsgType::Log);
 
 		// this creates debug entries like
 		// [2018-11-27 18:58:20.994303][DEBUG][0x00001770]...
@@ -196,7 +183,7 @@ Status::~Status()
 	}
 }
 
-void Status::SetVerbosity(Debug::Level verbosity)
+void Status::SetFileVerbosity(Debug::Level verbosity)
 {
 	using namespace impl;
 	if (sp_file_sink)
@@ -207,9 +194,30 @@ void Status::SetVerbosity(Debug::Level verbosity)
 		}
 		else
 		{
-			sp_file_sink->set_filter(
-				expr::attr<Debug::Level>("Severity") >= verbosity &&
-				expr::attr<MsgType>("MsgType") == MsgType::Log);
+			sp_file_sink->set_filter(expr::attr<Debug::Level>("Severity") >=
+									 verbosity);
+		}
+	}
+}
+
+void Status::SetConsoleVerbosity(Debug::Level verbosity)
+{
+	using namespace impl;
+	if (sp_console_sink)
+	{
+		if (verbosity == Debug::Level::trace)
+		{
+			sp_console_sink->reset_filter();
+		}
+		else
+		{
+			// warning, error and fatal must be seen by the user
+			if (verbosity > Debug::Level::warning)
+			{
+				verbosity = Debug::Level::warning;
+			}
+			sp_console_sink->set_filter(expr::attr<Debug::Level>("Severity") >=
+										verbosity);
 		}
 	}
 }
@@ -220,48 +228,34 @@ namespace Debug
 {
 namespace impl
 {
-static std::vector<boost::shared_ptr<boost::log::sources::logger_mt>>
-	sp_logger_console;
-static boost::shared_ptr<boost::log::sources::severity_logger_mt<Debug::Level>>
-	sp_file_logger;
+static std::vector<
+	boost::shared_ptr<boost::log::sources::severity_logger_mt<Debug::Level>>>
+	sp_logger;
 
-// access to the two loggers
-boost::log::sources::logger_mt &ConsoleLogger(Debug::impl::Color color)
+// access to the logger
+boost::log::sources::severity_logger_mt<Debug::Level> &
+Logger(Debug::impl::Color color)
 {
 	static std::once_flag s_once;
 	std::call_once(s_once, []() {
 		for (int i = 0; i < static_cast<int>(Debug::impl::Color::red); ++i)
 		{
-			auto logger = boost::make_shared<boost::log::sources::logger_mt>();
-			logger->add_attribute(
-				"MsgType",
-				boost::log::attributes::constant<MsgType>(MsgType::Print));
+			auto logger = boost::make_shared<
+				boost::log::sources::severity_logger_mt<Debug::Level>>();
 			logger->add_attribute("Color",
 								  boost::log::attributes::constant<Color>(
 									  static_cast<Debug::impl::Color>(i)));
 
-			sp_logger_console.push_back(logger);
+			sp_logger.push_back(logger);
 		}
 	});
-
-	int idx = static_cast<int>(color);
-	assert(idx >= 0 && idx <= static_cast<int>(Debug::impl::Color::red));
-	assert(sp_logger_console[idx] != nullptr);
-	return *sp_logger_console[idx];
-}
-boost::log::sources::severity_logger_mt<Debug::Level> &FileLogger()
-{
-	static std::once_flag s_once;
-	std::call_once(s_once, []() {
-		sp_file_logger = boost::make_shared<
-			boost::log::sources::severity_logger_mt<Debug::Level>>();
-		boost::log::sources::severity_logger_mt<Debug::Level> slg;
-		sp_file_logger->add_attribute(
-			"MsgType", boost::log::attributes::constant<MsgType>(MsgType::Log));
-		sp_file_logger->add_attribute(
-			"Color", boost::log::attributes::constant<Color>(Color::std));
-	});
-	return *sp_file_logger;
+	size_t idx = static_cast<size_t>(color);
+	if (idx < sp_logger.size())
+	{
+		return *sp_logger[idx];
+	}
+	assert(sp_logger.size() >= 1);
+	return *sp_logger[0];
 }
 } // namespace impl
 } // namespace Debug

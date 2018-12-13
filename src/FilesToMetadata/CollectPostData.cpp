@@ -634,7 +634,14 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 	si.s_filename = inputfile;
 
 	si.time = time;
-	si.changetime = changetime;
+	if (changetime.is_special())
+	{
+		si.changetime = time;
+	}
+	else
+	{
+		si.changetime = changetime;
+	}
 	si.s_title = s_title;
 	si.s_slug = s_slug;
 	si.s_author = s_author;

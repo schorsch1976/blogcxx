@@ -17,7 +17,7 @@ void CreateRSS(const fs::path outfile, const std::string title,
 	data.Set({"link"}, cfgs.url(""));
 	data.Set({"description"}, cfgs.sitetitle());
 	data.Set({"lastBuildDate"}, dateToPrint(pt::second_clock::local_time(),
-											time_fmt::date_time_rss));
+											time_fmt::rss_date_time));
 
 	for (int i = 0; i < cfgs.maxitems() && i < static_cast<int>(ar.size()); ++i)
 	{
@@ -32,10 +32,10 @@ void CreateRSS(const fs::path outfile, const std::string title,
 		data.Set({"items", i, "link"},
 				 cfgs.url(cfgs.rel_path_posts(post.s_slug)));
 		data.Set({"items", i, "pubDate"},
-				 dateToPrint(post.time, time_fmt::date_time_rss));
+				 dateToPrint(post.time, time_fmt::rss_date_time));
 	}
 
-	LOG_DEBUG("RSS: %1%", data.to_string());
+	LOG_TRACE("CreateRSS: %1%", data.to_string());
 
 	std::string rendered = engine.Render(cfgs.tpl_RSS(), data);
 	if (rendered.empty())

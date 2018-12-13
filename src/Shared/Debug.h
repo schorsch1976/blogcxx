@@ -14,10 +14,10 @@ using Level = boost::log::trivial::severity_level;
 // ----------------------------------------------------------------------------
 // this exception is used to indicate that it was printed by THROW_xxxx
 // ----------------------------------------------------------------------------
-class THROWN : public std::exception
+class THROWN
 {
 public:
-	const char *what() const throw();
+	THROWN() = default;
 };
 
 // ----------------------------------------------------------------------------
@@ -26,7 +26,8 @@ public:
 struct Status
 {
 	Status();
-	void SetVerbosity(Debug::Level verbosity);
+	void SetFileVerbosity(Debug::Level verbosity);
+	void SetConsoleVerbosity(Debug::Level verbosity);
 	~Status();
 };
 
@@ -39,6 +40,11 @@ struct Status
 // printf style %d types or %1% %2% to order them. Boost::format will take care
 // of the type safety
 // ----------------------------------------------------------------------------
+template <typename T, typename... Args>
+void LOG_TRACE(const T &fmt, Args... args)
+{
+	Debug::impl::LOG_IMPL<Debug::Level::trace>(fmt, args...);
+}
 
 template <typename T, typename... Args>
 void LOG_DEBUG(const T &fmt, Args... args)
@@ -74,7 +80,7 @@ void LOG_FATAL(const T &fmt, Args... args)
 template <typename T, typename... Args>
 void PRINT(const T &fmt, Args... args)
 {
-	Debug::impl::PRINT(Debug::impl::Color::std, fmt, args...);
+	Debug::impl::LOG_IMPL<Debug::Level::info>(fmt, args...);
 }
 
 template <typename T, typename... Args>

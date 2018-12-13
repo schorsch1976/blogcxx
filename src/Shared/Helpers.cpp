@@ -172,25 +172,38 @@ void write_file(fs::path filename, const std::string &data)
 // -----------------------------
 std::string dateToPrint(const pt::ptime& time, time_fmt fmt)
 {
-	// we got a global locale
 	using namespace boost::locale;
+
+	tm tm_t = pt::to_tm(time);
+	date_time_period_set s;
+	s.add(period::year(tm_t.tm_year + 1900));
+	s.add(period::month(tm_t.tm_mon));
+	s.add(period::hour(tm_t.tm_hour));
+	s.add(period::minute(tm_t.tm_min));
+	s.add(period::second(tm_t.tm_sec));
+
+	date_time dt(s);
 
 	std::ostringstream oss;
 	switch (fmt)
 	{
-	case time_fmt::date_short:
-		oss << as::ftime("%Y-%m-%d");
+	case time_fmt::locale_short:
+		oss << as::date_short << dt;
+		break;
+	case time_fmt::locale_date_time:
+		oss << as::date_full << dt;
+		break;
+	case time_fmt::iso_short:
+		oss << std::put_time(&tm_t, "%Y-%m-%d");
 		break;
 	default:
-	case time_fmt::date_time:
-		oss << as::ftime("%Y-%m-%d %H:%M:%S");
+	case time_fmt::iso_date_time:
+		oss << std::put_time(&tm_t, "%Y-%m-%d %H:%M:%S");
 		break;
-	case time_fmt::date_time_rss:
-		oss << as::ftime("%a, %d %b %Y %T %z");
+	case time_fmt::rss_date_time:
+		oss << std::put_time(&tm_t, "%a, %d %b %Y %T %z");
 		break;
 	};
-
-	oss << time;
 
 	return oss.str();
 }
@@ -198,7 +211,7 @@ std::string dateToPrint(const pt::ptime& time, time_fmt fmt)
 bool isFutureDate(pt::ptime time)
 {
 	// Returns true is time is in the future; else, false.
-	return time < pt::second_clock::local_time();
+	return time > pt::second_clock::local_time();
 }
 
 bool time_smaller(SingleItem::ConstPtr left, SingleItem::ConstPtr right)
