@@ -1,6 +1,6 @@
 #include "TextParseAll.h"
 
-#include "EmojiParserClass.h"
+#include "EmojiParser.h"
 #include "ExcerptExtractorClass.h"
 #include "Shared/Debug.h"
 
@@ -95,7 +95,7 @@ TextParseAll(const SingleItem &si, const ConfigCollection &cfgs,
 
 	if (si.b_emoji && si.b_markdown)
 	{
-		txt = EmojiParser().parse(txt);
+		txt = EmojiParser::parse(txt);
 	}
 
 	if (si.b_markdown && markdown)

@@ -28,8 +28,8 @@ SET(SRCS
 	CopyDirectory.cpp
 	CopyDirectory.h
 
-	EmojiParserClass.cpp
-	EmojiParserClass.h
+	EmojiParser.cpp
+	EmojiParser.h
 
 	ExcerptExtractorClass.cpp
 	ExcerptExtractorClass.h

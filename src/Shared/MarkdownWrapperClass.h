@@ -10,7 +10,6 @@
 #include <sstream>
 #include <string>
 
-#include "EmojiParserClass.h"
 #include "MarkdownParserClass.h"
 #include "MarkdownReturnClass.h"
 

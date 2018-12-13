@@ -6,7 +6,7 @@
 #include "ContentsGenerator.h"
 #include "Shared/Debug.h"
 
-#include "Shared/EmojiParserClass.h"
+#include "Shared/EmojiParser.h"
 
 ContentsGenerator::ContentsGenerator(ItemType type, fs::path input_folder,
 									 std::string author, std::string title,
@@ -25,7 +25,6 @@ void ContentsGenerator::generate()
 {
 	// Creates a new article or page file, fills the necessary
 	// variables and opens it in the system's default text editor.
-	EmojiParser eparser;
 	std::ostringstream contents;
 	fs::path filename{input_folder};
 
@@ -34,11 +33,11 @@ void ContentsGenerator::generate()
 		case ItemType::Post:
 			filename /= dateToPrint(pt::second_clock::local_time(),
 									time_fmt::date_short) +
-						trim(hyphenise(eparser.clear(title))) + ".txt";
+						trim(hyphenise(EmojiParser::clear(title))) + ".txt";
 			contents << createDummyArticle() << first_text;
 			break;
 		case ItemType::Page:
-			filename /= trim(hyphenise(eparser.clear(title))) + ".txt";
+			filename /= trim(hyphenise(EmojiParser::clear(title))) + ".txt";
 			contents << createDummyPage() << first_text;
 			break;
 		default:

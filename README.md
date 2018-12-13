@@ -70,7 +70,6 @@ The latest released version is 1-alpha
 
 ### what i am not sure if it works
 - highlight programming languages. The generated code looks correct.
-- OEmbed. WITHOUT OEMBED set, the simple Media Embedder seems to work.
 - comments (create an own template that gets loaded and parsed instead of
   poluting the source code with html. The job ob the template engine is
   separation of html and control.)

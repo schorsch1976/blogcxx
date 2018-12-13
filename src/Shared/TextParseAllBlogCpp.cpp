@@ -1,6 +1,5 @@
 #include "TextParseAll.h"
 
-#include "EmojiParserClass.h"
 #include "ExcerptExtractorClass.h"
 #include "Shared/Debug.h"
 

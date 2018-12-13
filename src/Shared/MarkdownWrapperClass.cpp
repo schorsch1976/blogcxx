@@ -5,6 +5,7 @@
  */
 
 #include "MarkdownWrapperClass.h"
+#include "EmojiParser.h"
 
 MarkdownReturn MarkdownWrapper::markdownify(std::string inputtext,
 											bool basic_markdown, bool no_emojis,
@@ -30,7 +31,6 @@ MarkdownReturn MarkdownWrapper::markdownify(std::string inputtext,
 	// If the user did not disable them, additionally try to parse embedded
 	// media.
 	MarkdownParser parser(basic_markdown, cfg_embeds);
-	EmojiParser eparser;
 
 	parser.prepare(
 		inputtext); // Inspect the article before doing the actual work
@@ -40,7 +40,7 @@ MarkdownReturn MarkdownWrapper::markdownify(std::string inputtext,
 		if (!no_emojis)
 		{
 			// Put some emojis into the line before markdownifying it.
-			line = eparser.parse(line);
+			line = EmojiParser::parse(line);
 		}
 		parser.parse(line);
 	}

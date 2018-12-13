@@ -1,9 +1,9 @@
 /*
  * blogcxx :: https://www.blogcxx.de
- * Emoji parser class.
+ * Emoji parser.
  */
 
-#include "EmojiParserClass.h"
+#include "EmojiParser.h"
 
 #include <cassert>
 #include <memory>
@@ -117,9 +117,8 @@ struct EmojiMaps
 };
 
 std::shared_ptr<const EmojiMaps> sp_emoji_map;
-} // namespace
 
-EmojiParser::EmojiParser()
+void init()
 {
 	// just initialize the emoji maps once
 	static std::once_flag s_once_emojis;
@@ -129,8 +128,14 @@ EmojiParser::EmojiParser()
 	assert(sp_emoji_map);
 }
 
-std::string EmojiParser::clear(const std::string text)
+} // namespace
+
+namespace EmojiParser
 {
+std::string clear(const std::string text)
+{
+	init();
+
 	// Removes emojis from <text>.
 	if (text.length() == 0)
 	{
@@ -161,8 +166,10 @@ std::string EmojiParser::clear(const std::string text)
 	return ret.str();
 }
 
-std::string EmojiParser::parse(const std::string text)
+std::string parse(const std::string text)
 {
+	init();
+
 	std::istringstream iss(text);
 	std::string line;
 	std::string out;
@@ -180,3 +187,4 @@ std::string EmojiParser::parse(const std::string text)
 
 	return out;
 }
+} // ns EmojiParser

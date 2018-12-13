@@ -1,17 +1,14 @@
 /*
  * blogcxx :: https://www.blogcxx.de
- * Emoji parser class [header].
+ * Emoji parser [header].
  */
 
 #pragma once
 
 #include <string>
 
-class EmojiParser
+namespace EmojiParser
 {
-public:
-	EmojiParser();
-
 	std::string clear(const std::string text);
 	std::string parse(const std::string text);
 };

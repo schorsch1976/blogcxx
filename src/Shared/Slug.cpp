@@ -6,7 +6,7 @@
 
 #include <boost/locale.hpp>
 
-#include "EmojiParserClass.h"
+#include "EmojiParser.h"
 #include "Shared/Debug.h"
 #include "Shared/Helpers.h"
 
@@ -38,8 +38,7 @@ std::string createBasicSlug(const SingleItem &si)
 	std::string ret = boost::locale::normalize(uinput, boost::locale::norm_nfd);
 
 	// Emojis:
-	EmojiParser eparser;
-	ret = eparser.clear(ret);
+	ret = EmojiParser::clear(ret);
 
 	// Hyphenization:
 	ret = trim(hyphenise(ret));
