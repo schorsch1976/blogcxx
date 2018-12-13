@@ -1,26 +1,4 @@
 ############################################################################
-# Objects embedded
-############################################################################
-OPTION(WITH_OEMBED "With objects embedded" OFF)
-if (WITH_OEMBED)
-	ADD_DEFINITIONS(-DWITH_OEMBED)
-
-	find_package(CURL)
-	IF(NOT ${CURL_FOUND})
-		MESSAGE(FATAL_ERROR "CURL not Found: Set in in the ADVANCED SETTINGS")
-	ENDIF(NOT ${CURL_FOUND})
-	INCLUDE_DIRECTORIES(${CURL_INCLUDE_DIRS})
-
-	SET(SRCS ${SRCS}
-		curl/HTTPDownloader.cpp
-	)
-
-	SET(LIBS ${LIBS}
-		${CURL_LIBRARY}
-	)
-ENDIF(WITH_OEMBED)
-
-############################################################################
 # 3rdParty includes provided by blogcxx
 ############################################################################
 IF(MARKDOWN_CMARK_GFM)

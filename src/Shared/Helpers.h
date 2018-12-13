@@ -13,8 +13,6 @@
 std::string trim(std::string inputstring);
 std::string hyphenise(std::string input);
 
-bool strEndsWith(const std::string &s, const std::string &ending);
-
 std::string lowercase(std::string input);
 std::string translate(std::string input);
 
@@ -22,9 +20,6 @@ void openWithEditor(fs::path filename);
 std::string read_file(fs::path filename);
 void write_file(fs::path filename, const unsigned char *data, size_t len);
 void write_file(fs::path filename, const std::string &data);
-
-std::vector<std::string> vectorSplit(std::string inputstring,
-									 std::string divider = ";");
 
 // -----------------------------
 // Date/Time Helpers

@@ -81,14 +81,12 @@ The latest released version is 1-alpha
 
 ### What is not yet working
 - metadata in the HTML (opengraphimg, feedmeta)
-- OEmbed
 - spawn $EDITOR on UNIX
+- OpenGraph support if you feel like sharing stuff on Facebook or
+  whatever.
 
 ### TODO list
 - download the highlight.js into the static folder
-- WITH_OEMBED: OEmbed (use boost::process to start the subprocess curl or wget.
-  This remove the burden from us to compile curl with openssl on windows.
-  There are prebuild binaries that get updated regulary. Take advantage of it.)
 
 ## Future plans
 - remove inja/json to be able to compile with a c++11 compiler.
@@ -96,18 +94,13 @@ The latest released version is 1-alpha
 ---
 
 ## Features common between blogcpp-9 and blogcxx-1
-
 -  Markdown support: Write your articles and pages in Markdown, get HTML.
 -  Theming support: You don't like the available themes? Well, nor do I.
    Go on and make a better one!
--  OEmbed support: Just post an OEmbed-enabled link (e.g. Twitter or
-   YouTube) and ``blogcxx`` will embed the media for you.
 -  RSS feeds for new articles, tags and categories.
 -  Sticky articles: Just put ``Sticky: On`` on top of your article file.
 -  Emoji support: Write ``:-)`` and get a *real* smiling face instead.
 -  Commenting support: Even a static blog needs a community. ;-)
--  OpenGraph support if you feel like sharing stuff on Facebook or
-   whatever.
 -  Syntax highlighting via [highlight.js](https://highlightjs.org/).
 -  Article series: If you have articles which continue other articles,
    you can just add them to the same series and ``blogcxx`` will make
@@ -163,9 +156,7 @@ The latest released version is 1-alpha
   codequality of blogcpp. If you need them, i could create a pluginsystem.
   This pluginsystem would have a js plugin that loads your js plugins.
 - google+ comment system: google+ [closes soon](https://en.wikipedia.org/wiki/Google%2B#Shutdown_of_consumer_version)
-
-## Features that might get removed
-- OEmbed
+- OEmbed support
 
 ---
 
@@ -468,11 +459,6 @@ Boost Log Backend API (just on windows)
 
 #### STATIC_LINKING
 Create a static binary.
-
-#### WITH_OEMBED
-``blogcxx`` supports the OEmbed standard. This will in some cases affect
-the page generation speed. (If not used,``blogcxx`` supports simple
-replacements for YouTube and Vimeo only.)
 
 #### TEST_OLDER_COMPILERS
 This is just an develop option. Please let it off. If on, it disables

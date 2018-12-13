@@ -4,41 +4,41 @@
 
 // clang-format off
 /*
-                   Flow of operation
+                      Flow of operation
 
 
-                   +----------------------------------------------------------------------------+
-                   |                                                                            |
-FilesToMetadata    |  CollectPostData                                                           |    1 Thread
-                   |                                                                            |
-                   +----------------------------------------------------------------------------+
-                   |                                                                            |
-                   |  GatherAllFiles                                                            |    1 Thread
-                   |                                                                            |
-                   +-------------------------+--------------------------------------------------+
-                   |                         |                                                  |
-                   |  Pages                  |             Posts                                |    2 Threads
-                   |                         |                                                  |
-                   +-------------------------+--------------------------------------------------+
-                   |                                                                            |
-                   |                 Check for Files                                            |
-                   |                 CheckMetadata                                              |    1 Thread
-                   |                 CheckArchi^es                                              |
-                   |                                                                            |
-                   +--------------------------+-------------------------------------------------+
-                                              |
-                     (Here flows Metadata)    |
-                                              |
-                   +--------------------------v-------------------------------------------------+
-                   |                                                                            |
-MetadataToHTML     |  CmdGenerateMetadata                                                       |    1 Thread
-                   |                                                                            |
-                   +------------+-------------+----------------+--------------+-----------------+
-                   |            |             |                |              |                 |
-                   | CreatePost | CreatePages | CreateArchives |  CreateIndex | CreateRSS       |    num+threads
-                   |            |             |                |              |                 |
-                   |            |             |                |              |                 |
-                   +------------+-------------+----------------+--------------+-----------------+
+                      +-----------------------------------------------------------------------+
+                      |                                                                       |
+FilesToMetadata       |  CollectPostData                                                      |   1 Thread
+                      |                                                                       |
+                      +-----------------------------------------------------------------------+
+                      |                                                                       |
+                      |  GatherAllFiles                                                       |   1 Thread
+                      |                                                                       |
+                      +-------------------------+---------------------------------------------+
+                      |                         |                                             |
+                      |  Pages                  |             Posts                           |   2 Threads
+                      |                         |                                             |
+                      +-------------------------+---------------------------------------------+
+                      |                                                                       |
+                      |                 Check for Files                                       |
+                      |                 CheckMetadata                                         |   1 Thread
+                      |                 CheckArchives                                         |
+                      |                                                                       |
+                      +--------------------------+--------------------------------------------+
+                                                 |
+                        (Here flows Metadata)    |
+                                                 |
+                      +--------------------------v--------------------------------------------+
+                      |                                                                       |
+MetadataToHTMLAndRSS  |  CmdGenerateMetadata                                                  |   1 Thread
+                      |  CreateHTMLAndRSS                                                     |
+                      +------------+-------------+----------------+--------------+------------+
+                      |            |             |                |              |            |
+                      | CreatePost | CreatePages | CreateArchi^es |  CreateIndex | CreateRSS  |   num threads
+                      |            |             |                |              |            |
+                      |            |             |                |              |            |
+                      +------------+-------------+----------------+--------------+------------+
 
 
 */
@@ -296,9 +296,7 @@ int main(int argc, char **argv)
 			("embeds",			po::value<bool>(&cfgs.cfg_embeds)->default_value(true),
 								"blogcxx can automatically embed media from certain websites "
 								"(like YouTube) if it finds a media link on a separate line. "
-								"If blogcxx was compiled with WITH_OEMBED, this option tries "
-								"to find and process OEmbeds behind all of those links; if "
-								"WITH_OEMBED is not set, only basic replacements are made. "
+								"Basic replacements for media links are made. "
 								"Set this to 'false' if you want to disable this behavior.")
 
 			("excerptlength",	po::value<int>(&cfgs.cfg_excerpts)->default_value(2),

@@ -226,6 +226,10 @@ TemplateData GenerateCommonTemplateData(const TemplateWrapper &engine,
 	return ret;
 }
 
+// this function adds function objects for all asyncronous tasks
+// to the AsyncWorker. If some things must be done prior the jobs,
+// this function handles them too. Like Creation and preparation
+// of output directories
 void CreateHTMLAndRSS(const ConstMetadata &merged, const ConfigCollection &cfgs)
 {
 	if (!fs::exists(cfgs.outdir_root()))
@@ -265,6 +269,7 @@ void CreateHTMLAndRSS(const ConstMetadata &merged, const ConfigCollection &cfgs)
 		++active_page;
 	}
 
+	// create Posts and Pages
 	for (const SingleItem::ConstPtr si : merged.all_posts)
 	{
 		std::function<void()> fo = [si, &merged, &cfgs, &engine,

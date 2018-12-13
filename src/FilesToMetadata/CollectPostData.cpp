@@ -14,6 +14,41 @@
 
 namespace
 {
+
+std::vector<std::string> vectorSplit(std::string inputstring,
+									 std::string divider = ";")
+{
+	// Returns a vector of elements in the <inputstring>.
+	std::vector<std::string> ret;
+
+	if (inputstring.size() == 0)
+	{
+		// Skip empty strings.
+		return ret;
+	}
+
+	std::regex re(divider); // Tokenize.
+	std::sregex_token_iterator it(inputstring.begin(), inputstring.end(), re,
+								  -1);
+	std::sregex_token_iterator reg_end;
+
+	for (; it != reg_end; ++it)
+	{
+		std::string toadd = trim(it->str());
+		if (toadd.empty())
+		{
+			// Empty elements could happen if the user writes ";;" or
+			// if we have a page which only has tags, no categories. In
+			// this case, we should not try to add an "empty item" as
+			// that would not make any sense, would it?
+			continue;
+		}
+		ret.push_back(trim(it->str()));
+	}
+
+	return ret;
+}
+
 template <typename T>
 void MakeUnique(std::vector<T> &v)
 {
@@ -63,8 +98,7 @@ void DetectArchives(Metadata &merged, const ConfigCollection &cfgs)
 		auto y = si->time.date().year();
 		auto m = si->time.date().month();
 		years[y].push_back(si);
-		years_months[std::make_pair(y, m)]
-			.push_back(si);
+		years_months[std::make_pair(y, m)].push_back(si);
 
 		for (auto &c : si->cats)
 		{
@@ -363,12 +397,12 @@ void CheckArchive(const Archive &archive)
 		if (si->time.is_special())
 		{
 			THROW_ERROR("File '%1%' has an invalid time set.",
-				si->s_filename.string());
+						si->s_filename.string());
 		}
 		if (si->changetime.is_special())
 		{
 			THROW_ERROR("File '%1%' has an invalid changetime set.",
-				si->s_filename.string());
+						si->s_filename.string());
 		}
 	}
 }
@@ -412,7 +446,7 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 #ifdef WITH_PLUGINS
 	std::string s_plugins;
 #endif
-	pt::ptime time = {}, changetime= {};
+	pt::ptime time = {}, changetime = {};
 
 	LOG_DEBUG("Gathering categories and tags from the %1% from '%2%'", type,
 			  inputfile);

@@ -59,13 +59,6 @@ std::string hyphenise(std::string input)
 	return input;
 }
 
-bool strEndsWith(const std::string &s, const std::string &ending)
-{
-	// true if <s> ends with <ending>.
-	return (s.size() >= ending.size()) &&
-		   equal(ending.rbegin(), ending.rend(), s.rbegin());
-}
-
 std::string lowercase(std::string input)
 {
 	std::string uinput = boost::locale::to_lower(input);
@@ -172,40 +165,6 @@ void write_file(fs::path filename, const std::string &data)
 
 	std::ostream_iterator<char> osi(ofs, "");
 	std::copy(data.begin(), data.end(), osi);
-}
-
-std::vector<std::string> vectorSplit(std::string inputstring,
-									 std::string divider)
-{
-	// Returns a vector of elements in the <inputstring>.
-	std::vector<std::string> ret;
-
-	if (inputstring.size() == 0)
-	{
-		// Skip empty strings.
-		return ret;
-	}
-
-	std::regex re(divider); // Tokenize.
-	std::sregex_token_iterator it(inputstring.begin(), inputstring.end(), re,
-								  -1);
-	std::sregex_token_iterator reg_end;
-
-	for (; it != reg_end; ++it)
-	{
-		std::string toadd = trim(it->str());
-		if (toadd.empty())
-		{
-			// Empty elements could happen if the user writes ";;" or
-			// if we have a page which only has tags, no categories. In
-			// this case, we should not try to add an "empty item" as
-			// that would not make any sense, would it?
-			continue;
-		}
-		ret.push_back(trim(it->str()));
-	}
-
-	return ret;
 }
 
 // -----------------------------
