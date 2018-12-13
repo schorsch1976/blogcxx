@@ -85,7 +85,7 @@ TemplateData GenerateCommonTemplateData(const TemplateWrapper &engine,
 
 	// archives
 	{
-		std::map<int, std::vector<ArchiveData>> archives_years_months;
+		std::map<year_t, std::vector<ArchiveData>> archives_years_months;
 		for (auto &ar : merged.archives)
 		{
 			const ArchiveData &ad = ar.first;
@@ -93,7 +93,7 @@ TemplateData GenerateCommonTemplateData(const TemplateWrapper &engine,
 			{
 				// because the year month archives get grouped by year
 				case ArchiveType::YearMonth:
-					archives_years_months[ad.time.tm_year + 1900].push_back(ad);
+					archives_years_months[ad.time.date().year()].push_back(ad);
 					break;
 				case ArchiveType::Year:
 				case ArchiveType::Author:
@@ -125,7 +125,7 @@ TemplateData GenerateCommonTemplateData(const TemplateWrapper &engine,
 			for (auto &ad : ar.second)
 			{
 				ret.Set({"archives", y, "months", m, "month"},
-						std::to_string(ad.time.tm_mon + 1));
+						std::to_string(ad.time.date().month()));
 				ret.Set({"archives", y, "months", m, "URL"},
 						cfgs.url(cfgs.rel_path_archive_year_month(ad.time)));
 				++m;

@@ -32,7 +32,8 @@ void CreateRSS(const fs::path outfile, const std::string title,
 				 cfgs.url(cfgs.rel_path_posts(post.s_slug)));
 
 		std::ostringstream pubdata;
-		pubdata << std::put_time(&post.time, "%a, %d %b %Y %T %z");
+		tm pub = pt::to_tm(post.time);
+		pubdata << std::put_time(&pub, "%a, %d %b %Y %T %z");
 		data.Set({"items", i, "pubDate"}, pubdata.str());
 	}
 

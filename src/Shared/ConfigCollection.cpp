@@ -176,20 +176,20 @@ fs::path ConfigCollection::rel_path_archive() const
 	return fs::path("archives");
 }
 
-fs::path ConfigCollection::rel_path_archive_year(const tm &time) const
+fs::path ConfigCollection::rel_path_archive_year(const pt::ptime& time) const
 {
 	std::ostringstream oss_year;
-	oss_year << std::setw(4) << std::setfill('0') << time.tm_year + 1900;
+	oss_year << std::setw(4) << std::setfill('0') << time.date().year();
 
 	fs::path ret{rel_path_archive()};
 	ret /= oss_year.str();
 	return ret;
 }
-fs::path ConfigCollection::rel_path_archive_year_month(const tm &time) const
+fs::path ConfigCollection::rel_path_archive_year_month(const pt::ptime& time) const
 {
 	std::ostringstream oss_year, oss_month;
-	oss_year << std::setw(4) << std::setfill('0') << time.tm_year + 1900;
-	oss_month << std::setw(2) << std::setfill('0') << time.tm_mon + 1;
+	oss_year << std::setw(4) << std::setfill('0') << time.date().year();
+	oss_month << std::setw(2) << std::setfill('0') << time.date().month();
 
 	fs::path ret{rel_path_archive()};
 	ret /= oss_year.str();

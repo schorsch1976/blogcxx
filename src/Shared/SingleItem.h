@@ -10,6 +10,13 @@
 #include <string>
 #include <vector>
 
+// we use modern c++ and avoid the old struct tm_t
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+namespace pt = boost::posix_time;
+using year_t = boost::gregorian::greg_year;
+using month_t = boost::gregorian::greg_month;
+
 #include "filesystem.h"
 
 enum class ItemType
@@ -44,8 +51,8 @@ public:
 	// -------------------------
 	// Meta data (from input)
 	// -------------------------
-	tm time;			  // The creation date/time of the item.
-	tm changetime;		  // The date/time of the latest change of the item.
+	pt::ptime time;		  // The creation date/time of the item.
+	pt::ptime changetime; // The date/time of the latest change of the item.
 	std::string s_title;  // The contents of the title of the item.
 	std::string s_slug;   // The (title/URL) slug of the item.
 	std::string s_author; // The author of the item.
@@ -62,7 +69,7 @@ public:
 		s_series; // An optional unique name for the series (if !b_isPage).
 
 	int i_position; // An optional position (1..infinity) if b_isPage.
-					// Default: 0.
+	// Default: 0.
 
 	std::vector<std::string> cats; // Contains the categories of the item.
 	std::vector<std::string> tags; // Contains the tags of the item.

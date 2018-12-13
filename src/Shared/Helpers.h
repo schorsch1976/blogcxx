@@ -33,13 +33,9 @@ bool vectorSort(std::string a, std::string b);
 
 std::string timeNow(const char *format = "%a, %d %b %Y %T %z");
 
-void parseDatestringToTm(std::string in_datetime, std::string inputfile,
-						 tm &input_tm);
-std::string dateToPrint(const tm &tm_t, bool shortdate = false);
+std::string dateToPrint(const pt::ptime& time, bool shortdate = false);
 
-bool isFutureDate(tm tm_im);
-
-std::string parseTmToPath(tm tm_t, std::string cfg_permalinks);
+bool isFutureDate(pt::ptime time);
 
 bool time_smaller(SingleItem::ConstPtr left, SingleItem::ConstPtr right);
 bool time_equal(SingleItem::ConstPtr left, SingleItem::ConstPtr right);

@@ -51,7 +51,7 @@ void DetectArchives(Metadata &merged, const ConfigCollection &cfgs)
 	LOG_DEBUG("DetectArchives...");
 
 	std::map<int, Archive> years;
-	std::map<std::pair<int, int>, Archive> years_months;
+	std::map<std::pair<year_t, month_t>, Archive> years_months;
 
 	std::map<std::string, Archive> cats;
 	std::map<std::string, Archive> tags;
@@ -60,8 +60,10 @@ void DetectArchives(Metadata &merged, const ConfigCollection &cfgs)
 
 	for (auto &si : merged.all_posts)
 	{
-		years[si->time.tm_year].push_back(si);
-		years_months[std::make_pair(si->time.tm_year, si->time.tm_mon)]
+		auto y = si->time.date().year();
+		auto m = si->time.date().month();
+		years[y].push_back(si);
+		years_months[std::make_pair(y, m)]
 			.push_back(si);
 
 		for (auto &c : si->cats)
@@ -358,19 +360,15 @@ void CheckArchive(const Archive &archive)
 						si->s_filename.string(), BUGTRACKER);
 		}
 
-		if (si->time.tm_hour > 23 || si->time.tm_hour < 0 ||
-			si->time.tm_min > 59 || si->time.tm_hour < 0 ||
-			si->time.tm_sec > 60 || si->time.tm_sec < 0 ||
-
-			si->time.tm_wday > 6 || si->time.tm_wday < 0 ||
-
-			si->time.tm_mday > 31 || si->time.tm_mday < 0 ||
-			si->time.tm_mon > 11 || si->time.tm_mon < 0 ||
-			si->time.tm_yday > 365 || si->time.tm_yday < 0 ||
-			si->time.tm_year < 0)
+		if (si->time.is_special())
 		{
 			THROW_ERROR("File '%1%' has an invalid time set.",
-						si->s_filename.string());
+				si->s_filename.string());
+		}
+		if (si->changetime.is_special())
+		{
+			THROW_ERROR("File '%1%' has an invalid changetime set.",
+				si->s_filename.string());
 		}
 	}
 }
@@ -414,7 +412,7 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 #ifdef WITH_PLUGINS
 	std::string s_plugins;
 #endif
-	tm tm_t = {}, change_tm_t = {};
+	pt::ptime time = {}, changetime= {};
 
 	LOG_DEBUG("Gathering categories and tags from the %1% from '%2%'", type,
 			  inputfile);
@@ -493,14 +491,13 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 			else if (regex_match(line, match, re_datetime) && match.size() > 1)
 			{
 				// Get the tm from the date/time in the file.
-				parseDatestringToTm(match.str(1), inputfile.string(), tm_t);
+				time = pt::time_from_string(match.str(1));
 			}
 			else if (regex_match(line, match, re_change_datetime) &&
 					 match.size() > 1)
 			{
 				// Get the tm from the "latest change" date/time in the file.
-				parseDatestringToTm(match.str(1), inputfile.string(),
-									change_tm_t);
+				changetime = pt::time_from_string(match.str(1));
 			}
 			else if (type != ItemType::Page &&
 					 regex_match(line, match, re_cats) && match.size() > 1)
@@ -602,8 +599,8 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 
 	si.s_filename = inputfile;
 
-	si.time = tm_t;
-	si.changetime = change_tm_t;
+	si.time = time;
+	si.changetime = changetime;
 	si.s_title = s_title;
 	si.s_slug = s_slug;
 	si.s_author = s_author;

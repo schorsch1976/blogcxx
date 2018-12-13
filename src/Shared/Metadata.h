@@ -33,7 +33,7 @@ struct ArchiveData
 {
 	fs::path path;
 	ArchiveType type;
-	tm time;
+	pt::ptime time;
 
 	inline bool operator<(const ArchiveData &rhs) const
 	{

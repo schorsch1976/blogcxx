@@ -232,87 +232,41 @@ std::string timeNow(const char *format)
 	return ss_time.str();
 }
 
-void parseDatestringToTm(std::string in_datetime, std::string inputfile,
-						 tm &input_tm)
-{
-	// Converts the in_datetime from a post or page into a struct tm.
-	std::istringstream ss_inputdate(in_datetime);
-
-	// Fill the tm:
-	ss_inputdate >> std::get_time(&input_tm, "%Y-%m-%d %H:%M:%S");
-
-	if (ss_inputdate.fail())
-	{
-		std::cout << "Failed to parse the date from the file " << inputfile
-				  << "." << std::endl;
-		std::cout << "Please check it before you continue." << std::endl;
-	}
-}
-
-std::string dateToPrint(const tm &tm_t, bool shortdate /*= false*/)
+std::string dateToPrint(const pt::ptime& time, bool shortdate /*= false*/)
 {
 	// we got a global locale
 	using namespace boost::locale;
-	date_time_period_set s;
-	s.add(period::year(tm_t.tm_year + 1900));
-	s.add(period::month(tm_t.tm_mon));
-	s.add(period::hour(tm_t.tm_hour));
-	s.add(period::minute(tm_t.tm_min));
-	s.add(period::second(tm_t.tm_sec));
-
-	date_time dt(s);
 
 	std::ostringstream oss;
 	if (shortdate)
 	{
-		oss << as::date << dt;
+		oss << as::date << time;
 	}
 	else
 	{
-		oss <<as::datetime << dt;
+		oss << as::datetime << time;
 	}
 
 	return oss.str();
 }
 
-bool isFutureDate(tm tm_im)
+bool isFutureDate(pt::ptime time)
 {
-	// Returns true is <datestring> is in the future; else, false.
-	time_t time_now = time(0);
-
-	time_t time_in = mktime(&tm_im);
-
-	double difference = difftime(time_now, time_in) / (60 * 60 * 24);
-
-	return (difference < 0);
-}
-
-std::string parseTmToPath(tm tm_t, std::string cfg_permalinks)
-{
-	// Converts the tm_t from a post or page to a correct path structure (see
-	// above).
-	std::ostringstream ss_outputdate;
-
-	const char *const cstr_permalinks = cfg_permalinks.c_str();
-	ss_outputdate << std::put_time(&tm_t, cstr_permalinks);
-
-	return ss_outputdate.str();
+	// Returns true is time is in the future; else, false.
+	return time < pt::second_clock::local_time();
 }
 
 bool time_smaller(SingleItem::ConstPtr left, SingleItem::ConstPtr right)
 {
-	return difftime(mktime(const_cast<struct tm *>(&left->time)),
-					mktime(const_cast<struct tm *>(&right->time))) < 0;
+	return left->time < right->time;
 };
 
 bool time_equal(SingleItem::ConstPtr left, SingleItem::ConstPtr right)
 {
-	return difftime(mktime(const_cast<struct tm *>(&left->time)),
-					mktime(const_cast<struct tm *>(&right->time))) == 0;
+	return left->time == right->time;
 };
 
 bool time_greater(SingleItem::ConstPtr left, SingleItem::ConstPtr right)
 {
-	return difftime(mktime(const_cast<struct tm *>(&left->time)),
-					mktime(const_cast<struct tm *>(&right->time))) > 0;
+	return left->time > right->time;
 };
