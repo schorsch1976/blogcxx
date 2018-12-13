@@ -31,8 +31,8 @@ SET(SRCS
 	EmojiParser.cpp
 	EmojiParser.h
 
-	ExcerptExtractorClass.cpp
-	ExcerptExtractorClass.h
+	ExcerptExtractor.cpp
+	ExcerptExtractor.h
 
 	MediaEmbedderClass.cpp
 	MediaEmbedderClass.h

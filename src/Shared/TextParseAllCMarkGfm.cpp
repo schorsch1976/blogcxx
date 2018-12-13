@@ -1,7 +1,7 @@
 #include "TextParseAll.h"
 
 #include "EmojiParser.h"
-#include "ExcerptExtractorClass.h"
+#include "ExcerptExtractor.h"
 #include "Shared/Debug.h"
 
 #include "cmark-gfm-core-extensions.h"
@@ -90,7 +90,8 @@ TextParseAll(const SingleItem &si, const ConfigCollection &cfgs,
 	std::string txt = si.s_text;
 	if (exceprt)
 	{
-		txt = ExcerptExtractor(txt, cfgs.excerpts()).extractExcerpt();
+		bool shortened = false;
+		std::tie(txt, shortened) = Excerpt::extract(txt, cfgs.excerpts());
 	}
 
 	if (si.b_emoji && si.b_markdown)

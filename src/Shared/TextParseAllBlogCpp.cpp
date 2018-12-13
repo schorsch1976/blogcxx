@@ -1,6 +1,6 @@
 #include "TextParseAll.h"
 
-#include "ExcerptExtractorClass.h"
+#include "ExcerptExtractor.h"
 #include "Shared/Debug.h"
 
 #include "MarkdownWrapperClass.h"
@@ -12,7 +12,8 @@ TextParseAll(const SingleItem &si, const ConfigCollection &cfgs,
 	std::string txt = si.s_text;
 	if (exceprt)
 	{
-		txt = ExcerptExtractor(txt, cfgs.excerpts()).extractExcerpt();
+		bool shortened = false;
+		std::tie(txt, shortened) = Excerpt::extract(txt, cfgs.excerpts());
 	}
 
 	auto marked = MarkdownWrapper::markdownify(

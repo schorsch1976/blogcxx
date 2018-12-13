@@ -1,22 +1,15 @@
 /*
  * blogcxx :: https://www.blogcxx.de
- * Excerpt extractor class.
+ * Excerpt extractor.
  */
 
-#include "ExcerptExtractorClass.h"
+#include "ExcerptExtractor.h"
 #include "Shared/Debug.h"
 
-ExcerptExtractor::ExcerptExtractor(std::string in_string, int in_excerpt_length)
+namespace Excerpt
 {
-	// A new ExcerptExtractor has a string and an integer passed.
-	// And a default "not shortened" value.
-	string_to_extract = in_string;
-	max_sentences = in_excerpt_length;
 
-	shortened = false;
-}
-
-std::string ExcerptExtractor::extractExcerpt()
+std::pair<std::string, bool> extract(std::string string_to_extract, int max_sentences)
 {
 	// Returns the excerpt and sets the "shortened" bool to "true" if
 	// applicable. If <max_sentences> is 0, this method will only check for
@@ -24,6 +17,7 @@ std::string ExcerptExtractor::extractExcerpt()
 	// <!--more--> links, similar to WordPress.
 	std::stringstream ret;
 	int sentence_counter = 1;
+	bool shortened = false;
 
 	// A "sentence" is - EITHER - text ending with ! or ? or . or : and a space
 	// character or a line break - OR - text ending with a comma and a line
@@ -58,5 +52,7 @@ std::string ExcerptExtractor::extractExcerpt()
 		ret << (*it).str();
 	}
 
-	return ret.str();
+	return std::make_pair(ret.str(), shortened);
 }
+
+} // ns Excerpt
