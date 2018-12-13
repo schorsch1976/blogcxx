@@ -255,12 +255,6 @@ ENDIF(WIN32)
 ############################################################################
 # Combine the CXX Libs
 ############################################################################
-IF(MARKDOWN_CMARK)
-	SET(BLOG_CXX_LIBS    ${BLOG_CXX_LIBS}
-		cmark
-	)
-ENDIF(MARKDOWN_CMARK)
-
 IF(MARKDOWN_CMARK_GFM)
 	SET(BLOG_CXX_LIBS    ${BLOG_CXX_LIBS}
 		cmark-gfm-extensions
