@@ -25,15 +25,19 @@ void write_file(fs::path filename, const std::string &data);
 
 std::vector<std::string> vectorSplit(std::string inputstring,
 									 std::string divider = ";");
-bool vectorSort(std::string a, std::string b);
 
 // -----------------------------
 // Date/Time Helpers
 // -----------------------------
 
-std::string timeNow(const char *format = "%a, %d %b %Y %T %z");
+enum class time_fmt
+{
+	date_short,
+	date_time,
+	date_time_rss
+};
 
-std::string dateToPrint(const pt::ptime& time, bool shortdate = false);
+std::string dateToPrint(const pt::ptime& time, time_fmt fmt = time_fmt::date_time);
 
 bool isFutureDate(pt::ptime time);
 

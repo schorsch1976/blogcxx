@@ -32,7 +32,8 @@ void ContentsGenerator::generate()
 	switch (type)
 	{
 		case ItemType::Post:
-			filename /= timeNow("%Y-%m-%d") + " " +
+			filename /= dateToPrint(pt::second_clock::local_time(),
+									time_fmt::date_short) +
 						trim(hyphenise(eparser.clear(title))) + ".txt";
 			contents << createDummyArticle() << first_text;
 			break;
@@ -88,7 +89,9 @@ std::string ContentsGenerator::createDummyPage()
 	ret << "Author: " << author << NEWLINE;
 	ret << "Title: " << title << NEWLINE;
 	ret << "Slug: " << slug << NEWLINE;
-	ret << "Date: " << timeNow("%Y-%m-%d %H:%M:%S") << NEWLINE;
+	ret << "Date: "
+		<< dateToPrint(pt::second_clock::local_time(), time_fmt::date_time)
+		<< NEWLINE;
 	ret << "Tags: " << NEWLINE;
 	ret << NEWLINE;
 	ret << HEADER_DIVIDER << NEWLINE;
@@ -105,7 +108,9 @@ std::string ContentsGenerator::createDummyArticle()
 	ret << "Author: " << author << NEWLINE;
 	ret << "Title: " << title << NEWLINE;
 	ret << "Slug: " << slug << NEWLINE;
-	ret << "Date: " << timeNow("%Y-%m-%d %H:%M:%S") << NEWLINE;
+	ret << "Date: "
+		<< dateToPrint(pt::second_clock::local_time(), time_fmt::date_time)
+		<< NEWLINE;
 	ret << "Tags: " << NEWLINE;
 	ret << "Categories: " << NEWLINE;
 	ret << NEWLINE;

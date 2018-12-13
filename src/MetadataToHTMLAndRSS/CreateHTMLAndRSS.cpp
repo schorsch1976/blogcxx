@@ -77,7 +77,7 @@ TemplateData GenerateCommonTemplateData(const TemplateWrapper &engine,
 	for (auto &si : latest_posts)
 	{
 		ret.Set({"latestposts", i, "title"}, si->s_title);
-		ret.Set({"latestposts", i, "date"}, dateToPrint(si->time, true));
+		ret.Set({"latestposts", i, "date"}, dateToPrint(si->time, time_fmt::date_short));
 		ret.Set({"latestposts", i, "link"},
 				cfgs.url(cfgs.rel_path_posts(si->s_slug)));
 		++i;

@@ -211,41 +211,27 @@ std::vector<std::string> vectorSplit(std::string inputstring,
 // -----------------------------
 // Date/Time Helpers
 // -----------------------------
-std::string timeNow(const char *format)
-{
-	// Returns a formatted "now()" string. The output format defaults to ISO
-	// time.
-	std::stringstream ss_time;
-	time_t t = time(0);
-#if (defined(_WIN32) && !__INTEL_COMPILER)
-	// Microsoft wants to have localtime_s here.
-	tm now;
-	localtime_s(&now, &t);
-#else
-	tm *now = localtime(&t);
-#endif
-#ifdef _WIN32
-	ss_time << std::put_time(&now, format);
-#else
-	ss_time << std::put_time(now, format);
-#endif
-	return ss_time.str();
-}
-
-std::string dateToPrint(const pt::ptime& time, bool shortdate /*= false*/)
+std::string dateToPrint(const pt::ptime& time, time_fmt fmt)
 {
 	// we got a global locale
 	using namespace boost::locale;
 
 	std::ostringstream oss;
-	if (shortdate)
+	switch (fmt)
 	{
-		oss << as::date << time;
-	}
-	else
-	{
-		oss << as::datetime << time;
-	}
+	case time_fmt::date_short:
+		oss << as::ftime("%Y-%m-%d");
+		break;
+	default:
+	case time_fmt::date_time:
+		oss << as::ftime("%Y-%m-%d %H:%M:%S");
+		break;
+	case time_fmt::date_time_rss:
+		oss << as::ftime("%a, %d %b %Y %T %z");
+		break;
+	};
+
+	oss << time;
 
 	return oss.str();
 }

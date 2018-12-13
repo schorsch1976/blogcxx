@@ -16,7 +16,8 @@ void CreateRSS(const fs::path outfile, const std::string title,
 	data.Set({"title"}, title);
 	data.Set({"link"}, cfgs.url(""));
 	data.Set({"description"}, cfgs.sitetitle());
-	data.Set({"lastBuildDate"}, timeNow());
+	data.Set({"lastBuildDate"}, dateToPrint(pt::second_clock::local_time(),
+											time_fmt::date_time_rss));
 
 	for (int i = 0; i < cfgs.maxitems() && i < static_cast<int>(ar.size()); ++i)
 	{
@@ -30,11 +31,8 @@ void CreateRSS(const fs::path outfile, const std::string title,
 		data.Set({"items", i, "description"}, desc);
 		data.Set({"items", i, "link"},
 				 cfgs.url(cfgs.rel_path_posts(post.s_slug)));
-
-		std::ostringstream pubdata;
-		tm pub = pt::to_tm(post.time);
-		pubdata << std::put_time(&pub, "%a, %d %b %Y %T %z");
-		data.Set({"items", i, "pubDate"}, pubdata.str());
+		data.Set({"items", i, "pubDate"},
+				 dateToPrint(post.time, time_fmt::date_time_rss));
 	}
 
 	LOG_DEBUG("RSS: %1%", data.to_string());
