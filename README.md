@@ -35,8 +35,8 @@ It is a very bad first expierience for the user of a project if it just crashes
 without printing anything.
 
 As i tried to send my changes to blogcpp, the author didn't want them because
-i use boost and added [cmark](https://github.com/commonmark/cmark) and/or
-[cmark-gfm](https://github.com/github/cmark-gfm). Both are to heavy for the author of blogcpp.
+i use boost and added [cmark-gfm](https://github.com/github/cmark-gfm). They are
+to heavy for the author of blogcpp.
 
 ## No, seriously, why?
 
@@ -59,7 +59,8 @@ i use boost and added [cmark](https://github.com/commonmark/cmark) and/or
 - usage should be much more convienent as it reports its error much better
 - syntax and other stuff stays the same :-)
 - more stable
-- better markdown support with libcmark/libcmark-gfm
+- better markdown support with libcmark-gfm
+- get source from git and not from mercurial
 
 ## Current version
 
@@ -116,7 +117,6 @@ The latest released version is 1-alpha
 
 - switch the markdown parser at compiletime to libcmark/libcmark-gfm but the blogcpp
   markdown parser is still available.
-  Markdown syntax used with [cmark](https://commonmark.org/help/)
   Markdown syntax used with [cmark-gfm](https://help.github.com/articles/basic-writing-and-formatting-syntax/)
 - blogcxx can now run without an blog.cfg. It uses internal defaults
   (the one from the blog.cfg-example). Just use the blog.cfg file to
@@ -192,6 +192,7 @@ raw threads. use std::future() and std::async(launch::async,...)
 - TemplateWrapper does now what its name implies. It totally encapulates
   json and the inja handling. It uses the so called PIMPL pattern that is also
   known as compiler firewall.
+- replace struct tm by boost::posix_time::ptime over the whole code base
 - Restructure the whole src folder. Split the tasks into manageable
   files that are grouped accordig to their function in the process.
 - use boost::log and boost::format for logging.
@@ -218,7 +219,7 @@ Now it is typesafe and without sstream everywhere
 
 ### What stayed the same between blogcpp and blogcxx?
 - Template design
-- Markdown Parser (but exchangeable with libcmark)
+- Markdown Parser (but exchangeable with libcmark-gfm)
 - Emoji Parser (clear(), but parse got reimplemented)
 - Excerpt Extractor
 - Fileparser (mostly)
@@ -232,7 +233,6 @@ Now it is typesafe and without sstream everywhere
 ``blogcxx`` uses the following third-party libraries (in ``3rdparty/``):
 - [inja](https://github.com/pantor/inja)
 - [json](https://github.com/nlohmann/json)
-- *optional* [cmark 0.28.3](https://github.com/commonmark/cmark)
 - *optional* [cmark-gfm 0.28.3](https://github.com/github/cmark-gfm)
 
 Not in 3rdparty directory because it is to big.
@@ -450,7 +450,6 @@ make -j8 clean all  278,61s user 7,67s system 520% cpu 55,023 total
 
 #### MARKDOWN_API
 * ``blogcxx`` is the traditional and default MarkdownParser.
-* ``libcmark`` is the reference implementation.
 * ``libcmark-gfm`` is the implementation used at github with table support
 
 #### BOOST_LOG_API
@@ -588,7 +587,7 @@ repository). Currently supported are:
 Yes, you can! Everything between ``<rawhtml>`` and ``</rawhtml>`` will
 be ignored by blogcpp Markdown parser.
 
-### cmark/cmark-gfm markdown parser
+### cmark-gfm markdown parser
 [Inline HTML with cmark-gfm](https://daringfireball.net/projects/markdown/syntax#html)
 
 In short, just add the raw html to the Markdown and it will be embedded. It

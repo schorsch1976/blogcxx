@@ -23,66 +23,6 @@ ENDIF(WITH_OEMBED)
 ############################################################################
 # 3rdParty includes provided by blogcxx
 ############################################################################
-IF(MARKDOWN_CMARK)
-	set(PROJECT_VERSION_MAJOR 0)
-	set(PROJECT_VERSION_MINOR 28)
-	set(PROJECT_VERSION_PATCH 3)
-	set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH} )
-
-	SET(CMARK_DIR cmark-0.28.3/src/)
-
-	# adopted from the cmake file from cmark
-	CONFIGURE_FILE(
-		${CMAKE_CURRENT_SOURCE_DIR}/${CMARK_DIR}/config.h.in
-		${CMAKE_CURRENT_BINARY_DIR}/config.h)
-
-	CONFIGURE_FILE(
-		${CMAKE_CURRENT_SOURCE_DIR}/${CMARK_DIR}/cmark_version.h.in
-		${CMAKE_CURRENT_BINARY_DIR}/cmark_version.h)
-
-	CONFIGURE_FILE(
-		${CMAKE_CURRENT_SOURCE_DIR}/${CMARK_DIR}/libcmark.pc.in
-		${CMAKE_CURRENT_BINARY_DIR}/libcmark.pc @ONLY)
-
-
-	INCLUDE_DIRECTORIES(${CMARK_DIR})
-	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-
-	SET(CMARK_SRCS ${CMARK_SRCS}
-		${CMARK_DIR}cmark.c
-		${CMARK_DIR}node.c
-		${CMARK_DIR}iterator.c
-		${CMARK_DIR}blocks.c
-		${CMARK_DIR}inlines.c
-		${CMARK_DIR}scanners.c
-		${CMARK_DIR}scanners.re
-		${CMARK_DIR}utf8.c
-		${CMARK_DIR}buffer.c
-		${CMARK_DIR}references.c
-		${CMARK_DIR}render.c
-		${CMARK_DIR}man.c
-		${CMARK_DIR}xml.c
-		${CMARK_DIR}html.c
-		${CMARK_DIR}commonmark.c
-		${CMARK_DIR}latex.c
-		${CMARK_DIR}houdini_href_e.c
-		${CMARK_DIR}houdini_html_e.c
-		${CMARK_DIR}houdini_html_u.c
-		${CMARK_DIR}cmark_ctype.c
-	)
-
-	include (GenerateExportHeader)
-	ADD_LIBRARY(cmark ${CMARK_SRCS})
-	generate_export_header(cmark)
-	target_compile_definitions(cmark PRIVATE -Dtrue=1 -Dfalse=0)
-	target_compile_definitions(cmark PRIVATE -DCMARK_STATIC_DEFINE)
-
-	SET(CMARK_INCLUDE_DIR
-		${CMAKE_CURRENT_SOURCE_DIR}/${CMARK_DIR}
-		${CMAKE_CURRENT_BINARY_DIR}
-	PARENT_SCOPE)
-ENDIF(MARKDOWN_CMARK)
-
 IF(MARKDOWN_CMARK_GFM)
 	set(PROJECT_VERSION_MAJOR 0)
 	set(PROJECT_VERSION_MINOR 28)
