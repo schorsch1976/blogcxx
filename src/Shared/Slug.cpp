@@ -16,9 +16,6 @@
 std::string createBasicSlug(const SingleItem &si)
 {
 	// Creates a basic slug.
-	// Mainly used for category/tag/archive slugs.
-	std::string ret;
-
 	std::string start;
 	if (si.s_slug.empty())
 	{
@@ -35,10 +32,10 @@ std::string createBasicSlug(const SingleItem &si)
 			si.s_filename.string());
 	}
 	// Lowercase:
-	std::string uinput = boost::locale::to_lower(start);
+	std::string uinput = lowercase(start);
 
 	// Umlauts/diacritics -> ASCII:
-	ret = boost::locale::normalize(uinput, boost::locale::norm_nfd);
+	std::string ret = boost::locale::normalize(uinput, boost::locale::norm_nfd);
 
 	// Emojis:
 	EmojiParser eparser;

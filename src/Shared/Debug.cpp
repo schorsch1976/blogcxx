@@ -23,8 +23,9 @@
 #include <boost/log/utility/setup/file.hpp>
 
 #ifdef _WIN32
-#include <VersionHelpers.h> // getversion for color output
 #include <windows.h>
+
+#include <VersionHelpers.h> // getversion for color output
 #endif
 
 namespace
@@ -69,6 +70,17 @@ logging::formatting_ostream &
 operator<<(logging::formatting_ostream &strm,
 		   logging::to_log_manip<Color, color_tag> const &manip)
 {
+	static std::once_flag s_detect_version;
+	std::call_once(s_detect_version, []() {
+		// https://docs.microsoft.com/de-de/windows/desktop/SysInfo/version-helper-apis
+#ifdef _WIN32
+		// just on Win10 is color available
+		sb_color_available = IsWindowsVersionOrGreater(10, 0, 0);
+#else
+		sb_color_available = true;
+#endif
+	});
+
 #ifdef UNIX
 	// https://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
 	static const char *strings[] = {
@@ -78,38 +90,19 @@ operator<<(logging::formatting_ostream &strm,
 		"\033[1;36m", // cyan
 		"\033[1;31m"  // red
 	};
-
-	Color color = manip.get();
-	if (static_cast<std::size_t>(color) < sizeof(strings) / sizeof(*strings))
-	{
-		strm << strings[static_cast<int>(color)];
-	}
-	else
-	{
-		// else red
-		strm << strings[static_cast<int>(Color::red)];
-	}
-
 #endif
 #ifdef _WIN32
-	static std::once_flag s_detect_version;
-	std::call_once(s_detect_version, []() {
-		// https://docs.microsoft.com/de-de/windows/desktop/SysInfo/version-helper-apis
-
-		// just on Win10 is color available
-		sb_color_available = IsWindowsVersionOrGreater(10, 0, 0);
-	});
+	static const char *strings[] = {
+		"^<ESC^>[37m [37m", // std = white
+		"^<ESC^>[34m [34m", // blue
+		"^<ESC^>[33m [33m", // yellow
+		"^<ESC^>[36m [36m", // cyan
+		"^<ESC^>[31m [31m"  // red
+	};
+#endif
 
 	if (sb_color_available)
 	{
-		static const char *strings[] = {
-			"^<ESC^>[37m [37m", // std = white
-			"^<ESC^>[34m [34m", // blue
-			"^<ESC^>[33m [33m", // yellow
-			"^<ESC^>[36m [36m", // cyan
-			"^<ESC^>[31m [31m"  // red
-		};
-
 		Color color = manip.get();
 		if (static_cast<std::size_t>(color) <
 			sizeof(strings) / sizeof(*strings))
@@ -122,7 +115,6 @@ operator<<(logging::formatting_ostream &strm,
 			strm << strings[static_cast<int>(Color::red)];
 		}
 	}
-#endif
 	return strm;
 }
 
