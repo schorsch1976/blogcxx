@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <iterator>
 
-#include <regex>
+#include "Shared/regex.h"
 #include <sstream>
 
 #include <boost/locale.hpp>
@@ -40,9 +40,10 @@ std::string trim(std::string inputstring)
 	// Removes leading and trailing whitespaces from <inputstring>.
 	auto wsfront = std::find_if_not(inputstring.begin(), inputstring.end(),
 									[](int c) { return isspace(c); });
-	auto wsback = find_if_not(inputstring.rbegin(), inputstring.rend(),
-							  [](int c) { return isspace(c); })
-					  .base();
+	auto wsback =
+		find_if_not(inputstring.rbegin(), inputstring.rend(), [](int c) {
+			return isspace(c);
+		}).base();
 	return (wsback <= wsfront ? std::string() : std::string(wsfront, wsback));
 }
 
@@ -139,7 +140,8 @@ std::string read_file(fs::path filename)
 	}
 
 	// remove any "\r"
-	std::remove(std::begin(file_contents), std::end(file_contents), '\r');
+	file_contents.erase(
+		std::remove(std::begin(file_contents), std::end(file_contents), '\r'));
 
 	return file_contents;
 }
@@ -170,7 +172,7 @@ void write_file(fs::path filename, const std::string &data)
 // -----------------------------
 // Date/Time Helpers
 // -----------------------------
-std::string dateToPrint(const pt::ptime& time, time_fmt fmt)
+std::string dateToPrint(const pt::ptime &time, time_fmt fmt)
 {
 	using namespace boost::locale;
 
@@ -187,22 +189,22 @@ std::string dateToPrint(const pt::ptime& time, time_fmt fmt)
 	std::ostringstream oss;
 	switch (fmt)
 	{
-	case time_fmt::locale_short:
-		oss << as::date_short << dt;
-		break;
-	case time_fmt::locale_date_time:
-		oss << as::date_full << dt;
-		break;
-	case time_fmt::iso_short:
-		oss << std::put_time(&tm_t, "%Y-%m-%d");
-		break;
-	default:
-	case time_fmt::iso_date_time:
-		oss << std::put_time(&tm_t, "%Y-%m-%d %H:%M:%S");
-		break;
-	case time_fmt::rss_date_time:
-		oss << std::put_time(&tm_t, "%a, %d %b %Y %T %z");
-		break;
+		case time_fmt::locale_short:
+			oss << as::date_short << dt;
+			break;
+		case time_fmt::locale_date_time:
+			oss << as::date_full << dt;
+			break;
+		case time_fmt::iso_short:
+			oss << std::put_time(&tm_t, "%Y-%m-%d");
+			break;
+		default:
+		case time_fmt::iso_date_time:
+			oss << std::put_time(&tm_t, "%Y-%m-%d %H:%M:%S");
+			break;
+		case time_fmt::rss_date_time:
+			oss << std::put_time(&tm_t, "%a, %d %b %Y %T %z");
+			break;
 	};
 
 	return oss.str();

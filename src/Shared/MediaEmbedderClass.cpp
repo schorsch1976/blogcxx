@@ -27,15 +27,15 @@ bool MediaEmbedder::addEmbeds(std::string &inputline)
 
 	LOG_DEBUG("Using standard embeds.");
 
-	std::regex youtube(
+	rx::regex youtube(
 		"^https?://(www\\.)?youtube\\.com/watch\\?v=([A-Za-z0-9-]+)&?$");
-	std::regex vimeo("^https?://(www\\.)?vimeo\\.com/(\\d+)$");
+	rx::regex vimeo("^https?://(www\\.)?vimeo\\.com/(\\d+)$");
 
-	std::smatch match;
+	rx::smatch match;
 
 	parsedline = inputline;
 
-	if (std::regex_match(inputline, match, youtube))
+	if (rx::regex_match(inputline, match, youtube))
 	{
 
 		LOG_INFO("Found a YouTube link: %1%", match.str(0));
@@ -47,7 +47,7 @@ bool MediaEmbedder::addEmbeds(std::string &inputline)
 		parsedline = ss_parsedline.str();
 		ret = true;
 	}
-	else if (std::regex_match(inputline, match, vimeo))
+	else if (rx::regex_match(inputline, match, vimeo))
 	{
 		LOG_INFO("Found a Vimeo link: %1%", match.str(0));
 

@@ -22,24 +22,24 @@ std::pair<std::string, bool> extract(std::string string_to_extract, int max_sent
 	// A "sentence" is - EITHER - text ending with ! or ? or . or : and a space
 	// character or a line break - OR - text ending with a comma and a line
 	// break (for addressing your readers).
-	std::regex re_sentence("(.*?)([!\\?\\.:][\\s\\n]|,\\n)");
+	rx::regex re_sentence("(.*?)([!\\?\\.:][\\s\\n]|,\\n)");
 
 	// If the user defined a "<!--more-->" item somewhere in the text, it
 	// supersedes the automatically determined end of the excerpt. We also
 	// accept "<!-- more -->".
-	std::regex re_morelink("<!--\\s?more\\s?-->");
+	rx::regex re_morelink("<!--\\s?more\\s?-->");
 
 	// Find the first <cfg_excerpt> sentences (ending with '!', '?' or '.')
 	// and put them into our ret-Stream.
-	auto it_sentcs_begin = std::sregex_iterator(
+	auto it_sentcs_begin = rx::sregex_iterator(
 		string_to_extract.begin(), string_to_extract.end(), re_sentence);
-	auto it_sentcs_end = std::sregex_iterator();
+	auto it_sentcs_end = rx::sregex_iterator();
 
 	for (auto it = it_sentcs_begin; it != it_sentcs_end;
 		 ++it, sentence_counter++)
 	{
 		// Traverse through the sentences.
-		if (std::regex_search((*it).str(), re_morelink) ||
+		if (rx::regex_search((*it).str(), re_morelink) ||
 			(max_sentences > 0 && sentence_counter > max_sentences))
 		{
 			// The user added a manual break here, or the maximum number of

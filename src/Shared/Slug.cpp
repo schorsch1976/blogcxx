@@ -11,7 +11,7 @@
 #include "Shared/Helpers.h"
 
 #include <iomanip>
-#include <regex>
+#include "Shared/regex.h"
 
 std::string createBasicSlug(const SingleItem &si)
 {
@@ -46,7 +46,7 @@ std::string createBasicSlug(const SingleItem &si)
 			  [](char ch) { return ch == ' ' ? '-' : ch; });
 
 	// Avoid double hyphenization though:
-	ret = std::regex_replace(ret, std::regex("--+"), "-");
+	ret = rx::regex_replace(ret, rx::regex("--+"), "-");
 
 	// It's rather wise not to end a slug with ".", "\" or "/".
 	// Also we could remove trailing hyphens and exclamation marks while we're

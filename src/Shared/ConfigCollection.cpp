@@ -10,7 +10,7 @@
 #include "constants.h"
 
 #include <iomanip>
-#include <regex>
+#include "Shared/regex.h"
 #include <sstream>
 #include <thread>
 
@@ -302,8 +302,8 @@ std::string ConfigCollection::url(const fs::path rel_path, int index) const
 	}
 
 	// Makes "a/b/c" out of "a//b//////c".
-	std::regex slash("([^:])/+"); // Do not replace "https://".
-	std::string out = std::regex_replace(ret, slash, "$1/");
+	rx::regex slash("([^:])/+"); // Do not replace "https://".
+	std::string out = rx::regex_replace(ret, slash, "$1/");
 	return out;
 }
 

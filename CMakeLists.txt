@@ -113,15 +113,15 @@ ENDIF (WIN32)
 ############################################################################
 # Linkage
 ############################################################################
-OPTION(STATIC_LINKING "Link everything static" OFF)
-IF (STATIC_LINKING)
+OPTION(API_STATIC_LINKING "Link everything static" OFF)
+IF (API_STATIC_LINKING)
 	ConfigureMSVCRuntime(static)
 
 	SET(Boost_USE_STATIC_LIBS		ON)
 	SET(Boost_USE_STATIC_RUNTIME	ON)
-ELSE (STATIC_LINKING)
+ELSE (API_STATIC_LINKING)
 	ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK=1)
-ENDIF (STATIC_LINKING)
+ENDIF (API_STATIC_LINKING)
 
 ############################################################################
 # Test on older compilers
@@ -134,60 +134,72 @@ ENDIF (TEST_OLDER_COMPILERS)
 ############################################################################
 # markdown
 ############################################################################
-SET(MARKDOWN_API "libcmark-gfm" CACHE STRING "Use this markdown implementation")
-SET_PROPERTY(CACHE MARKDOWN_API PROPERTY STRINGS "blogcpp" "libcmark-gfm")
+SET(API_MARKDOWN "libcmark-gfm" CACHE STRING "Use this markdown implementation")
+SET_PROPERTY(CACHE API_MARKDOWN PROPERTY STRINGS "blogcpp" "libcmark-gfm")
 
-IF (MARKDOWN_API STREQUAL "blogcpp")
+IF (API_MARKDOWN STREQUAL "blogcpp")
 	SET(MARKDOWN_BLOGCPP ON)
 	SET(MARKDOWN_CMARK_GFM OFF)
-ENDIF (MARKDOWN_API STREQUAL "blogcpp")
+ENDIF (API_MARKDOWN STREQUAL "blogcpp")
 
 # libcmark-gfm
-IF (MARKDOWN_API STREQUAL "libcmark-gfm")
+IF (API_MARKDOWN STREQUAL "libcmark-gfm")
 	SET(MARKDOWN_BLOGCPP OFF)
 	SET(MARKDOWN_CMARK_GFM ON)
-ENDIF (MARKDOWN_API STREQUAL "libcmark-gfm")
+ENDIF (API_MARKDOWN STREQUAL "libcmark-gfm")
 
 ############################################################################
 # variant
 ############################################################################
-SET(VARIANT_API "boost::variant" CACHE STRING "Use this variant API")
-SET_PROPERTY(CACHE VARIANT_API PROPERTY STRINGS "std::variant" "boost::variant")
+SET(API_VARIANT "boost::variant" CACHE STRING "Use this variant API")
+SET_PROPERTY(CACHE API_VARIANT PROPERTY STRINGS "std::variant" "boost::variant")
 
-IF (VARIANT_API STREQUAL "std::variant")
+IF (API_VARIANT STREQUAL "std::variant")
 	ADD_DEFINITIONS(-DUSE_VARIANT_API=1)
-ENDIF (VARIANT_API STREQUAL "std::variant")
+ENDIF (API_VARIANT STREQUAL "std::variant")
 
-IF (VARIANT_API STREQUAL "boost::variant")
+IF (API_VARIANT STREQUAL "boost::variant")
 	ADD_DEFINITIONS(-DUSE_VARIANT_API=2)
-ENDIF (VARIANT_API STREQUAL "boost::variant")
+ENDIF (API_VARIANT STREQUAL "boost::variant")
+
+############################################################################
+# regex because of this bug
+# https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=233994
+############################################################################
+IF(NOT FREEBSD)
+	# everywhere use std::regex
+	ADD_DEFINITIONS(-DUSE_REGEX_API=1)
+ELSE(NOT FREEBSD)
+	# except on Freebsd: use::boost regex
+	ADD_DEFINITIONS(-DUSE_REGEX_API=2)
+ENDIF(NOT FREEBSD)
 
 ############################################################################
 # filesystem
 ############################################################################
-SET(FILESYSTEM_API "boost::filesystem" CACHE STRING "Use this filesystem API")
-SET_PROPERTY(CACHE FILESYSTEM_API PROPERTY STRINGS "std::filesystem" "std::experimental::filesystem" "boost::filesystem")
+SET(API_FILESYSTEM "boost::filesystem" CACHE STRING "Use this filesystem API")
+SET_PROPERTY(CACHE API_FILESYSTEM PROPERTY STRINGS "std::filesystem" "std::experimental::filesystem" "boost::filesystem")
 
-IF (FILESYSTEM_API STREQUAL "std::filesystem")
+IF (API_FILESYSTEM STREQUAL "std::filesystem")
 	ADD_DEFINITIONS(-DUSE_FILESYSTEM_API=1)
 	SET(STD_FILESYSTEM ON)
 	SET(STD_EX_FILESYSTEM OFF)
 	SET(BOOST_FILESYSTEM OFF)
-ENDIF (FILESYSTEM_API STREQUAL "std::filesystem")
+ENDIF (API_FILESYSTEM STREQUAL "std::filesystem")
 
-IF (FILESYSTEM_API STREQUAL "std::experimental::filesystem")
+IF (API_FILESYSTEM STREQUAL "std::experimental::filesystem")
 	ADD_DEFINITIONS(-DUSE_FILESYSTEM_API=2)
 	SET(STD_FILESYSTEM OFF)
 	SET(STD_EX_FILESYSTEM ON)
 	SET(BOOST_FILESYSTEM OFF)
-ENDIF (FILESYSTEM_API STREQUAL "std::experimental::filesystem")
+ENDIF (API_FILESYSTEM STREQUAL "std::experimental::filesystem")
 
-IF (FILESYSTEM_API STREQUAL "boost::filesystem")
+IF (API_FILESYSTEM STREQUAL "boost::filesystem")
 	ADD_DEFINITIONS(-DUSE_FILESYSTEM_API=3)
 	SET(STD_FILESYSTEM OFF)
 	SET(STD_EX_FILESYSTEM OFF)
 	SET(BOOST_FILESYSTEM ON)
-ENDIF (FILESYSTEM_API STREQUAL "boost::filesystem")
+ENDIF (API_FILESYSTEM STREQUAL "boost::filesystem")
 
 ############################################################################
 # Use as much boost as we can to reduce the 3rdparty library count

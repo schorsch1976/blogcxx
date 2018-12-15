@@ -10,7 +10,7 @@
 
 #include "Shared/Slug.h"
 
-#include <regex>
+#include "Shared/regex.h"
 
 namespace
 {
@@ -27,10 +27,10 @@ std::vector<std::string> vectorSplit(std::string inputstring,
 		return ret;
 	}
 
-	std::regex re(divider); // Tokenize.
-	std::sregex_token_iterator it(inputstring.begin(), inputstring.end(), re,
+	rx::regex re(divider); // Tokenize.
+	rx::sregex_token_iterator it(inputstring.begin(), inputstring.end(), re,
 								  -1);
-	std::sregex_token_iterator reg_end;
+	rx::sregex_token_iterator reg_end;
 
 	for (; it != reg_end; ++it)
 	{
@@ -460,43 +460,43 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 	std::string line;
 	std::istringstream ss_contents(file_contents);
 
-	std::regex re_author("^Author\\s*:[\\s\\t]*(.*?)$",
-						 std::regex_constants::icase);
-	std::regex re_title("^Title\\s*:[\\s\\t]*(.*?)$",
-						std::regex_constants::icase);
-	std::regex re_slug("^Slug\\s*:[\\s\\t]*(.*?)$",
-					   std::regex_constants::icase);
-	std::regex re_datetime("^Date\\s*:[\\s\\t]*(\\d{4}\\-\\d{2}\\-\\d{2} "
+	rx::regex re_author("^Author\\s*:[\\s\\t]*(.*?)$",
+						 rx::regex_constants::icase);
+	rx::regex re_title("^Title\\s*:[\\s\\t]*(.*?)$",
+						rx::regex_constants::icase);
+	rx::regex re_slug("^Slug\\s*:[\\s\\t]*(.*?)$",
+					   rx::regex_constants::icase);
+	rx::regex re_datetime("^Date\\s*:[\\s\\t]*(\\d{4}\\-\\d{2}\\-\\d{2} "
 						   "\\d{2}:\\d{2}:\\d{2}?)$",
-						   std::regex_constants::icase);
-	std::regex re_change_datetime("^Changed\\s*:[\\s\\t]*(\\d{4}\\-\\d{2}"
+						   rx::regex_constants::icase);
+	rx::regex re_change_datetime("^Changed\\s*:[\\s\\t]*(\\d{4}\\-\\d{2}"
 								  "\\-\\d{2} \\d{2}:\\d{2}:\\d{2}?)$",
-								  std::regex_constants::icase);
-	std::regex re_cats("^Categories\\s*:[\\s\\t]*(.*?)$",
-					   std::regex_constants::icase);
-	std::regex re_tags("^Tags\\s*:[\\s\\t]*(.*?)$",
-					   std::regex_constants::icase);
-	std::regex re_markdown("^Markdown\\s*:[\\s\\t]*(.*?)$",
-						   std::regex_constants::icase);
-	std::regex re_hardbreaks("^Hardbreaks\\s*:[\\s\\t]*(.*?)$",
-							 std::regex_constants::icase);
-	std::regex re_emoji("^Emoji\\s*:[\\s\\t]*(.*?)$",
-						std::regex_constants::icase);
-	std::regex re_sticky("^Sticky\\s*:[\\s\\t]*(.*?)$",
-						 std::regex_constants::icase);
-	std::regex re_comments("^Comments\\s*:[\\s\\t]*(.*?)$",
-						   std::regex_constants::icase);
-	std::regex re_ogimage("^OpenGraphImage\\s*:[\\s\\t]*(.*?)$",
-						  std::regex_constants::icase);
-	std::regex re_series("^Series\\s*:[\\s\\t]*(.*?)$",
-						 std::regex_constants::icase);
-	std::regex re_position("^Position\\s*:[\\s\\t]*(\\d*?)$",
-						   std::regex_constants::icase);
+								  rx::regex_constants::icase);
+	rx::regex re_cats("^Categories\\s*:[\\s\\t]*(.*?)$",
+					   rx::regex_constants::icase);
+	rx::regex re_tags("^Tags\\s*:[\\s\\t]*(.*?)$",
+					   rx::regex_constants::icase);
+	rx::regex re_markdown("^Markdown\\s*:[\\s\\t]*(.*?)$",
+						   rx::regex_constants::icase);
+	rx::regex re_hardbreaks("^Hardbreaks\\s*:[\\s\\t]*(.*?)$",
+							 rx::regex_constants::icase);
+	rx::regex re_emoji("^Emoji\\s*:[\\s\\t]*(.*?)$",
+						rx::regex_constants::icase);
+	rx::regex re_sticky("^Sticky\\s*:[\\s\\t]*(.*?)$",
+						 rx::regex_constants::icase);
+	rx::regex re_comments("^Comments\\s*:[\\s\\t]*(.*?)$",
+						   rx::regex_constants::icase);
+	rx::regex re_ogimage("^OpenGraphImage\\s*:[\\s\\t]*(.*?)$",
+						  rx::regex_constants::icase);
+	rx::regex re_series("^Series\\s*:[\\s\\t]*(.*?)$",
+						 rx::regex_constants::icase);
+	rx::regex re_position("^Position\\s*:[\\s\\t]*(\\d*?)$",
+						   rx::regex_constants::icase);
 
-	std::regex re_url("https?://",
-					  std::regex_constants::icase); // Avoid stupidities
+	rx::regex re_url("https?://",
+					  rx::regex_constants::icase); // Avoid stupidities
 
-	std::smatch match;
+	rx::smatch match;
 
 	while (getline(ss_contents, line))
 	{
@@ -506,7 +506,7 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 			break;
 		}
 
-		using std::regex_match;
+		using rx::regex_match;
 
 		try
 		{
@@ -580,7 +580,7 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 				i_position = stoi(match.str(1));
 			}
 		}
-		catch (const std::regex_error &e)
+		catch (const rx::regex_error &e)
 		{
 			// Syntax error in the regular expression.
 			LOG_FATAL("An error occurred while trying to match a regular "

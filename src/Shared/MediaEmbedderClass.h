@@ -6,7 +6,7 @@
 #pragma once
 
 #include <iomanip>
-#include <regex>
+#include "Shared/regex.h"
 #include <sstream>
 #include <string>
 

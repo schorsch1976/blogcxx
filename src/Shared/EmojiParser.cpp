@@ -8,7 +8,7 @@
 #include <cassert>
 #include <memory>
 #include <mutex> // once_flag
-#include <regex>
+#include "Shared/regex.h"
 #include <sstream>
 #include <unordered_map>
 
@@ -64,16 +64,16 @@ struct EmojiMaps
 			std::string escaped = escape(e.first);
 
 			// between words
-			std::regex re_emoji_1("[[:space:]]" + escaped + "[[:space:]]");
+			rx::regex re_emoji_1("[[:space:]]" + escaped + "[[:space:]]");
 
 			// begin of a line
-			std::regex re_emoji_2("^" + escaped + "[[:space:]]");
+			rx::regex re_emoji_2("^" + escaped + "[[:space:]]");
 
 			// end of a line
-			std::regex re_emoji_3("[[:space:]]" + escaped + "$");
+			rx::regex re_emoji_3("[[:space:]]" + escaped + "$");
 
 			// alone on a line
-			std::regex re_emoji_4("^" + escaped + "$");
+			rx::regex re_emoji_4("^" + escaped + "$");
 
 			std::string replacement_1 = " " + e.second + " ";
 			std::string replacement_2 = e.second + " ";
@@ -113,7 +113,7 @@ struct EmojiMaps
 	}
 
 	const std::unordered_map<std::string, std::string> m_emojis;
-	std::vector<std::pair<std::regex, std::string>> m_regex_to_replacement;
+	std::vector<std::pair<rx::regex, std::string>> m_regex_to_replacement;
 };
 
 std::shared_ptr<const EmojiMaps> sp_emoji_map;
@@ -178,7 +178,7 @@ std::string parse(const std::string text)
 		// replace in this line every possible emoji
 		for (auto &e : sp_emoji_map->m_regex_to_replacement)
 		{
-			line = std::regex_replace(line, e.first, e.second);
+			line = rx::regex_replace(line, e.first, e.second);
 		}
 
 		// readd the line break

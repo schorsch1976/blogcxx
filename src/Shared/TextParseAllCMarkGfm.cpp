@@ -106,13 +106,13 @@ TextParseAll(const SingleItem &si, const ConfigCollection &cfgs,
 
 	// get used languages
 	std::vector<std::string> used_languages;
-	std::regex codelang("^\\s{4}::::(\\S+)");
+	rx::regex codelang("^\\s{4}::::(\\S+)");
 	std::istringstream iss(si.s_text);
 	std::string line;
 	while (std::getline(iss, line))
 	{
-		std::smatch match;
-		if (std::regex_match(line, match, codelang))
+		rx::smatch match;
+		if (rx::regex_match(line, match, codelang))
 		{
 			used_languages.push_back(match[1]);
 		}

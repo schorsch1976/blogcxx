@@ -10,6 +10,8 @@ SET(SRCS
 	Debug.h
 
 	filesystem.h
+	regex.h
+	variant.h
 
 	Helpers.cpp
 	Helpers.h

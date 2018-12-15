@@ -15,7 +15,7 @@
 #include <fstream>
 #include <functional>
 #include <iterator>
-#include <regex>
+#include "Shared/regex.h"
 #include <sstream>
 #include <string>
 
