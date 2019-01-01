@@ -1,24 +1,23 @@
-{% include "header.txt" %}
-{% include "sidebar.txt" %}
+[TMPL_INCLUDE header.txt]
+[TMPL_INCLUDE sidebar.txt]
 
 <div id="single">
-  <h1 class="posttitle">{{ title }}</h1>
+  <h1 class="posttitle">[TMPL_VAR title]</h1>
 
-  <!-- <div class="metadata">published on {{ date }} by <a href="{{ author-url }}">{{ author }}</a></div> -->
-  <!-- <div class="metadata">changed on {{ changedate }}</div> -->
+  <!-- <div class="metadata">published on [TMPL_VAR date] by <a href="[TMPL_VAR author-url]">[TMPL_VAR author]</a></div> -->
+  <!-- <div class="metadata">changed on [TMPL_VAR changedate]</div> -->
 
   <div class="contents">
-    {{ text }}
+    [TMPL_VAR text]
   </div>
 
   <div class="post-bags">
-    <div class="tags"><b>{{ tags_title }}</b>
-	{% if exists("tags") %}
+    <div class="tags"><b>[TMPL_VAR tags_title]</b>
       {% for tag in tags %}
-      <a href="{{ baseurl }}/tags/{{ tag/slug }}">{{ tag/name }}</a>
-      {% endfor %}</div>
-	{% endif %}
+      [TMPL_FOR tags]
+      <a href="[TMPL_VAR baseurl]/tags/[TMPL_VAR slug]">[TMPL_VAR name]</a>
+      [/TMPL_FOR]
   </div>
 </div>
 
-{% include "footer.txt" %}
+[TMPL_INCLUDE footer.txt]

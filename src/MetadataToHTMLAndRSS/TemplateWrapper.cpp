@@ -7,40 +7,18 @@
 #include "Shared/Debug.h"
 #include "Shared/constants.h"
 
-#ifndef TEST_OLDER_COMPILERS
-#include "inja.hpp"
-#include "json.hpp"
+#include "html-template++/html.h"
 
-using json = nlohmann::json;
-#else
-// dummy json
-struct json
-{
-	void operator=(const std::string &v) {}
-	void operator=(const bool &v) {}
-	template <typename T>
-	json operator[](T v)
-	{
-		return json();
-	}
-	bool is_array() const { return false; }
-	static json array() { return json(); }
-	json &operator=(const json &) { return *this; }
-	std::string dump(int) const { return "Dummy"; }
-};
-
-#endif
-
-#include <map>
+#include <set>
 
 // ----------------------------------------------------------------------------
 // the json wrapper
 // ----------------------------------------------------------------------------
 struct TemplateData::impl
 {
-	json data;
+	html::map data;
 
-	void Set(json &d, std::vector<TemplateKey> path, const ValueKey &value)
+	void Set(html::map &d, std::vector<TemplateKey> path, const ValueKey &value)
 	{
 #if USE_VARIANT_API == 1
 		// std::variant
@@ -112,11 +90,16 @@ struct TemplateData::impl
 		const auto &switchdata = path.front();
 		if (const std::string *p = boost::get<std::string>(&switchdata))
 		{
-			Set(d[*p], reduced, value);
+			if (d.get_children(*p).empty())
+			{
+				d.get_children(*p).resize(1);
+			}
+			Set(d.get_children(*p)[0], reduced, value);
 		}
 		else if (const int *p = boost::get<int>(&switchdata))
 		{
 			// this must be an array
+
 			if (!d.is_array())
 			{
 				d = json::array();
@@ -165,7 +148,25 @@ void TemplateData::Set(std::vector<TemplateKey> path, const ValueKey &value)
 std::string TemplateData::to_string() const
 {
 	std::ostringstream oss;
-	oss << mp_impl->data.dump(4);
+	auto sub = [&oss](const html::map& m, int lvl)
+	{
+		for(html::map::const_iterator cit = m.cbegin();
+			cit != m.cend(); ++cit)
+		{
+			if (m.has_children(cit->first))
+			{
+				std::string v = std::get<std::string>(cit->second);
+				oss <<
+			}
+			else
+			{
+
+			}
+		}
+	};
+
+	sub(mp_impl->data, 0);
+
 	return oss.str();
 }
 
@@ -174,12 +175,9 @@ std::string TemplateData::to_string() const
 // ----------------------------------------------------------------------------
 struct TemplateWrapper::impl
 {
-#ifndef TEST_OLDER_COMPILERS
 	// sadly, as the environment is not const for render, we
 	// need to use an own environment for all CreateXYZ functions
-	inja::Environment m_env;
-	std::map<fs::path, inja::Template> m_tpl;
-#endif
+	std::set<fs::path> m_tpl;
 };
 
 TemplateWrapper::TemplateWrapper(std::vector<fs::path> templ_directories,
@@ -205,20 +203,15 @@ TemplateWrapper::TemplateWrapper(std::vector<fs::path> templ_directories,
 				continue;
 			}
 
-#ifndef TEST_OLDER_COMPILERS
 			try
 			{
-				inja::Template tpl =
-					mp_impl->m_env.parse_template(path.string());
-				mp_impl->m_tpl[path] = tpl;
-				mp_impl->m_env.include_template(path.filename().string(), tpl);
+				mp_impl->m_tpl.insert(path);
 			}
 			catch (const std::exception &ex)
 			{
 				THROW_FATAL("TemplateWrapper: File: '%1%' - Error: %2%",
 							path.string(), ex.what());
 			}
-#endif
 		}
 	}
 }
@@ -227,7 +220,6 @@ TemplateWrapper::~TemplateWrapper() {}
 std::string TemplateWrapper::Render(const fs::path &tpl_file,
 									const TemplateData &data) const
 {
-#ifndef TEST_OLDER_COMPILERS
 	auto pos = mp_impl->m_tpl.find(tpl_file);
 	if (pos == mp_impl->m_tpl.end())
 	{
@@ -238,16 +230,8 @@ std::string TemplateWrapper::Render(const fs::path &tpl_file,
 	std::string rendered;
 	try
 	{
-		/*
-		std::ostringstream oss;
-		oss << data.mp_impl->data;
-		LOG_DEBUG("Try to render: %1%", oss.str());
-		*/
 		// making a copy preserves the outer data structure in any case
-		inja::Environment render_env = mp_impl->m_env;
-		json render_data = data.mp_impl->data;
-
-		rendered = render_env.render_template(pos->second, render_data);
+		rendered = html::parse(tpl_file, data.mp_impl->data);
 	}
 	catch (std::exception &e)
 	{
@@ -255,8 +239,4 @@ std::string TemplateWrapper::Render(const fs::path &tpl_file,
 					tpl_file.string(), e.what(), data.to_string());
 	}
 	return rendered;
-#else
-	// return dummy data
-	return "TEST_OLDER_COMPILERS";
-#endif
 }

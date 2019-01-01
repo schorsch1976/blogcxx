@@ -1,7 +1,4 @@
     </div>
-	{% if exists("blogcxx") %}
-    <div id="footer">made with love and <a href={{ blogcxx }}>blogcxx</a></div>
-	{% endif %}
-    {{ default(footscripts, "") }}
+    <div id="footer">made with love and <a href=[TMPL_VAR blogcxx]>blogcxx</a></div>
   </body>
 </html>

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0">
     <channel>
-        <title>{{ title }}</title>
-        <link>{{ link }}</link>
-        <description>{{ description }}</description>
-        <lastBuildDate>{{ lastBuildDate }}</lastBuildDate>
-		{% for item in items %}
+        <title>[TMPL_VAR title ]</title>
+        <link>[TMPL_VAR link ]</link>
+        <description>[TMPL_VAR description ]</description>
+        <lastBuildDate>[TMPL_VAR lastBuildDate ]</lastBuildDate>
+		[TMPL_FOR items]
         <item>
-            <title>{{ item/title }}</title>
-            <description>{{ item/description }}</description>
-            <link>{{ item/link }}</link>
-            <pubDate>{{ item/pubDate }}</pubDate>
+            <title>[TMPL_VAR title]</title>
+            <description>[TMPL_VAR description]</description>
+            <link>[TMPL_VAR link]</link>
+            <pubDate>[TMPL_VAR pubDate]</pubDate>
         </item>
-		{% endfor %}
+		[/TMPL_FOR]
     </channel>
 </rss>

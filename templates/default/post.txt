@@ -1,58 +1,55 @@
-{% include "header.txt" %}
-{% include "sidebar.txt" %}
+[TMPL_INCLUDE header.txt]
+[TMPL_INCLUDE sidebar.txt]
 
 <div id="single">
   <div id="postnav">
-    <div id="prev">{{ default(prevlink, "") }}</div>
-    <div id="next">{{ default(nextlink, "") }}</div>
+    <div id="prev">[TMPL_VAR prevlink]</div>
+    <div id="next">[TMPL_VAR nextlink]</div>
   </div>
 
-  <h1 class="posttitle">{{ title }}</h1>
+  <h1 class="posttitle">[TMPL_VAR title]</h1>
 
-  <div class="metadata">published on {{ date }} by <a href="{{ author-url }}">{{ author }}</a></div>
-  <!-- <div class="metadata">changed on {{ changedate }}</div> -->
+  <div class="metadata">published on [TMPL_VAR date] by <a href="[TMPL_VAR author-url]">[TMPL_VAR author]</a></div>
+  <!-- <div class="metadata">changed on [TMPL_VAR changedate]</div> -->
 
   <div class="contents">
-    {{ text }}
+    [TMPL_VAR text]
   </div>
 
   <div class="post-bags">
-    <div class="cats"><b>{{ cats_title }}</b>
-		{% if exists("categories") %}
-			{% for cat in categories %}
-				<a href="{{ baseurl }}/categories/{{ cat/slug }}">{{ cat/name }}</a>
-			{% endfor %}</div>
-		{% endif %}
+    <div class="cats"><b>[TMPL_VAR cats_title]</b>
 
-	{% if exists("tags") %}
-		<div class="tags"><b>{{ tags_title }}</b>
-		{% for tag in tags %}
-			<a href="{{ baseurl }}/tags/{{ tag/slug }}">{{ tag/name }}</a>
-		{% endfor %}
-	{% endif %}
+		[TMPL_FOR categories]
+			<a href="[TMPL_VAR baseurl]/categories/[TMPL_VAR slug]">[TMPL_VAR name]</a>
+		[/TMPL_FOR]
+
+		<div class="tags"><b>[TMPL_VAR tags_title]</b>
+		[TMPL_FOR tags]
+			<a href="[TMPL_VAR baseurl]/tags/[TMPL_VAR slug]">[TMPL_VAR name]</a>
+		[/TMPL_FOR]
 
 	</div>
 
-    {% if exists("series") %}
+[TMPL_IF is_series]
     <div id="seriesnav" style="text-align:center">
-      <b>Articles from {{ series/name }}:</b><br />
-      <div style="font-style:italic">{{ title }}</div>
-{% if existsIn(series, "prev") %}
-      <div style="float:left"><a href="{{ series/prev/url }}">{{ series/prev/name }}</a></div>
-{% endif %}
+      <b>Articles from [TMPL_VAR series_name]:</b><br />
+      <div style="font-style:italic">[TMPL_VAR title]</div>
+[TMPL_IF series_has_prev]
+      <div style="float:left"><a href="[TMPL_VAR series_prev_url]">[TMPL_VAR series_prev_name]</a></div>
+[/TMPL_IF]
 
-{% if existsIn(series, "next") %}
-      <div style="float:right"><a href="{{ series/next/url }}">{{ series/next/name }}</a></div>
-{% endif %}
+[TMPL_IF series_has_next]
+      <div style="float:right"><a href="[TMPL_VAR series_next_url]">[TMPL_VAR series_next_name]</a></div>
+[/TMPL_IF]
 
       <br style="clear:both" />
     </div>
-    {% endif %}
-    <div id="permalink">Permanent link to this post: <a href="{{ permalink }}">{{ permalink }}</a></div>
+[/TMPL_IF]
+    <div id="permalink">Permanent link to this post: <a href="[TMPL_VAR permalink]">[TMPL_VAR permalink]</a></div>
   </div>
 
-  {{ default(comments-body, "") }}
+  [TMPL_VAR comments-body]
 
   </div>
 
-{% include "footer.txt" %}
+[TMPL_INCLUDE footer.txt]

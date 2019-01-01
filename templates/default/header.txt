@@ -1,31 +1,31 @@
 <!doctype html>
 <html>
     <head>
-        <title>{{ pagetitle }}</title>
+        <title>[TMPL_VAR pagetitle]</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="manifest" href="{{ baseurl }}/static/manifest.json" />
+        <link rel="manifest" href="[TMPL_VAR baseurl]/static/manifest.json" />
         <meta name="theme-color" content="#ffffff" />
-        {{ default(feedmeta, "") }}
-        {{ default(opengraphmeta, "") }}
-        <link rel="stylesheet" href="{{ baseurl }}/static/styles.css" />
-        <link rel="alternate" type="application/rss+xml" title="{{ sitetitle }} RSS Feed" href="{{ rsslink }}" />
-        <link rel="start" href="{{ baseurl }}" />
-        {{ default(prevmeta, "") }}
-        {{ default(nextmeta, "") }}
-        {{ default(keywordsmeta, "") }}
-		{% if exists("highlightdata") %}
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/{{ hljsver }}/styles/default.min.css" />
-			 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/{{ hljsver }}/highlight.min.js"></script>
-			{% for lang in highlightdata %}
+        [TMPL_VAR feedmeta]
+        [TMPL_VAR opengraphmeta]
+        <link rel="stylesheet" href="[TMPL_VAR baseurl]/static/styles.css" />
+        <link rel="alternate" type="application/rss+xml" title="[TMPL_VAR sitetitle] RSS Feed" href="[TMPL_VAR rsslink]" />
+        <link rel="start" href="[TMPL_VAR baseurl]" />
+        [TMPL_VAR prevmeta]
+        [TMPL_VAR nextmeta]
+        [TMPL_VAR keywordsmeta]
+		[TMPL_IF has_highlightdata]
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/[TMPL_VAR hljsver]/styles/default.min.css" />
+			 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/[TMPL_VAR hljsver]/highlight.min.js"></script>
+			[TMPL_FOR highlightdata]
 				<script type="text/javascript"
-					src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/{{ hljsver }}/languages/{{ lang/lang }}.min.js">
+					src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/[TMPL_VAR hljsver]/languages/[TMPL_VAR lang].min.js">
 				</script>
-			{% endfor %}
-		{% endif %}
-        <script src="{{ baseurl }}/static/blogcxx.js"></script>
-        {{ default(comments-header, "") }}
-        {{ default(headscripts, "") }}
+			[/TMPL_FOR]
+		[/TMPL_IF]
+        <script src="[TMPL_VAR baseurl]/static/blogcxx.js"></script>
+        [TMPL_VAR comments-header]
+        [TMPL_VAR headscripts]
     </head>
     <body>
         <script type="text/javascript">
@@ -34,18 +34,16 @@
         </script>
         <div id="content">
             <div id="header">
-                <h1><a href="{{ baseurl }}">{{ sitetitle }}</a></h1>
-                <h2>{{ subtitle }}</h2>
+                <h1><a href="[TMPL_VAR baseurl]">[TMPL_VAR sitetitle]</a></h1>
+                <h2>[TMPL_VAR subtitle]</h2>
             </div>
 
             <div id="pagelist">
                 <ul>
-                    <li class="navlink {{ defaultclass }}"><a href="{{ baseurl }}">Blog</a></li>
-		{% if exists("pagenav") %}
-                    {% for nav in pagenav %}
-                    <li class="navlink{{ nav/cssclass }}"><a href="{{ nav/link }}" title="{{ nav/title }}">{{ nav/title }}</a></li>
-                    {% endfor %}
-		{% endif %}
+                    <li class="navlink [TMPL_VAR defaultclass]><a href="[TMPL_VAR baseurl]">Blog</a></li>
+				[TMPL_FOR pagenav]
+                    <li class="navlink[TMPL_VAR cssclass]"><a href="[TMPL_VAR link]" title="[TMPL_VAR title]">[TMPL_VAR title]</a></li>
+				[/TMPL_FOR]
                 </ul>
             </div>
 
