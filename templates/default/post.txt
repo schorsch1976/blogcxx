@@ -20,12 +20,12 @@
     <div class="cats"><b>[TMPL_VAR cats_title]</b>
 
 		[TMPL_FOR categories]
-			<a href="[TMPL_VAR baseurl]/categories/[TMPL_VAR slug]">[TMPL_VAR name]</a>
+			<a href="[TMPL_VAR URL]">[TMPL_VAR name]</a>
 		[/TMPL_FOR]
 
 		<div class="tags"><b>[TMPL_VAR tags_title]</b>
 		[TMPL_FOR tags]
-			<a href="[TMPL_VAR baseurl]/tags/[TMPL_VAR slug]">[TMPL_VAR name]</a>
+			<a href="[TMPL_VAR URL]">[TMPL_VAR name]</a>
 		[/TMPL_FOR]
 
 	</div>

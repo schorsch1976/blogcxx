@@ -38,8 +38,8 @@ ConfigCollection::ConfigCollection(const ConfigCollectionFile &file)
 
 	if (m_file.cfg_siteurl.empty())
 	{
-		m_url = "file:///" + fs::current_path().string();
-		m_url += "/" + m_file.cfg_outdir + "/";
+		m_url = "file://" + fs::current_path().string();
+		m_url += "/" + m_file.cfg_outdir ;
 	}
 	else
 	{
@@ -302,9 +302,9 @@ std::string ConfigCollection::url(const fs::path rel_path, int index) const
 	}
 
 	// Makes "a/b/c" out of "a//b//////c".
-	rx::regex slash("([^:])/+"); // Do not replace "https://".
-	std::string out = rx::regex_replace(ret, slash, "$1/");
-	return out;
+	//rx::regex slash("([^:])/+"); // Do not replace "https://".
+	//std::string out = rx::regex_replace(ret, slash, "$1/");
+	return ret;
 }
 
 fs::path ConfigCollection::feed_file(const ArchiveData &ad) const
