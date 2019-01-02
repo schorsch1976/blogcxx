@@ -61,6 +61,9 @@ to heavy for the author of blogcpp.
 - more stable
 - better markdown support with libcmark-gfm
 - get source from git and not from mercurial
+- template engine got replaced by htmltemplate, like perl [HTML::template](https://metacpan.org/pod/HTML::Template)
+  but it is a straight forward simple implementation to get rid of json and inja because
+  inja didn't work on freebsd
 
 ## Current version
 
@@ -83,13 +86,11 @@ The latest released version is 1-alpha
 - spawn $EDITOR on UNIX
 - OpenGraph support if you feel like sharing stuff on Facebook or
   whatever.
+- blerc template
 
 ### TODO list
 - download the highlight.js into the static folder
 - config colletion: check the pathes if they are unique
-
-## Future plans
-- remove inja/json to be able to compile with a c++11 compiler.
 
 ---
 
@@ -140,6 +141,9 @@ The latest released version is 1-alpha
 - cxxopts replaced by boost::program_options (users dont care)
 - icu replaced by boost::locale (but still used as a backend on Linux) (users dont care)
 - Configurable article permalinks.
+- template engine got replaced by htmltemplate, like perl [HTML::template](https://metacpan.org/pod/HTML::Template)
+  but it is a straight forward simple implementation to get rid of json and inja because
+  inja didn't work on freebsd
 
 ### other good things
 - all compilation is now consistent on all platforms
