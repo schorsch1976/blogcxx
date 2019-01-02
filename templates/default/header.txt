@@ -40,7 +40,7 @@
 
             <div id="pagelist">
                 <ul>
-                    <li class="navlink [TMPL_VAR defaultclass]><a href="[TMPL_VAR baseurl]">Blog</a></li>
+                    <li class="navlink [TMPL_VAR defaultclass]"><a href="[TMPL_VAR baseurl]">Blog</a></li>
 				[TMPL_FOR pagenav]
                     <li class="navlink[TMPL_VAR cssclass]"><a href="[TMPL_VAR link]" title="[TMPL_VAR title]">[TMPL_VAR title]</a></li>
 				[/TMPL_FOR]

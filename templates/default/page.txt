@@ -13,9 +13,8 @@
 
   <div class="post-bags">
     <div class="tags"><b>[TMPL_VAR tags_title]</b>
-      {% for tag in tags %}
       [TMPL_FOR tags]
-      <a href="[TMPL_VAR baseurl]/tags/[TMPL_VAR slug]">[TMPL_VAR name]</a>
+      <a href="[TMPL_VAR URL]">[TMPL_VAR name]</a>
       [/TMPL_FOR]
   </div>
 </div>

@@ -81,21 +81,21 @@ void CreateIndex(size_t page, size_t page_count, const ConstArchive &posts,
 		{
 			if (p < page)
 			{
-				data.Set({"pagination", "prev", prev_index, "link"},
+				data.Set({"pagination_prev", prev_index, "link"},
 						 cfgs.url(to_target_index(p)));
-				data.Set({"pagination", "prev", prev_index, "text"},
+				data.Set({"pagination_prev", prev_index, "text"},
 						 std::to_string(p + 1));
 				++prev_index;
 			}
 			else if (p == page)
 			{
-				data.Set({"pagination", "active"}, std::to_string(p + 1));
+				data.Set({"pagination_active"}, std::to_string(p + 1));
 			}
 			else
 			{
-				data.Set({"pagination", "next", next_index, "link"},
+				data.Set({"pagination_next", next_index, "link"},
 						 cfgs.url(to_target_index(p)));
-				data.Set({"pagination", "next", next_index, "text"},
+				data.Set({"pagination_next", next_index, "text"},
 						 std::to_string(p + 1));
 				++next_index;
 			}

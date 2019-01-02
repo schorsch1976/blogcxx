@@ -20,13 +20,13 @@
 <div id="paginator">
 
 	<center>
-		[TMPL_FOR prev]
+		[TMPL_FOR pagination_prev]
 			<a href=[TMPL_VAR link]>[TMPL_VAR text]</a>&nbsp;
 		[/TMPL_FOR]
 
-	    [TMPL_VAR active]&nbsp;
+	    [TMPL_VAR pagination_active]&nbsp;
 
-		[TMPL_FOR next]
+		[TMPL_FOR pagination_next]
 			<a href=[TMPL_VAR link]>[TMPL_VAR text]</a>&nbsp;
 		[/TMPL_FOR]
 	</center>

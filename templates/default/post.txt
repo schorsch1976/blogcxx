@@ -30,7 +30,7 @@
 
 	</div>
 
-[TMPL_IF is_series]
+[TMPL_EXISTS series]
     <div id="seriesnav" style="text-align:center">
       <b>Articles from [TMPL_VAR series_name]:</b><br />
       <div style="font-style:italic">[TMPL_VAR title]</div>
@@ -44,7 +44,7 @@
 
       <br style="clear:both" />
     </div>
-[/TMPL_IF]
+[/TMPL_EXISTS]
     <div id="permalink">Permanent link to this post: <a href="[TMPL_VAR permalink]">[TMPL_VAR permalink]</a></div>
   </div>
 
