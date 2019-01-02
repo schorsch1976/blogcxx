@@ -141,7 +141,7 @@ std::string read_file(fs::path filename)
 
 	// remove any "\r"
 	file_contents.erase(
-		std::remove(std::begin(file_contents), std::end(file_contents), '\r'));
+		std::remove(std::begin(file_contents), std::end(file_contents), '\r'), file_contents.end());
 
 	return file_contents;
 }
