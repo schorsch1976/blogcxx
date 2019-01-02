@@ -792,6 +792,11 @@ namespace html
 					throw token_stream_error("ENDEXISTS without matching EXISTS: " + to_string(ct));
 					break;
 
+				case type_t::INCLUDE:
+					throw token_stream_error("INCLUDE: still in token_stream" + to_string(ct));
+					break;
+
+
 				case type_t::END:
 					return;
 					break;
