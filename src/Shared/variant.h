@@ -11,10 +11,10 @@
 
 #if USE_VARIANT_API == 1
 #include <variant>
-namespace variant_ns = std;
+namespace var = std;
 #endif
 
 #if USE_VARIANT_API == 2
 #include <boost/variant.hpp>
-namespace variant_ns = boost;
+namespace var = boost;
 #endif

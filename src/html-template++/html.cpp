@@ -37,57 +37,280 @@ namespace html
 	}
 
 	// ----------------------------------------
-	// the data we provide for the HTML Template
-	// subvalues are like "key1.table1.b"
+	// an item in the map:
 	// ----------------------------------------
-	bool map::has_children(const std::string& v) const
+	item::item(std::string name)
+		: m_name(name)
 	{
-
 	}
-	std::string& map::operator[](const std::string& v)
+	item::item(const item& rhs)
+		: m_name(rhs.m_name), m_data(rhs.m_data)
 	{
-		return std::get<0>(m_data[v]);
 	}
-	const std::string&  map::operator[](const std::string& v) const
+	item::item(item&& rhs)
+		: m_name(rhs.m_name), m_data(std::move(rhs.m_data))
 	{
-		auto pos = m_data.find(v);
-		if (pos == m_data.end())
-			throw data_map_error("operator[" + v + "] not found");
-
-		return std::get<0>(pos->second);
 	}
-
-	map::iterator map::begin()
+	item& item::operator=(const item& rhs)
 	{
-		return m_data.begin();
+		m_name = rhs.m_name;
+		m_data = rhs.m_data;
+		return *this;
 	}
-	map::iterator map::end()
+	item& item::operator==(item&& rhs)
 	{
-		return m_data.end();
-	}
-
-	map::const_iterator map::cbegin() const
-	{
-		return m_data.cbegin();
-	}
-	map::const_iterator map::cend() const
-	{
-		return m_data.cend();
+		m_name = std::move(rhs.m_name);
+		m_data = std::move(rhs.m_data);
+		return *this;
 	}
 
-	std::vector<map>& map::get_children(const std::string& v)
+	item::iterator item::begin()
 	{
-		return std::get<1>(m_data[v]);
+		if (is_array())
+		{
+			return get_array().begin();
+		}
+		return item::iterator();
 	}
-	const std::vector<map>& map::get_children(const std::string& v) const
+	item::iterator item::end()
 	{
-		auto pos = m_data.find(v);
-		if (pos == m_data.end())
-			throw data_map_error("get_children(" + v + ") not found");
-
-		return std::get<1>(pos->second);
-
+		if (is_array())
+		{
+			return get_array().end();
+		}
+		return item::iterator();
 	}
+
+	item::const_iterator item::cbegin() const
+	{
+		if (is_array())
+		{
+			return get_array().cbegin();
+		}
+		return item::const_iterator();
+	}
+	item::const_iterator item::cend() const
+	{
+		if (is_array())
+		{
+			return get_array().cend();
+		}
+		return item::const_iterator();
+	}
+
+	bool item::is_array() const
+	{
+		return index() == 2;
+	}
+	bool item::is_string() const
+	{
+		return index() == 0;
+	}
+	bool item::is_bool() const
+	{
+		return index() == 1;
+	}
+	bool item::is_null() const
+	{
+		return !is_array() && !is_string() && !is_bool();
+	}
+
+	std::string& item::get_string()
+	{
+#if USE_VARIANT_API == 1
+		return std::get<0>(m_data);
+#endif
+#if USE_VARIANT_API == 2
+		if (!is_string())
+		{
+			m_data = std::string();
+		}
+		return *boost::get<std::string>(&m_data);
+#endif
+	}
+	bool& item::get_bool()
+	{
+#if USE_VARIANT_API == 1
+		return std::get<1>(m_data);
+#endif
+#if USE_VARIANT_API == 2
+		if (!is_bool())
+		{
+			m_data = false;
+		}
+		return *boost::get<bool>(&m_data);
+#endif
+	}
+	std::vector<item>& item::get_array()
+	{
+#if USE_VARIANT_API == 1
+		return std::get<2>(m_data);
+#endif
+#if USE_VARIANT_API == 2
+		if (!is_array())
+		{
+			m_data = std::vector<item>();
+		}
+		return *boost::get<std::vector<item>>(&m_data);
+#endif
+	}
+
+	const std::string& item::get_string() const
+	{
+#if USE_VARIANT_API == 1
+		return std::get<0>(m_data);
+#endif
+#if USE_VARIANT_API == 2
+		return *boost::get<std::string>(&m_data);
+#endif
+	}
+	const bool& item::get_bool() const
+	{
+#if USE_VARIANT_API == 1
+		return std::get<1>(m_data);
+#endif
+#if USE_VARIANT_API == 2
+		return *boost::get<bool>(&m_data);
+#endif
+	}
+	const std::vector<item>& item::get_array() const
+	{
+#if USE_VARIANT_API == 1
+		return std::get<2>(m_data);
+#endif
+#if USE_VARIANT_API == 2
+		return *boost::get<std::vector<item>>(&m_data);
+#endif
+	}
+
+	std::string item::name() const
+	{
+		return m_name;
+	}
+
+	// used in the html parser
+	item& item::child(const std::string& key)
+	{
+		auto& arr = get_array();
+		auto pos = std::find_if(std::begin(arr), std::end(arr), [key](const item& i)
+		{
+			return i.name() == key;
+		});
+		if (pos == std::end(arr))
+		{
+			arr.emplace_back(item(key));
+		}
+		return *arr.rbegin();
+	}
+
+	const item& item::child(const std::string& key) const
+	{
+		const interal_t& arr = get_array();
+		auto pos = std::find_if(std::begin(arr), std::end(arr), [key](const item& i)
+		{
+			return i.name() == key;
+		});
+		if (pos == std::end(arr))
+		{
+			throw data_map_error("child " + key + " not found");
+		}
+
+		return *pos;
+	}
+
+	std::string item::dump(int ident) const
+	{
+		struct sub
+		{
+			sub(std::ostream& s) : oss(s) {}
+
+			void operator()(const html::item& m, const int ident, const int lvl)
+			{
+				indent(lvl * ident);
+				oss << m.name() << "=";
+				if (m.is_null())
+				{
+					oss << "{null}";
+				}
+				else if (m.is_string())
+				{
+					std::string msg = m.get_string();
+					msg.erase(std::remove(msg.begin(), msg.end(), '\n'), msg.end());
+					msg.erase(std::remove(msg.begin(), msg.end(), '\r'), msg.end());
+					oss << "{\"" << msg << "\"}";
+				}
+				else if (m.is_bool())
+				{
+					oss << std::boolalpha << m.get_bool();
+				}
+				else if (m.is_array())
+				{
+					oss << std::endl;
+					indent(lvl * ident);
+					oss << "{" << std::endl;
+					sub s(oss);
+					const auto& sub_items = m.get_array();
+					for (auto& item : sub_items)
+					{
+						s(item, ident, lvl + 1);
+					}
+					indent(lvl * ident);
+					oss << "}";
+				}
+				oss << std::endl;
+			}
+			void indent(int indent)
+			{
+				for (int i = 0; i < indent; ++i)
+				{
+					oss << " ";
+				}
+			}
+
+			std::ostream& oss;
+		};
+
+		std::ostringstream oss;
+
+		sub s(oss);
+		s(*this, ident, 0);
+
+		return oss.str();
+	}
+
+	int item::index() const
+	{
+#if USE_VARIANT_API == 1
+		size_t pos = m_data.index();
+		if (pos != std::variant_npos)
+		{
+			return static_cast<int>(m_data.index());
+		}
+		else
+		{
+			return -1;
+		}
+#endif
+#if USE_VARIANT_API == 2
+		if (const std::string *p = boost::get<std::string>(&m_data))
+		{
+			return 0;
+		}
+		else if (const bool *p = boost::get<bool>(&m_data))
+		{
+			return 1;
+		}
+		else if (const std::vector<item> *p = boost::get<std::vector<item>>(&m_data))
+		{
+			return 2;
+		}
+		else
+		{
+			return -1;
+		}
+#endif
+	}
+
 	// ----------------------------------------
 	// the tokenization of the TMPL file
 	// ----------------------------------------
@@ -118,6 +341,11 @@ namespace html
 		// the parsed stream of tokens
 		using stream = std::vector<tok>;
 
+		void remove_spaces(std::string& msg)
+		{
+			msg.erase(std::remove(msg.begin(), msg.end(), ' '), msg.end());
+
+		}
 		void tokenize(const fs::path file, std::istream& is, size_t& line, token::tok& next_token)
 		{
 			/*
@@ -169,6 +397,8 @@ namespace html
 					auto start = tok_data.find(" ");
 					std::copy(tok_data.begin() + start + 1, tok_data.begin() + tok_data.size()-1,
 						std::back_inserter(next_token.name));
+
+					remove_spaces(next_token.name);
 				}
 				else if (tok_data.find("[TMPL_FOR ") != std::string::npos)
 				{
@@ -179,6 +409,8 @@ namespace html
 					auto start = tok_data.find(" ");
 					std::copy(tok_data.begin() + start + 1, tok_data.begin() + tok_data.size() - 1,
 						std::back_inserter(next_token.name));
+
+					remove_spaces(next_token.name);
 				}
 				else if (tok_data.find("[/TMPL_FOR]") != std::string::npos)
 				{
@@ -199,6 +431,8 @@ namespace html
 
 					std::copy(tok_data.begin() + start + 1, tok_data.begin() + tok_data.size() - 1,
 						std::back_inserter(next_token.name));
+
+					remove_spaces(next_token.name);
 				}
 				else if (tok_data.find("[TMPL_ELSE]") != std::string::npos)
 				{
@@ -219,6 +453,8 @@ namespace html
 					auto start = tok_data.find(" ");
 					std::copy(tok_data.begin() + start + 1, tok_data.begin() + tok_data.size() - 1,
 						std::back_inserter(next_token.name));
+
+					remove_spaces(next_token.name);
 				}
 				else
 				{
@@ -366,7 +602,7 @@ namespace html
 			std::string& ret,
 			token::stream::const_iterator begin,
 			token::stream::const_iterator end,
-			const html::map &data)
+			const html::item &data)
 		{
 			// for IF ELSE ENDIF
 			auto else_pos = begin;
@@ -389,7 +625,7 @@ namespace html
 					break;
 
 				case type_t::VAR:
-					ret += data[ct.name];
+					ret += data.child(ct.name).get_string();
 					break;
 
 				case type_t::FOR:
@@ -414,7 +650,7 @@ namespace html
 
 					// now repeat the content of the interval [for_pos, endfor_pos]
 					{
-						auto children = data.get_children(ct.name);
+						auto children = data.child(ct.name).get_array();
 						for (const auto& child : children)
 						{
 							parse_token_stream(ret, for_pos + 1, endfor_pos, child);
@@ -457,7 +693,7 @@ namespace html
 					}
 
 					// evaluate it
-					if (data[ct.name] == "true")
+					if (data.child(ct.name).get_bool())
 					{
 						// parse the iterator sequence [IF / (ELSE|ENDIF)]
 						parse_token_stream(ret, pos + 1, else_pos, data);
@@ -491,7 +727,7 @@ namespace html
 	// main function
 	// parse in the file and get out the generated document
 	// ----------------------------------------
-	std::string parse(fs::path file, std::istream& is, const map& data)
+	std::string parse(fs::path file, std::istream& is, const item& data)
 	{
 		using namespace token;
 
@@ -502,7 +738,7 @@ namespace html
 		parse_token_stream(ret, tokens.cbegin(), tokens.cend(), data);
 		return ret;
 	}
-	std::string parse(fs::path file, const map& data)
+	std::string parse(fs::path file, const item& data)
 	{
 		std::ifstream ifs(file.string());
 		if (!ifs.is_open())

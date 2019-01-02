@@ -16,70 +16,31 @@
 // ----------------------------------------------------------------------------
 struct TemplateData::impl
 {
-	html::map data;
+	html::item data;
 
-	void Set(html::map &d, std::vector<TemplateKey> path, const ValueKey &value)
+	impl() : data("root")
 	{
-#if USE_VARIANT_API == 1
-		// std::variant
-		// break the recursion
-		if (path.empty())
-		{
-			size_t index = value.index();
-			switch (index)
-			{
-				// string
-				case 0:
-					d = std::get<0>(value);
-					break;
+	}
 
-				// bool
-				case 1:
-					d = std::get<1>(value).value;
-					break;
-				default:
-					THROW_FATAL("TemplateData::impl: Unhandled Variant value. "
-								"This is a Bug. Please report it at %1%.",
-								BUGTRACKER);
-			}
-			return;
-		}
-		std::vector<TemplateKey> reduced{path};
-		reduced.erase(reduced.begin());
-
-		size_t idx = path.front().index();
-		switch (idx)
-		{
-			case 0:
-				Set(d[std::get<std::string>(path.front())], reduced, value);
-				break;
-			case 1:
-				Set(d[std::get<int>(path.front())], reduced, value);
-				break;
-			default:
-				THROW_FATAL("TemplateData::impl: Unhandled Variant value. "
-							"This is a Bug. Please report it at %1%.",
-							BUGTRACKER);
-		}
-#endif
-#if USE_VARIANT_API == 2
+	void Set(html::item &d, std::vector<TemplateKey> path, const ValueKey &value)
+	{
 		// boost
 		// break the recursion
 		if (path.empty())
 		{
 			if (const std::string *p = boost::get<std::string>(&value))
 			{
-				d = *p;
+				d.get_string() = *p;
 			}
 			else if (const boolean *p = boost::get<boolean>(&value))
 			{
-				d = p->value;
+				d.get_bool() = p->value;
 			}
 			else
 			{
 				THROW_FATAL("TemplateData::impl: Unhandled Variant value. "
-							"This is a Bug. Please report it at %1%.",
-							BUGTRACKER);
+					"This is a Bug. Please report it at %1%.",
+					BUGTRACKER);
 			}
 			return;
 		}
@@ -87,24 +48,23 @@ struct TemplateData::impl
 		std::vector<TemplateKey> reduced{path};
 		reduced.erase(reduced.begin());
 
-		const auto &switchdata = path.front();
-		if (const std::string *p = boost::get<std::string>(&switchdata))
+		const auto &next_key = path.front();
+		if (const std::string *p = boost::get<std::string>(&next_key))
 		{
-			if (d.get_children(*p).empty())
-			{
-				d.get_children(*p).resize(1);
-			}
-			Set(d.get_children(*p)[0], reduced, value);
+			Set(d.child(*p), reduced, value);
 		}
-		else if (const int *p = boost::get<int>(&switchdata))
+		else if (const int *p = boost::get<int>(&next_key))
 		{
 			// this must be an array
-
-			if (!d.is_array())
+			auto& arr = d.get_array();
+			if (static_cast<int>(arr.size()) < *p + 1)
 			{
-				d = json::array();
+				for (int i = static_cast<int>(arr.size()); i < *p + 1; ++i)
+				{
+					arr.emplace_back(html::item(std::to_string(i)));
+				}
 			}
-			Set(d[*p], reduced, value);
+			Set(arr[*p], reduced, value);
 		}
 		else
 		{
@@ -112,7 +72,6 @@ struct TemplateData::impl
 						"This is a Bug. Please report it at %1%.",
 						BUGTRACKER);
 		}
-#endif
 	}
 };
 
@@ -143,31 +102,18 @@ TemplateData &TemplateData::operator=(const TemplateData &rhs)
 
 void TemplateData::Set(std::vector<TemplateKey> path, const ValueKey &value)
 {
+	if (path.empty())
+	{
+		LOG_ERROR("TemplateData::Set: path is empty");
+		return;
+	}
+
 	mp_impl->Set(mp_impl->data, path, value);
 }
 std::string TemplateData::to_string() const
 {
-	std::ostringstream oss;
-	auto sub = [&oss](const html::map& m, int lvl)
-	{
-		for(html::map::const_iterator cit = m.cbegin();
-			cit != m.cend(); ++cit)
-		{
-			if (m.has_children(cit->first))
-			{
-				std::string v = std::get<std::string>(cit->second);
-				oss <<
-			}
-			else
-			{
-
-			}
-		}
-	};
-
-	sub(mp_impl->data, 0);
-
-	return oss.str();
+	std::string s = mp_impl->data.dump();
+	return s;
 }
 
 // ----------------------------------------------------------------------------
@@ -231,11 +177,12 @@ std::string TemplateWrapper::Render(const fs::path &tpl_file,
 	try
 	{
 		// making a copy preserves the outer data structure in any case
+		std::string s = data.to_string();
 		rendered = html::parse(tpl_file, data.mp_impl->data);
 	}
 	catch (std::exception &e)
 	{
-		THROW_FATAL("inja error trying to render '%1%' - %2%.\n   json=%3%",
+		THROW_FATAL("error trying to render '%1%' - %2%.\n   json=%3%",
 					tpl_file.string(), e.what(), data.to_string());
 	}
 	return rendered;

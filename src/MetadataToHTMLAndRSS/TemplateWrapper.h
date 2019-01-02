@@ -19,8 +19,8 @@ struct boolean
 	bool value;
 };
 
-using TemplateKey = variant_ns::variant<std::string, int>;
-using ValueKey = variant_ns::variant<std::string, boolean>;
+using TemplateKey = var::variant<std::string, int>;
+using ValueKey = var::variant<std::string, boolean>;
 
 class TemplateWrapper;
 class TemplateData

@@ -2,11 +2,11 @@
 #define __html_template_h__
 
 #include <string>
-#include <map>
 #include <vector>
-#include <tuple>
 #include <istream>
 #include <stdexcept>
+
+#include "Shared/variant.h"
 #include "Shared/filesystem.h"
 
 namespace html
@@ -42,16 +42,18 @@ namespace html
 	// the data we provide for the HTML Template
 	// subvalues are like "key1.table1.b"
 	// ----------------------------------------
-	class map
+	class item
 	{
 	public:
-		using interal_t = std::map<std::string, std::tuple<std::string, std::vector<map>>>;
+		using interal_t = std::vector<item>;
 		using iterator = interal_t::iterator;
 		using const_iterator = interal_t::const_iterator;
 
-		bool has_children(const std::string& v) const;
-		std::string& operator[](const std::string& v);
-		const std::string&  operator[](const std::string& v) const;
+		item(std::string name);
+		item(const item& rhs);
+		item(item&& rhs);
+		item& operator=(const item& rhs);
+		item& operator==(item&& rhs);
 
 		iterator begin();
 		iterator end();
@@ -59,18 +61,37 @@ namespace html
 		const_iterator cbegin() const;
 		const_iterator cend() const;
 
-		std::vector<map>& get_children(const std::string& v);
-		const std::vector<map>& get_children(const std::string& v) const;
+		bool is_array() const;
+		bool is_string() const;
+		bool is_bool() const;
+		bool is_null() const;
 
+		std::string& get_string();
+		bool& get_bool();
+		std::vector<item>& get_array();
+
+		const std::string& get_string() const;
+		const bool& get_bool() const;
+		const std::vector<item>& get_array() const;
+
+		std::string name() const;
+
+		// used in the html parser
+		item& child(const std::string& key);
+		const item& child(const std::string& key) const;
+
+		std::string dump(int ident = 4) const;
 	private:
-		interal_t m_data;
+		int index() const;
+		std::string m_name;
+		var::variant<std::string, bool, std::vector<item>> m_data;
 	};
 
 	// ----------------------------------------
 	// main function
 	// parse in the file and get out the generated document
 	// ----------------------------------------
-	std::string parse(fs::path file, const map& data);
+	std::string parse(fs::path file, const item& data);
 
 } // ns html
 
