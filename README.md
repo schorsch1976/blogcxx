@@ -226,8 +226,6 @@ Now it is typesafe and without sstream everywhere
 ## Used libraries
 
 ``blogcxx`` uses the following third-party libraries (in ``3rdparty/``):
-- [inja](https://github.com/pantor/inja)
-- [json](https://github.com/nlohmann/json)
 - *optional* [cmark-gfm 0.28.3](https://github.com/github/cmark-gfm)
 
 Not in 3rdparty directory because it is to big.
@@ -324,9 +322,6 @@ You mean, except the Title/Tags/Date part? Well:
 
 ### OK, but how can I compile ``blogcxx`` first?
 
-If you're on Windows, you can just [get a static binary](http://blogcxx.org/pages/download). There are also
-[precompiled builds for Debian GNU/Linux](https://blog.mdosch.de/2017/08/26/blogc++-in-debian-benutzen/)
-which have, sadly, not been updated in a while.
 It's not hard to compile ``blogcxx`` yourself though:
 
 Boost API is most suitable for 'older' compilers like gcc 6.3 and will build on almost every compiler.
@@ -367,6 +362,7 @@ Boost API is most suitable for 'older' compilers like gcc 6.3 and will build on 
   FBSD 12 | clang 6    |        | boost      | boost
 
 Building on Stretch fails because of inja/json. :-(
+
 
 ---
 
