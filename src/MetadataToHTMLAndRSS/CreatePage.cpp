@@ -45,7 +45,7 @@ void CreatePage(SingleItem::ConstPtr s, int page_index,
 	data.Set({"text"}, text);
 
 	// active page
-	data.Set({"pagenav", page_index, "cssclass"}, " active");
+	data.Set({ "pagenav", page_index, "cssclass" }, " active");
 
 	// create the file
 	PRINT("Creating a new page with the %1% template from '%2%'",

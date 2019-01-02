@@ -29,14 +29,14 @@
   <b>Tags:</b>
   <ul class="taglist">
 		[TMPL_FOR alltags]
-			<li><a href="[TMPL_VAR a]{{ tag/URL }}" title="Articles tagged [TMPL_VAR a]{{ tag/tagname }}">[TMPL_VAR a]{{ tag/tagname }}</a></li>
+			<li><a href="[TMPL_VAR URL]" title="Articles tagged [TMPL_VAR tagname]">[TMPL_VAR tagname]</a></li>
 		[/TMPL_FOR]
   </ul>
 
   <b>Series:</b>
   <ul class="serieslist">
       [TMPL_FOR allseries]
-		<li><a href="[TMPL_VAR baseurl]/series/[TMPL_VAR slug]" title="Articles in the [TMPL_VAR seriesname] category">[TMPL_VAR seriesname]</a></li>
+		<li><a href="[TMPL_VAR URL]" title="Articles in the [TMPL_VAR seriesname] category">[TMPL_VAR seriesname]</a></li>
       [/TMPL_FOR]
   </ul>
 

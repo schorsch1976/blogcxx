@@ -79,6 +79,7 @@ namespace html
 		// used in the html parser
 		item& child(const std::string& key);
 		const item& child(const std::string& key) const;
+		bool childexists(const std::string& key) const;
 
 		std::string dump(int ident = 4) const;
 	private:

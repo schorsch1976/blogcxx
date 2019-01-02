@@ -199,8 +199,9 @@ namespace html
 		if (pos == std::end(arr))
 		{
 			arr.emplace_back(item(key));
+			return *arr.rbegin();
 		}
-		return *arr.rbegin();
+		return *pos;
 	}
 
 	const item& item::child(const std::string& key) const
@@ -216,6 +217,16 @@ namespace html
 		}
 
 		return *pos;
+	}
+
+	bool item::childexists(const std::string& key) const
+	{
+		const interal_t& arr = get_array();
+		auto pos = std::find_if(std::begin(arr), std::end(arr), [key](const item& i)
+		{
+			return i.name() == key;
+		});
+		return (pos != std::end(arr));
 	}
 
 	std::string item::dump(int ident) const
@@ -318,7 +329,7 @@ namespace html
 	{
 		enum class type_t
 		{
-			TEXT, VAR, FOR, ENDFOR, IF, ELSE, ENDIF, INCLUDE, END
+			TEXT, VAR, FOR, ENDFOR, IF, ELSE, ENDIF, INCLUDE, EXISTS, ENDEXISTS, END
 		};
 
 		struct tok
@@ -355,7 +366,9 @@ namespace html
 			[TMPL_IF xyz]  : token::IF
 			[TMPL_ELSE]    : token::ELSE
 			[/TMPL_IF]     : token::ENDIF
-			[TMPL_INCLUDE xyz]  : token::TMPL_INCLUDE
+			[TMPL_INCLUDE xyz]  : token::INCLUDE
+			[TMPL_EXISTS xyz]   : token::EXISTS
+			[/TMPL_EXISTS]      : token::ENDEXISTS
 
 			End of stream  : token::END
 			*/
@@ -455,6 +468,23 @@ namespace html
 						std::back_inserter(next_token.name));
 
 					remove_spaces(next_token.name);
+				}
+				else if (tok_data.find("[TMPL_EXISTS ") != std::string::npos)
+				{
+					next_token.type = type_t::EXISTS;
+					next_token.line = line;
+
+					// extract the exists name
+					auto start = tok_data.find(" ");
+					std::copy(tok_data.begin() + start + 1, tok_data.begin() + tok_data.size() - 1,
+						std::back_inserter(next_token.name));
+
+					remove_spaces(next_token.name);
+				}
+				else if (tok_data.find("[/TMPL_EXISTS]") != std::string::npos)
+				{
+					next_token.type = type_t::ENDEXISTS;
+					next_token.line = line;
 				}
 				else
 				{
@@ -581,15 +611,17 @@ namespace html
 			std::string ret = "type_t::";
 			switch (ct.type)
 			{
-			case type_t::TEXT:   ret += "TEXT    : "; break;
-			case type_t::VAR:    ret += "VAR     : "; break;
-			case type_t::FOR:    ret += "FOR     : "; break;
-			case type_t::ENDFOR: ret += "ENDFOR  : "; break;
-			case type_t::IF:     ret += "IF      : "; break;
-			case type_t::ELSE:   ret += "ELSE    : "; break;
-			case type_t::ENDIF:  ret += "ENDIF   : "; break;
-			case type_t::INCLUDE:ret += "INCLUDE : "; break;
-			case type_t::END:    ret += "END     : "; break;
+			case type_t::TEXT:      ret += "TEXT    : "; break;
+			case type_t::VAR:       ret += "VAR     : "; break;
+			case type_t::FOR:       ret += "FOR     : "; break;
+			case type_t::ENDFOR:    ret += "ENDFOR  : "; break;
+			case type_t::IF:        ret += "IF      : "; break;
+			case type_t::ELSE:      ret += "ELSE    : "; break;
+			case type_t::ENDIF:     ret += "ENDIF   : "; break;
+			case type_t::INCLUDE:   ret += "INCLUDE : "; break;
+			case type_t::EXISTS:    ret += "EXISTS  : "; break;
+			case type_t::ENDEXISTS: ret += "ENDEXISTS  : "; break;
+			case type_t::END:       ret += "END     : "; break;
 			}
 
 			ret += "Line: " + std::to_string(ct.line) + " ";
@@ -612,6 +644,10 @@ namespace html
 			auto for_pos = begin;
 			auto endfor_pos = begin;
 
+			// for EXISTS
+			auto exists_pos = begin;
+			auto endexists_pos = begin;
+
 			int sublevel = 0;
 
 			for (auto pos = begin; pos != end; ++pos)
@@ -625,7 +661,10 @@ namespace html
 					break;
 
 				case type_t::VAR:
-					ret += data.child(ct.name).get_string();
+					if (data.childexists(ct.name))
+					{
+						ret += data.child(ct.name).get_string();
+					}
 					break;
 
 				case type_t::FOR:
@@ -649,6 +688,7 @@ namespace html
 					}
 
 					// now repeat the content of the interval [for_pos, endfor_pos]
+					if (data.childexists(ct.name))
 					{
 						auto children = data.child(ct.name).get_array();
 						for (const auto& child : children)
@@ -693,15 +733,18 @@ namespace html
 					}
 
 					// evaluate it
-					if (data.child(ct.name).get_bool())
+					if (data.childexists(ct.name))
 					{
-						// parse the iterator sequence [IF / (ELSE|ENDIF)]
-						parse_token_stream(ret, pos + 1, else_pos, data);
-					}
-					else
-					{
-						// parse the iterator sequence [ELSE / ENDIF]
-						parse_token_stream(ret, else_pos + 1, endif_pos, data);
+						if (data.child(ct.name).get_bool())
+						{
+							// parse the iterator sequence [IF / (ELSE|ENDIF)]
+							parse_token_stream(ret, pos + 1, else_pos, data);
+						}
+						else
+						{
+							// parse the iterator sequence [ELSE / ENDIF]
+							parse_token_stream(ret, else_pos + 1, endif_pos, data);
+						}
 					}
 					pos = endif_pos;
 
@@ -713,6 +756,40 @@ namespace html
 
 				case type_t::ENDIF:
 					throw token_stream_error("ENDIF without matching IF: " + to_string(ct));
+					break;
+
+				case type_t::EXISTS:
+					// adjust else_pos and endif_pos
+					exists_pos = endexists_pos = pos;
+					sublevel = 0;
+
+					for (auto tmp_pos = pos; tmp_pos != end; ++tmp_pos)
+					{
+						// sub EXISTS
+						if (tmp_pos->type == type_t::EXISTS)
+							++sublevel;
+						if (tmp_pos->type == type_t::ENDEXISTS)
+							--sublevel;
+
+						if (sublevel == 0 && tmp_pos->type == type_t::ENDEXISTS)
+						{
+							endexists_pos = tmp_pos;
+							break;
+						}
+					}
+
+					// evaluate it
+					if (data.childexists(ct.name))
+					{
+						// parse the iterator sequence [EXISTS / ENDEXISTS]
+						parse_token_stream(ret, pos + 1, endexists_pos, data);
+					}
+					pos = endexists_pos;
+
+					break;
+
+				case type_t::ENDEXISTS:
+					throw token_stream_error("ENDEXISTS without matching EXISTS: " + to_string(ct));
 					break;
 
 				case type_t::END:
