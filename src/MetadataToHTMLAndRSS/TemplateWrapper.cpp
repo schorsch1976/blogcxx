@@ -24,6 +24,65 @@ struct TemplateData::impl
 
 	void Set(html::item &d, std::vector<TemplateKey> path, const ValueKey &value)
 	{
+#if USE_VARIANT_API==1
+        // std
+		// break the recursion
+		if (path.empty())
+		{
+            size_t index = value.index();
+            switch (index)
+            {
+                case 0:
+                    d.get_string() = std::get<0>(value);
+                    break;
+                case 1:
+                    d.get_bool() =std::get<1>(value).value;
+                    break;
+                default:
+                    THROW_FATAL("TemplateData::impl: Unhandled Variant value. "
+                        "This is a Bug. Please report it at %1%.",
+                        BUGTRACKER);
+                    break;
+
+            }
+			return;
+		}
+
+		std::vector<TemplateKey> reduced{path};
+		reduced.erase(reduced.begin());
+
+		const auto &next_key = path.front();
+        size_t index = next_key.index();
+        switch(index)
+        {
+            case 0:
+                Set(d.child(std::get<0>(next_key)), reduced, value);
+                break;
+            case 1:
+            {
+                // this must be an array
+                auto& arr = d.get_array();
+                const int p = std::get<1>(next_key);
+                if (static_cast<int>(arr.size()) < p + 1)
+                {
+                    for (int i = static_cast<int>(arr.size()); i < p + 1; ++i)
+                    {
+                        arr.emplace_back(html::item(std::to_string(i)));
+                    }
+                }
+                Set(arr[p], reduced, value);
+                break;
+            }
+            default:
+                THROW_FATAL("TemplateData::impl: Unhandled Variant value. "
+						"This is a Bug. Please report it at %1%.",
+						BUGTRACKER);
+                break;
+        }
+
+#endif
+
+#if USE_VARIANT_API==2
 		// boost
 		// break the recursion
 		if (path.empty())
@@ -72,6 +131,7 @@ struct TemplateData::impl
 						"This is a Bug. Please report it at %1%.",
 						BUGTRACKER);
 		}
+#endif
 	}
 };
 

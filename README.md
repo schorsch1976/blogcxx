@@ -61,9 +61,9 @@ to heavy for the author of blogcpp.
 - more stable
 - better markdown support with libcmark-gfm
 - get source from git and not from mercurial
-- template engine got replaced by htmltemplate, like perl [HTML::template](https://metacpan.org/pod/HTML::Template)
+- template engine got replaced by htmltemplate++, like perl [HTML::template](https://metacpan.org/pod/HTML::Template)
   but it is a straight forward simple implementation to get rid of json and inja because
-  inja didn't work on freebsd
+  inja didn't work on freebsd. It was written from me.
 
 ## Current version
 
