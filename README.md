@@ -344,40 +344,38 @@ Boost API is most suitable for 'older' compilers like gcc 6.3 and will build on 
 
 ``blogcxx`` has been proven to compile on:
 
-  OS      | Compiler   | Status | filesystem | variant
- ---------|------------|--------|------------|---------
-  Windows | MSVC 2017  | OK     | std        | std
-  Windows | MSVC 2017  | OK     | std::exp   | std
-  Windows | MSVC 2017  | OK     | boost      | std
-  Windows | MSVC 2017  | OK     | std        | boost
-  Windows | MSVC 2017  | OK     | std::exp   | boost
-  Windows | MSVC 2017  | OK     | boost      | boost
-  Windows | MSYS  8.2  |        | std        | std
-  Windows | MSYS  8.2  |        | std::exp   | std
-  Windows | MSYS  8.2  |        | boost      | std
-  Windows | MSYS  8.2  |        | std        | boost
-  Windows | MSYS  8.2  |        | std::exp   | boost
-  Windows | MSYS  8.2  | OK     | boost      | boost
-  Stretch | gcc 6.3    | FAIL   | std        | std
-  Stretch | gcc 6.3    | FAIL   | std::exp   | std
-  Stretch | gcc 6.3    | FAIL   | boost      | std
-  Stretch | gcc 6.3    | FAIL   | std        | boost
-  Stretch | gcc 6.3    | FAIL   | std::exp   | boost
-  Stretch | gcc 6.3    | FAIL   | boost      | boost
-  Buster  | gcc 8.2    | OK     | std        | std
-  Buster  | gcc 8.2    | OK     | std::exp   | std
-  Buster  | gcc 8.2    | OK     | boost      | std
-  Buster  | gcc 8.2    | OK     | std        | boost
-  Buster  | gcc 8.2    | OK     | std::exp   | boost
-  Buster  | gcc 8.2    | OK     | boost      | boost
-  FBSD 12 | clang 6    | OK     | std        | std
-  FBSD 12 | clang 6    |        | std::exp   | std
-  FBSD 12 | clang 6    |        | boost      | std
-  FBSD 12 | clang 6    |        | std        | boost
-  FBSD 12 | clang 6    |        | std::exp   | boost
-  FBSD 12 | clang 6    |        | boost      | boost
-
-Building on Stretch fails because of inja/json. :-(
+  OS      | Compiler   | Status | filesystem | variant | tested
+ ---------|------------|--------|------------|---------|-------------
+  Windows | MSVC 2017  | OK     | std        | std     | 1-alpha
+  Windows | MSVC 2017  | OK     | std::exp   | std     | 1-alpha
+  Windows | MSVC 2017  | OK     | boost      | std     | 1-alpha
+  Windows | MSVC 2017  | OK     | std        | boost   | 1-alpha
+  Windows | MSVC 2017  | OK     | std::exp   | boost   | 1-alpha
+  Windows | MSVC 2017  | OK     | boost      | boost   | 1-alpha
+  Windows | MSYS  8.2  |        | std        | std     |
+  Windows | MSYS  8.2  |        | std::exp   | std     |
+  Windows | MSYS  8.2  |        | boost      | std     |
+  Windows | MSYS  8.2  |        | std        | boost   |
+  Windows | MSYS  8.2  |        | std::exp   | boost   |
+  Windows | MSYS  8.2  | OK     | boost      | boost   | 1-alpha
+  Stretch | gcc 6.3    | FAIL   | std        | std     | 1-alpha
+  Stretch | gcc 6.3    | FAIL   | std::exp   | std     | 1-alpha
+  Stretch | gcc 6.3    | FAIL   | boost      | std     | 1-alpha
+  Stretch | gcc 6.3    | FAIL   | std        | boost   | 1-alpha
+  Stretch | gcc 6.3    | FAIL   | std::exp   | boost   | 1-alpha
+  Stretch | gcc 6.3    | FAIL   | boost      | boost   | 1-alpha
+  Buster  | gcc 8.2    | OK     | std        | std     | 1-alpha
+  Buster  | gcc 8.2    | OK     | std::exp   | std     | 1-alpha
+  Buster  | gcc 8.2    | OK     | boost      | std     | 1-alpha
+  Buster  | gcc 8.2    | OK     | std        | boost   | 1-alpha
+  Buster  | gcc 8.2    | OK     | std::exp   | boost   | 1-alpha
+  Buster  | gcc 8.2    | OK     | boost      | boost   | 1-alpha
+  FBSD 12 | clang 6    | OK     | std        | std     | 1-alpha
+  FBSD 12 | clang 6    |        | std::exp   | std     |
+  FBSD 12 | clang 6    |        | boost      | std     |
+  FBSD 12 | clang 6    |        | std        | boost   |
+  FBSD 12 | clang 6    |        | std::exp   | boost   |
+  FBSD 12 | clang 6    |        | boost      | boost   |
 
 
 ---
@@ -459,11 +457,6 @@ make -j8 clean all  278,61s user 7,67s system 520% cpu 55,023 total
 * ``blogcxx`` is the traditional and default MarkdownParser.
 * ``libcmark-gfm`` is the implementation used at github with table support
 
-#### BOOST_LOG_API
-Boost Log Backend API (just on windows)
-* ``BOOST_WINAPI_VERSION_WINXP``
-* ``BOOST_WINAPI_VERSION_WIN7``
-
 #### FILESYSTEM_API
   * ``std::filesystem``
   * ``std::experimental::filesystem``
@@ -478,10 +471,7 @@ Create a static binary.
 
 #### TEST_OLDER_COMPILERS
 This is just an develop option. Please let it off. If on, it disables
-all ``c++17`` support. That also means, no output >:-) . This changes
-*soon* as i plan to replace json/inja with boost::spirit. The template
-is a [CFG](https://en.wikipedia.org/wiki/Context-free_grammar) grammar.
-
+all ``c++17`` support.
 
 ## Which directories need to be there?
 
@@ -604,6 +594,3 @@ other template files are optional. CSS and image files can be put into a
 subfolder named **static**, ``blogcxx`` will automatically copy this
 folder to your output directory then.
 
-Starting with version 1, ``blogcxx``'s templates are *mostly* compatible
-with the [Jinja2](http://jinja.pocoo.org/) syntax, so porting your
-existing Python themes should be rather easy.

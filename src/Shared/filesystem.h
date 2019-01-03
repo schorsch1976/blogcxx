@@ -16,11 +16,6 @@ namespace fs = std::filesystem;
 #endif
 
 #if USE_FILESYSTEM_API == 2
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#endif
-
-#if USE_FILESYSTEM_API == 3
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 #endif

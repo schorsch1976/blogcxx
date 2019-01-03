@@ -169,35 +169,30 @@ ENDIF (API_VARIANT STREQUAL "boost::variant")
 IF(NOT FREEBSD)
 	# everywhere use std::regex
 	ADD_DEFINITIONS(-DUSE_REGEX_API=1)
+	SET(STD_REGEX ON)
+	SET(BOOST_REGEX OFF)
 ELSE(NOT FREEBSD)
 	# except on Freebsd: use::boost regex
 	ADD_DEFINITIONS(-DUSE_REGEX_API=2)
+	SET(STD_REGEX OFF)
+	SET(BOOST_REGEX ON)
 ENDIF(NOT FREEBSD)
 
 ############################################################################
 # filesystem
 ############################################################################
 SET(API_FILESYSTEM "boost::filesystem" CACHE STRING "Use this filesystem API")
-SET_PROPERTY(CACHE API_FILESYSTEM PROPERTY STRINGS "std::filesystem" "std::experimental::filesystem" "boost::filesystem")
+SET_PROPERTY(CACHE API_FILESYSTEM PROPERTY STRINGS "std::filesystem" "boost::filesystem")
 
 IF (API_FILESYSTEM STREQUAL "std::filesystem")
 	ADD_DEFINITIONS(-DUSE_FILESYSTEM_API=1)
 	SET(STD_FILESYSTEM ON)
-	SET(STD_EX_FILESYSTEM OFF)
 	SET(BOOST_FILESYSTEM OFF)
 ENDIF (API_FILESYSTEM STREQUAL "std::filesystem")
 
-IF (API_FILESYSTEM STREQUAL "std::experimental::filesystem")
+IF (API_FILESYSTEM STREQUAL "boost::filesystem")
 	ADD_DEFINITIONS(-DUSE_FILESYSTEM_API=2)
 	SET(STD_FILESYSTEM OFF)
-	SET(STD_EX_FILESYSTEM ON)
-	SET(BOOST_FILESYSTEM OFF)
-ENDIF (API_FILESYSTEM STREQUAL "std::experimental::filesystem")
-
-IF (API_FILESYSTEM STREQUAL "boost::filesystem")
-	ADD_DEFINITIONS(-DUSE_FILESYSTEM_API=3)
-	SET(STD_FILESYSTEM OFF)
-	SET(STD_EX_FILESYSTEM OFF)
 	SET(BOOST_FILESYSTEM ON)
 ENDIF (API_FILESYSTEM STREQUAL "boost::filesystem")
 
@@ -206,34 +201,51 @@ ENDIF (API_FILESYSTEM STREQUAL "boost::filesystem")
 ############################################################################
 SET(BOOST_VERSION "1.62.0")
 
-# boost log uses boost::filesystem internaly
 SET(Boost_USE_MULTITHREADED		ON)
 FIND_PACKAGE(Boost ${BOOST_VERSION} COMPONENTS
 	date_time
 	locale
-	filesystem
 	program_options
 	system
 
 	REQUIRED
 )
 
+SET(BOOST_LIBS
+	${Boost_DATE_TIME_LIBRARY}
+	${Boost_SYSTEM_LIBRARY}
+	${Boost_LOCALE_LIBRARY}
+	${Boost_PROGRAM_OPTIONS_LIBRARY}
+)
+
+IF (BOOST_FILESYSTEM)
+	FIND_PACKAGE(Boost ${BOOST_VERSION} COMPONENTS
+		filesystem
+
+		REQUIRED
+	)
+	SET(BOOST_LIBS
+		${Boost_FILESYSTEM_LIBRARY}
+		${BOOST_LIBS}
+	)
+ENDIF (BOOST_FILESYSTEM)
+
+IF(BOOST_REGEX)
+	FIND_PACKAGE(Boost ${BOOST_VERSION} COMPONENTS
+		regex
+
+		REQUIRED
+	)
+	SET(BOOST_LIBS
+		${Boost_REGEX_LIBRARY}
+		${BOOST_LIBS}
+	)
+ENDIF(BOOST_REGEX)
+
 ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
-
-SET(BOOST_LIBS
-	${Boost_ATOMIC_LIBRARY}
-	${Boost_CHRONO_LIBRARY}
-	${Boost_FILESYSTEM_LIBRARY}
-	${Boost_REGEX_LIBRARY}
-	${Boost_DATE_TIME_LIBRARY}
-	${Boost_SYSTEM_LIBRARY}
-	${Boost_THREAD_LIBRARY}
-	${Boost_LOCALE_LIBRARY}
-	${Boost_PROGRAM_OPTIONS_LIBRARY}
-)
 
 IF(LINUX)
 	# on Linux, the locale backend is ICU
