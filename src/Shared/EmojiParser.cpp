@@ -5,59 +5,54 @@
 
 #include "EmojiParser.h"
 
+#include "Shared/regex.h"
 #include <cassert>
 #include <memory>
 #include <mutex> // once_flag
-#include "Shared/regex.h"
 #include <sstream>
 #include <unordered_map>
 
-#include "Log/Log.h"
+#include <boost/locale.hpp>
 
-#ifndef TEST_OLDER_COMPILERS
-using namespace std::literals::string_literals; // for s
-#endif
+#include "Log/Log.h"
 
 namespace
 {
-
+std::string u8(std::wstring w)
+{
+	return boost::locale::conv::utf_to_utf<char>(w);
+}
 struct EmojiMaps
 {
 	EmojiMaps()
-#ifndef TEST_OLDER_COMPILERS
-		: // clang-format off
-			// The emojis are kept in an assignment table for your and
-			// my own convenience.
-			// Code reference: http://emojipedia.org/people/
-		m_emojis
-		{
-			{ ":-)", u8"\U0001F642"s },
-			{ ";-)", u8"\U0001F609"s },
-			{ ":-D", u8"\U0001F600"s },
-			{ ":-(", u8"\U00002639"s },
-			{ ":'(", u8"\U0001F62D"s },
-			{ ":-|", u8"\U0001F610"s },
-			{ ">:)", u8"\U0001F608"s },
-			{ ">:-)", u8"\U0001F608"s },
-			{ ">:(", u8"\U0001F620"s },
-			{ ">:-(", u8"\U0001F620"s },
-			{ ":-*", u8"\U0001F618"s },
-			{ ":-O", u8"\U0001F62E"s },
-			{ ":-o", u8"\U0001F62E"s },
-			{ ":-S", u8"\U0001F615"s },
-			{ ":-s", u8"\U0001F615"s },
-			{ ":-#", u8"\U0001F636"s },
-			{ "0:-)", u8"\U0001F607"s },
-			{ ":o)", u8"\U0001F921"s },
-			{ "<_<", u8"\U0001F612"s },
-			{ "^^", u8"\U0001F60A"s },
-			{ "^_^", u8"\U0001F60A"s },
-			{ "<3", u8"\U00002764"s },
-			{ "m(", u8"\U0001F926"s }
-		}
-		  // clang-format on
-#endif
 	{
+		// The emojis are kept in an assignment table for your and
+		// my own convenience.
+		// Code reference: http://emojipedia.org/people/
+		m_emojis[":-)"] = u8(L"\U0001F642");
+		m_emojis[";-)"] = u8(L"\U0001F609");
+		m_emojis[":-D"] = u8(L"\U0001F600");
+		m_emojis[":-("] = u8(L"\U00002639");
+		m_emojis[":'("] = u8(L"\U0001F62D");
+		m_emojis[":-|"] = u8(L"\U0001F610");
+		m_emojis[">:)"] = u8(L"\U0001F608");
+		m_emojis[">:-)"] = u8(L"\U0001F608");
+		m_emojis[">:("] = u8(L"\U0001F620");
+		m_emojis[">:-("] = u8(L"\U0001F620");
+		m_emojis[":-*"] = u8(L"\U0001F618");
+		m_emojis[":-O"] = u8(L"\U0001F62E");
+		m_emojis[":-o"] = u8(L"\U0001F62E");
+		m_emojis[":-S"] = u8(L"\U0001F615");
+		m_emojis[":-s"] = u8(L"\U0001F615");
+		m_emojis[":-#"] = u8(L"\U0001F636");
+		m_emojis["0:-)"] = u8(L"\U0001F607");
+		m_emojis[":o)"] = u8(L"\U0001F921");
+		m_emojis["<_<"] = u8(L"\U0001F612");
+		m_emojis["^^"] = u8(L"\U0001F60A");
+		m_emojis["^_^"] = u8(L"\U0001F60A");
+		m_emojis["<3"] = u8(L"\U00002764");
+		m_emojis["m("] = u8(L"\U0001F926");
+
 		// build the regex to replacement map
 		for (auto &e : m_emojis)
 		{
@@ -112,7 +107,7 @@ struct EmojiMaps
 		return out;
 	}
 
-	const std::unordered_map<std::string, std::string> m_emojis;
+	std::unordered_map<std::string, std::string> m_emojis;
 	std::vector<std::pair<rx::regex, std::string>> m_regex_to_replacement;
 };
 

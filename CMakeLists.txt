@@ -124,14 +124,6 @@ ELSE (API_STATIC_LINKING)
 ENDIF (API_STATIC_LINKING)
 
 ############################################################################
-# Test on older compilers
-############################################################################
-OPTION(TEST_OLDER_COMPILERS "Test on older compilers" OFF)
-IF (TEST_OLDER_COMPILERS)
-	ADD_DEFINITIONS(-DTEST_OLDER_COMPILERS)
-ENDIF (TEST_OLDER_COMPILERS)
-
-############################################################################
 # markdown
 ############################################################################
 SET(API_MARKDOWN "libcmark-gfm" CACHE STRING "Use this markdown implementation")

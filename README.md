@@ -168,7 +168,6 @@ The latest released version is 1-alpha
 - option added to switch the API for variant(std::variant/boost::variant) and
   filesystem (std::filesystem/std::experimental::filesystem and boost::filesystem)
 - option added to link all static
-- option added to support testing on older compilers TEST_OLDER_COMPILERS
 - Installation option for blogcxx added
 
 ## Features removed compared to blogcpp
@@ -199,14 +198,12 @@ raw threads. use std::future() and std::async(launch::async,...)
 - make a metadata structure that is after the FilesToMetadata phase const
 - reduce #ifdef #else #endif over the whole codebase, but still keep the options
   available. This improves readability and maintainable a lot.
-- update inja and use exists() and existsIn() in the templates [Inja 1.1.0-pre](https://github.com/pantor/inja/tree/e44c2372e1b70f79e83e8ecbb10d6f99f679a872)
-- TemplateWrapper does now what its name implies. It totally encapulates
-  json and the inja handling. It uses the so called PIMPL pattern that is also
-  known as compiler firewall.
+- TemplateWrapper does now what its name implies. It uses the so
+  called PIMPL pattern that is also known as compiler firewall.
 - replace struct tm by boost::posix_time::ptime over the whole code base
 - Restructure the whole src folder. Split the tasks into manageable
   files that are grouped accordig to their function in the process.
-- use boost::log and boost::format for logging.
+- use boost::format for logging.
 - RSS (replaced tinyxml2 with inja. we already have a templating engine)
 
 No more
@@ -347,34 +344,24 @@ Boost API is most suitable for 'older' compilers like gcc 6.3 and will build on 
   OS      | Compiler   | Status | filesystem | variant | tested
  ---------|------------|--------|------------|---------|-------------
   Windows | MSVC 2017  | OK     | std        | std     | 1-alpha
-  Windows | MSVC 2017  | OK     | std::exp   | std     | 1-alpha
   Windows | MSVC 2017  | OK     | boost      | std     | 1-alpha
   Windows | MSVC 2017  | OK     | std        | boost   | 1-alpha
-  Windows | MSVC 2017  | OK     | std::exp   | boost   | 1-alpha
   Windows | MSVC 2017  | OK     | boost      | boost   | 1-alpha
   Windows | MSYS  8.2  |        | std        | std     |
-  Windows | MSYS  8.2  |        | std::exp   | std     |
   Windows | MSYS  8.2  |        | boost      | std     |
   Windows | MSYS  8.2  |        | std        | boost   |
-  Windows | MSYS  8.2  |        | std::exp   | boost   |
   Windows | MSYS  8.2  | OK     | boost      | boost   | 1-alpha
   Stretch | gcc 6.3    | FAIL   | std        | std     | 1-alpha
-  Stretch | gcc 6.3    | FAIL   | std::exp   | std     | 1-alpha
   Stretch | gcc 6.3    | FAIL   | boost      | std     | 1-alpha
   Stretch | gcc 6.3    | FAIL   | std        | boost   | 1-alpha
-  Stretch | gcc 6.3    | FAIL   | std::exp   | boost   | 1-alpha
   Stretch | gcc 6.3    | FAIL   | boost      | boost   | 1-alpha
   Buster  | gcc 8.2    | OK     | std        | std     | 1-alpha
-  Buster  | gcc 8.2    | OK     | std::exp   | std     | 1-alpha
   Buster  | gcc 8.2    | OK     | boost      | std     | 1-alpha
   Buster  | gcc 8.2    | OK     | std        | boost   | 1-alpha
-  Buster  | gcc 8.2    | OK     | std::exp   | boost   | 1-alpha
   Buster  | gcc 8.2    | OK     | boost      | boost   | 1-alpha
   FBSD 12 | clang 6    | OK     | std        | std     | 1-alpha
-  FBSD 12 | clang 6    |        | std::exp   | std     |
   FBSD 12 | clang 6    |        | boost      | std     |
   FBSD 12 | clang 6    |        | std        | boost   |
-  FBSD 12 | clang 6    |        | std::exp   | boost   |
   FBSD 12 | clang 6    |        | boost      | boost   |
 
 
@@ -459,7 +446,6 @@ make -j8 clean all  278,61s user 7,67s system 520% cpu 55,023 total
 
 #### FILESYSTEM_API
   * ``std::filesystem``
-  * ``std::experimental::filesystem``
   * ``boost::filesystem``
 
 #### VARIANT_API
@@ -468,10 +454,6 @@ make -j8 clean all  278,61s user 7,67s system 520% cpu 55,023 total
 
 #### STATIC_LINKING
 Create a static binary.
-
-#### TEST_OLDER_COMPILERS
-This is just an develop option. Please let it off. If on, it disables
-all ``c++17`` support.
 
 ## Which directories need to be there?
 
@@ -509,7 +491,7 @@ You can call ``blogcxx`` with the following parameters:
 	  are part of the ``blog.cfg-example``
 -  ``-v`` / ``--version``
 	* Prints the version number of ``blogcxx``.
--  ``--verbosity``
+-  ``--console-verbosity`` ``--file-verbosity``
 	* Generates your site, but set the amount of info you want to see.
 		Quiet = 5 / Verbose = 0
 -  ``--new-article``
@@ -526,8 +508,8 @@ Given that you have *actually enabled* Emoji support in your
 to process, the following smiley codes will automatically be replaced:
 
 
- Code      | Emoji
- ----------|-----------
+ Code       | Emoji
+ -----------|-----------
  ``:-)``    | ☺
  ``;-)``    | 😉
  ``:-D``    | 😀
