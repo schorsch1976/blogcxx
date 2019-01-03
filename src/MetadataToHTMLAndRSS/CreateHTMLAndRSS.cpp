@@ -365,15 +365,15 @@ void CreateHTMLAndRSS(const ConstMetadata &merged, const ConfigCollection &cfgs)
 					  cfgs.outdir_root() / cfgs.rel_path_static());
 	});
 
-	// add copy static images
-	creator.Add("CopyImages", [&cfgs]() {
+	// add copy static media
+	creator.Add("CopyMedia", [&cfgs]() {
 		if (fs::exists(cfgs.indir() / cfgs.rel_path_images()))
 		{
-			PRINT("Copying images.");
-			fs::create_directories(cfgs.outdir_root() / cfgs.rel_path_images());
+			PRINT("Copying media files.");
+			fs::create_directories(cfgs.outdir_root() / cfgs.rel_path_media());
 
-			CopyDirectory(cfgs.indir() / cfgs.rel_path_images(),
-						  cfgs.outdir_root() / cfgs.rel_path_images());
+			CopyDirectory(cfgs.indir() / cfgs.rel_path_media(),
+				cfgs.outdir_root() / cfgs.rel_path_media());
 		}
 	});
 

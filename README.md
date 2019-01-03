@@ -140,7 +140,7 @@ The latest released version is 1-alpha
 - Articles can be parsed with hardbreaks on to format code and so on
   Hardbreaks: On (default is off). If hardbreaks are on, If you make new line,
   the generated html has a new line.
-- a folder ``images`` gets copied into the outdir.
+- a folder ``media`` gets copied into the outdir.
 - colorize output for warn/error/fatal messages. This works on Unix and Win10+
   - white  = standard
   - yellow = warning

@@ -121,7 +121,7 @@ public:
 	fs::path rel_path_tags(const std::string &cat) const;
 	fs::path rel_path_static() const;
 	fs::path rel_path_series(const std::string &series) const;
-	fs::path rel_path_images() const;
+	fs::path rel_path_media() const;
 	fs::path rel_path_feed() const;
 
 	fs::path feed_file(const ArchiveData &ad) const;

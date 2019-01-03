@@ -250,9 +250,9 @@ fs::path ConfigCollection::rel_path_series(const std::string &series) const
 	return p;
 }
 
-fs::path ConfigCollection::rel_path_images() const
+fs::path ConfigCollection::rel_path_media() const
 {
-	fs::path ret{"images"};
+	fs::path ret{"media"};
 	return ret;
 }
 
