@@ -367,7 +367,7 @@ void CreateHTMLAndRSS(const ConstMetadata &merged, const ConfigCollection &cfgs)
 
 	// add copy static media
 	creator.Add("CopyMedia", [&cfgs]() {
-		if (fs::exists(cfgs.indir() / cfgs.rel_path_images()))
+		if (fs::exists(cfgs.indir() / cfgs.rel_path_media()))
 		{
 			PRINT("Copying media files.");
 			fs::create_directories(cfgs.outdir_root() / cfgs.rel_path_media());
