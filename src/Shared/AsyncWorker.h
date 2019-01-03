@@ -10,7 +10,7 @@
 #include <set>
 #include <type_traits>
 
-#include "Debug.h"
+#include "Log/Log.h"
 
 template <typename KeyT, typename RetValT>
 class AsyncWorker

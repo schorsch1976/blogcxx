@@ -12,7 +12,7 @@
 #include <sstream>
 #include <unordered_map>
 
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 
 #ifndef TEST_OLDER_COMPILERS
 using namespace std::literals::string_literals; // for s

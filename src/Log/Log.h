@@ -7,7 +7,7 @@
 
 #include <boost/log/trivial.hpp>
 
-namespace Debug
+namespace Log
 {
 using Level = boost::log::trivial::severity_level;
 
@@ -26,14 +26,14 @@ public:
 struct Status
 {
 	Status();
-	void SetFileVerbosity(Debug::Level verbosity);
-	void SetConsoleVerbosity(Debug::Level verbosity);
+	void SetFileVerbosity(Log::Level verbosity);
+	void SetConsoleVerbosity(Log::Level verbosity);
 	~Status();
 };
 
 } // namespace Debug
 
-#include "DebugImpl.h"
+#include "Log-Impl.h"
 
 // ----------------------------------------------------------------------------
 // variadic template that uses typesafe operations. Just use the classical
@@ -43,54 +43,54 @@ struct Status
 template <typename T, typename... Args>
 void LOG_TRACE(const T &fmt, Args... args)
 {
-	Debug::impl::LOG_IMPL<Debug::Level::trace>(fmt, args...);
+	Log::impl::LOG_IMPL<Log::Level::trace>(fmt, args...);
 }
 
 template <typename T, typename... Args>
 void LOG_DEBUG(const T &fmt, Args... args)
 {
-	Debug::impl::LOG_IMPL<Debug::Level::debug>(fmt, args...);
+	Log::impl::LOG_IMPL<Log::Level::debug>(fmt, args...);
 }
 
 template <typename T, typename... Args>
 void LOG_INFO(const T &fmt, Args... args)
 {
-	Debug::impl::LOG_IMPL<Debug::Level::info>(fmt, args...);
+	Log::impl::LOG_IMPL<Log::Level::info>(fmt, args...);
 }
 
 template <typename T, typename... Args>
 void LOG_WARN(const T &fmt, Args... args)
 {
-	Debug::impl::LOG_IMPL<Debug::Level::warning>(fmt, args...);
+	Log::impl::LOG_IMPL<Log::Level::warning>(fmt, args...);
 }
 
 template <typename T, typename... Args>
 void LOG_ERROR(const T &fmt, Args... args)
 {
-	Debug::impl::LOG_IMPL<Debug::Level::error>(fmt, args...);
+	Log::impl::LOG_IMPL<Log::Level::error>(fmt, args...);
 }
 
 template <typename T, typename... Args>
 void LOG_FATAL(const T &fmt, Args... args)
 {
-	Debug::impl::LOG_IMPL<Debug::Level::fatal>(fmt, args...);
+	Log::impl::LOG_IMPL<Log::Level::fatal>(fmt, args...);
 }
 
 // we need this defines always
 template <typename T, typename... Args>
 void PRINT(const T &fmt, Args... args)
 {
-	Debug::impl::LOG_IMPL<Debug::Level::info>(fmt, args...);
+	Log::impl::LOG_IMPL<Log::Level::info>(fmt, args...);
 }
 
 template <typename T, typename... Args>
 void THROW_ERROR(const T &fmt, Args... args)
 {
-	Debug::impl::THROW<Debug::Level::error>(fmt, args...);
+	Log::impl::THROW<Log::Level::error>(fmt, args...);
 }
 
 template <typename T, typename... Args>
 void THROW_FATAL(const T &fmt, Args... args)
 {
-	Debug::impl::THROW<Debug::Level::fatal>(fmt, args...);
+	Log::impl::THROW<Log::Level::fatal>(fmt, args...);
 }

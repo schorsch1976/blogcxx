@@ -9,7 +9,7 @@
 #include <boost/optional.hpp>
 #include <string>
 
-#include "Debug.h"
+#include "Log/Log.h"
 #include "Metadata.h"
 #include "filesystem.h"
 
@@ -68,8 +68,8 @@ public:
 	std::string sitetitle() const;
 	const boost::optional<std::string> subtitle() const;
 
-	Debug::Level file_verbosity() const;
-	Debug::Level console_verbosity() const;
+	Log::Level file_verbosity() const;
+	Log::Level console_verbosity() const;
 
 	std::string author() const;
 

@@ -57,6 +57,7 @@ SET(LIBS
 	FilesToMetadata
 	MetadataToHTMLAndRSS
 	Shared
+	Log
 	htmltemplate++
 	${BLOG_CXX_LIBS}
 )

@@ -6,8 +6,7 @@
 #include <iomanip>
 #include <mutex> // once flag
 
-#include "Debug.h"
-#include "constants.h"
+#include "Log.h"
 
 #include <boost/core/null_deleter.hpp>
 
@@ -30,8 +29,8 @@
 
 namespace
 {
-using namespace Debug;
-using namespace Debug::impl;
+using namespace Log;
+using namespace Log::impl;
 
 // the file sink
 typedef sinks::synchronous_sink<sinks::text_file_backend> file_sink_t;
@@ -49,7 +48,7 @@ static bool sb_color_available = false;
 } // namespace
 
 // public interface
-namespace Debug
+namespace Log
 {
 
 using namespace boost::log;
@@ -144,7 +143,7 @@ Status::Status()
 	std::call_once(s_once_file, [=]() {
 		// Create a backend and initialize it with a stream
 		auto backend = boost::make_shared<sinks::text_file_backend>();
-		backend->set_file_name_pattern(DEBUGLOGFILE);
+		backend->set_file_name_pattern("debug.txt");
 
 		// Wrap it into the frontend and register in the core
 		sp_file_sink.reset(new file_sink_t(backend));
@@ -183,68 +182,68 @@ Status::~Status()
 	}
 }
 
-void Status::SetFileVerbosity(Debug::Level verbosity)
+void Status::SetFileVerbosity(Log::Level verbosity)
 {
 	using namespace impl;
 	if (sp_file_sink)
 	{
-		if (verbosity == Debug::Level::trace)
+		if (verbosity == Log::Level::trace)
 		{
 			sp_file_sink->reset_filter();
 		}
 		else
 		{
-			sp_file_sink->set_filter(expr::attr<Debug::Level>("Severity") >=
+			sp_file_sink->set_filter(expr::attr<Log::Level>("Severity") >=
 									 verbosity);
 		}
 	}
 }
 
-void Status::SetConsoleVerbosity(Debug::Level verbosity)
+void Status::SetConsoleVerbosity(Log::Level verbosity)
 {
 	using namespace impl;
 	if (sp_console_sink)
 	{
-		if (verbosity == Debug::Level::trace)
+		if (verbosity == Log::Level::trace)
 		{
 			sp_console_sink->reset_filter();
 		}
 		else
 		{
 			// warning, error and fatal must be seen by the user
-			if (verbosity > Debug::Level::warning)
+			if (verbosity > Log::Level::warning)
 			{
-				verbosity = Debug::Level::warning;
+				verbosity = Log::Level::warning;
 			}
-			sp_console_sink->set_filter(expr::attr<Debug::Level>("Severity") >=
+			sp_console_sink->set_filter(expr::attr<Log::Level>("Severity") >=
 										verbosity);
 		}
 	}
 }
 
-} // namespace Debug
+} // namespace Log
 
-namespace Debug
+namespace Log
 {
 namespace impl
 {
 static std::vector<
-	boost::shared_ptr<boost::log::sources::severity_logger_mt<Debug::Level>>>
+	boost::shared_ptr<boost::log::sources::severity_logger_mt<Log::Level>>>
 	sp_logger;
 
 // access to the logger
-boost::log::sources::severity_logger_mt<Debug::Level> &
-Logger(Debug::impl::Color color)
+boost::log::sources::severity_logger_mt<Log::Level> &
+Logger(Log::impl::Color color)
 {
 	static std::once_flag s_once;
 	std::call_once(s_once, []() {
-		for (int i = 0; i < static_cast<int>(Debug::impl::Color::red); ++i)
+		for (int i = 0; i < static_cast<int>(Log::impl::Color::red); ++i)
 		{
 			auto logger = boost::make_shared<
-				boost::log::sources::severity_logger_mt<Debug::Level>>();
+				boost::log::sources::severity_logger_mt<Log::Level >> ();
 			logger->add_attribute("Color",
 								  boost::log::attributes::constant<Color>(
-									  static_cast<Debug::impl::Color>(i)));
+									  static_cast<Log::impl::Color>(i)));
 
 			sp_logger.push_back(logger);
 		}
@@ -258,4 +257,4 @@ Logger(Debug::impl::Color color)
 	return *sp_logger[0];
 }
 } // namespace impl
-} // namespace Debug
+} // namespace Log

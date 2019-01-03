@@ -4,7 +4,7 @@
  */
 
 #include "ExcerptExtractor.h"
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 
 namespace Excerpt
 {

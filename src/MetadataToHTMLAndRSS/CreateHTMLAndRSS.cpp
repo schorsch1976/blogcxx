@@ -2,7 +2,7 @@
  * blogcxx :: https://www.blogcxx.de
  */
 
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 
 #include "CreateHTMLAndRSS.h"
 

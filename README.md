@@ -9,6 +9,22 @@ A static blog generator, written in ``C++17``. It is a fork of [blogcpp](https:/
 This is my public (but not main repository). It is used to publish released versions and
 for bug/issue tracking.
 
+## How do i use blogcxx?
+My goal was to remove php from my server. I just have a somehow static blog. So i used
+for some time [dokuwiki](https://www.dokuwiki.org/dokuwiki). This stores its data in
+files but still uses php.
+
+In the [BSDForen.de](https://www.bsdforen.de) i meet CrimsonKing aka tux_ on
+bitbucket. He introduced his [blogcpp](https://www.blogcpp.org).
+
+I setup my git repository for my blog site that has an post-update hook to run
+the static blog generator. The output outdir of the blog is the DocRoot of the
+webserver. The output gets mailed to me to get feedback. When i push data to
+the repo the post-update hook runs and updates the blog.
+
+``blogcpp`` seemned perfect for the issue but it was unstable
+and crashed repeatedly.
+
 ## Fork
 As blogcpp is licenced under WTFPL2, i fork it and do what
 the f*ck i want. As i rewrote so big chunks, i licence blogcxx
@@ -20,14 +36,14 @@ WTFPL 2 and GPL3 are compatible.
 - [Wikipedia](https://en.wikipedia.org/wiki/WTFPL)
 - [Fedora](https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing)
 
-## Why?
+## Why forked?
 
 blogcpp was heavyly rewritten because there were internal source code
 difficulties. ( There was a pattern used called [spagetti code](https://en.wikipedia.org/wiki/Spaghetti_code). )
 Take a look at [blogcpp.cpp](https://bitbucket.org/tux_/blogcpp/src/89af0ad6f725f958b99cf1118252895cecde046c/src/blogcpp.cpp?at=default&fileviewer=file-view-default)
 can you follow easily where the global varibales are locked? How is the programflow?
 
-Aside from this, it didnt' handle it well when there was no site dir or it was
+Aside from this, it didn't handle it well when there was no site dir or it was
 executed in an empty directory. It just segfaulted with no error message at all.
 The setup of a new blogsite was painful if you dont know the internals.
 The final reason to rewrite was that it just crashed with no help for the user.

@@ -1,12 +1,6 @@
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 ############################################################################
-# inja inja-1.1.0-pre + json
-############################################################################
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/3rdparty/inja-1.1.0-pre/src)
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/3rdparty/inja-1.1.0-pre/src/nlohmann)
-
-############################################################################
 # FreeBSD and Darwin
 ############################################################################
 IF (${FREEBSD} OR ${DARWIN})
@@ -16,6 +10,7 @@ IF (${FREEBSD} OR ${DARWIN})
 ENDIF(${FREEBSD} OR ${DARWIN})
 
 
+ADD_SUBDIRECTORY(Log)
 ADD_SUBDIRECTORY(FilesToMetadata)
 ADD_SUBDIRECTORY(MetadataToHTMLAndRSS)
 ADD_SUBDIRECTORY(Shared)

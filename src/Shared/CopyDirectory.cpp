@@ -1,6 +1,6 @@
 #include "CopyDirectory.h"
 
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 
 void CopyDirectory(const fs::path &from, const fs::path &to)
 {

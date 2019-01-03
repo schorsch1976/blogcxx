@@ -5,10 +5,6 @@ SET(SRCS
 	ConfigCollection.cpp
 	ConfigCollection.h
 
-	Debug.cpp
-	DebugImpl.h
-	Debug.h
-
 	filesystem.h
 	regex.h
 	variant.h

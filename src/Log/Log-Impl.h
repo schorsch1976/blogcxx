@@ -22,7 +22,7 @@
 
 #include <boost/locale.hpp>
 
-namespace Debug
+namespace Log
 {
 
 namespace impl
@@ -66,23 +66,23 @@ std::string Format(boost::format &f, T v, Args... args)
 namespace logging = boost::log;
 
 // access to the logger
-boost::log::sources::severity_logger_mt<Debug::Level> &Logger(Debug::impl::Color color);
+boost::log::sources::severity_logger_mt<Log::Level> &Logger(Log::impl::Color color);
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(color, "Color", Color)
 
-template <Debug::Level lvl, typename T, typename... Args>
+template <Log::Level lvl, typename T, typename... Args>
 void LOG_IMPL(const T &fmt, Args... args)
 {
 	Color color = Color::std;
 	switch (lvl)
 	{
-		case Debug::Level::fatal:
+		case Log::Level::fatal:
 			color = Color::cyan;
 			break;
-		case Debug::Level::error:
+		case Log::Level::error:
 			color = Color::red;
 			break;
-		case Debug::Level::warning:
+		case Log::Level::warning:
 			color = Color::yellow;
 			break;
 		default:
@@ -94,7 +94,7 @@ void LOG_IMPL(const T &fmt, Args... args)
 	BOOST_LOG_SEV(Logger(color), lvl) << Format(f, args...);
 }
 
-template <Debug::Level lvl, typename T, typename... Args>
+template <Log::Level lvl, typename T, typename... Args>
 void THROW(const T &fmt, Args... args)
 {
 	LOG_IMPL<lvl>(fmt, args...);
@@ -103,4 +103,4 @@ void THROW(const T &fmt, Args... args)
 
 } // namespace impl
 
-} // namespace Debug
+} // namespace Log

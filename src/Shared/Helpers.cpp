@@ -15,7 +15,7 @@
 #include <boost/locale.hpp>
 #include <boost/locale/date_time.hpp>
 
-#include "Debug.h"
+#include "Log/Log.h"
 
 // clang-format off
 #ifdef _WIN32

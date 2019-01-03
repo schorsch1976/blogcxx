@@ -1,7 +1,7 @@
 #include "TextParseAll.h"
 
 #include "ExcerptExtractor.h"
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 
 #include "MarkdownWrapperClass.h"
 

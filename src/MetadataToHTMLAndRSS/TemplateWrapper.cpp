@@ -4,7 +4,7 @@
  */
 
 #include "TemplateWrapper.h"
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 #include "Shared/constants.h"
 
 #include "html-template++/html.h"

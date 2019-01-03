@@ -2,7 +2,7 @@
 
 #include "EmojiParser.h"
 #include "ExcerptExtractor.h"
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 
 #include "cmark-gfm-core-extensions.h"
 #include "cmark-gfm.h"

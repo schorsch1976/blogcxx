@@ -1,6 +1,6 @@
 #include "PrintVersion.h"
 
-#include "Debug.h"
+#include "Log/Log.h"
 #include "constants.h"
 
 void PrintVersion(const std::string app)

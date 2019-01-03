@@ -8,7 +8,7 @@
 #include <boost/program_options/parsers.hpp>
 namespace po = boost::program_options;
 
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 #include "Shared/PrintVersion.h"
 #include "Shared/constants.h"
 #include "Shared/filesystem.h"
@@ -86,7 +86,7 @@ std::string MakeClean(std::string str)
 
 int main(int argc, char **argv)
 {
-	Debug::Status debug_status;
+	Log::Status debug_status;
 
 	try
 	{
@@ -190,7 +190,7 @@ int main(int argc, char **argv)
 				THROW_FATAL("undefined mode %1%", mode);
 		}
 	}
-	catch (const Debug::THROWN &)
+	catch (const Log::THROWN &)
 	{
 		// already printed
 	}

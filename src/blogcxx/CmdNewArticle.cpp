@@ -7,7 +7,7 @@
 #include <string>
 
 #include "ContentsGenerator.h"
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 #include "Shared/Helpers.h"
 #include "Shared/Slug.h"
 

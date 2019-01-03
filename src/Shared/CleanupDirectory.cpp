@@ -4,7 +4,7 @@
 
 #include "CleanupDirectory.h"
 
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 
 void CleanupDirectory(fs::path path)
 {

@@ -55,7 +55,7 @@ namespace po = boost::program_options;
 
 #include <boost/locale.hpp>
 
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 
 #include "Shared/ConfigCollection.h"
 #include "Shared/Helpers.h"
@@ -240,7 +240,7 @@ void GenerateData(const ConfigCollection &cfgs)
 
 int main(int argc, char **argv)
 {
-	Debug::Status debug_status;
+	Log::Status debug_status;
 
 	try
 	{
@@ -581,7 +581,7 @@ int main(int argc, char **argv)
 		}
 		return EXIT_SUCCESS;
 	}
-	catch (const Debug::THROWN &)
+	catch (const Log::THROWN &)
 	{
 		// already printed
 	}

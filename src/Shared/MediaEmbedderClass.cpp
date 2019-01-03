@@ -4,7 +4,7 @@
  */
 
 #include "MediaEmbedderClass.h"
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 
 MediaEmbedder::MediaEmbedder()
 {

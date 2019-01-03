@@ -7,7 +7,7 @@
 #include <boost/locale.hpp>
 
 #include "EmojiParser.h"
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 #include "Shared/Helpers.h"
 
 #include <iomanip>

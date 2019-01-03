@@ -4,7 +4,7 @@
  */
 
 #include "MarkdownParserClass.h"
-#include "Shared/Debug.h"
+#include "Log/Log.h"
 
 MarkdownParser::MarkdownParser(bool basic_markdown, bool add_embeds)
 {

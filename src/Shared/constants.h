@@ -7,7 +7,6 @@
 
 #include <string>
 
-const std::string DEBUGLOGFILE = "debug.txt";
 const std::string APP_VERSION = "1-alpha";
 const std::string APP_URL = "https://blogcxx.de";
 const std::string BUGTRACKER =

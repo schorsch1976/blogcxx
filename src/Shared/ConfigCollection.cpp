@@ -4,7 +4,6 @@
 
 #include "ConfigCollection.h"
 
-#include "Debug.h"
 #include "Helpers.h"
 #include "SingleItem.h"
 #include "constants.h"
@@ -18,22 +17,22 @@ ConfigCollection::ConfigCollection(const ConfigCollectionFile &file)
 	: m_file(file)
 {
 	// check the verbosity
-	if (m_file.file_verbosity > static_cast<int>(Debug::Level::fatal) ||
-		m_file.file_verbosity < static_cast<int>(Debug::Level::trace))
+	if (m_file.file_verbosity > static_cast<int>(Log::Level::fatal) ||
+		m_file.file_verbosity < static_cast<int>(Log::Level::trace))
 	{
 		THROW_FATAL("File verbosity set to an unsupported value %1%. [Quiet(%2%) - "
 					"Verbose(%3%)]",
-					m_file.file_verbosity, static_cast<int>(Debug::Level::trace),
-					static_cast<int>(Debug::Level::fatal));
+					m_file.file_verbosity, static_cast<int>(Log::Level::trace),
+					static_cast<int>(Log::Level::fatal));
 	}
 
-	if (m_file.console_verbosity > static_cast<int>(Debug::Level::fatal) ||
-		m_file.console_verbosity < static_cast<int>(Debug::Level::trace))
+	if (m_file.console_verbosity > static_cast<int>(Log::Level::fatal) ||
+		m_file.console_verbosity < static_cast<int>(Log::Level::trace))
 	{
 		THROW_FATAL("Console verbosity set to an unsupported value %1%. [Quiet(%2%) - "
 			"Verbose(%3%)]",
-			m_file.console_verbosity, static_cast<int>(Debug::Level::trace),
-			static_cast<int>(Debug::Level::fatal));
+			m_file.console_verbosity, static_cast<int>(Log::Level::trace),
+			static_cast<int>(Log::Level::fatal));
 	}
 
 	if (m_file.cfg_siteurl.empty())
@@ -61,13 +60,13 @@ const boost::optional<std::string> ConfigCollection::subtitle() const
 	return m_file.cfg_subtitle;
 }
 
-Debug::Level ConfigCollection::file_verbosity() const
+Log::Level ConfigCollection::file_verbosity() const
 {
-	return static_cast<Debug::Level>(m_file.file_verbosity);
+	return static_cast<Log::Level>(m_file.file_verbosity);
 }
-Debug::Level ConfigCollection::console_verbosity() const
+Log::Level ConfigCollection::console_verbosity() const
 {
-	return static_cast<Debug::Level>(m_file.console_verbosity);
+	return static_cast<Log::Level>(m_file.console_verbosity);
 }
 std::string ConfigCollection::author() const { return m_file.cfg_author; }
 
