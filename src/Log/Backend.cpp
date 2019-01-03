@@ -1,6 +1,7 @@
 #include "Backend.h"
 
 #include <algorithm>
+#include <ctime>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -24,7 +25,7 @@ std::string to_iso_extended_string(time_point_t tp)
 	microseconds ms = duration_cast<microseconds>(tp - tp_sec);
 
 	std::tm ttm;
-	auto err = localtime_s(&ttm, &ttime_t);
+	ttm = *localtime(&ttime_t);
 
 	char date_time_format[] = "%Y.%m.%dT%H:%M:%S";
 

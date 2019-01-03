@@ -2,7 +2,7 @@ SET(SRCS
 			Backend.cpp
 			Backend.h
 			Log.cpp
-			Log-impl.h
+			Log-Impl.h
 			Log.h
 )
 

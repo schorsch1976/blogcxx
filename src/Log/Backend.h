@@ -24,7 +24,7 @@ namespace impl
 // ---------------------------------------------------------
 // Time/chrono utils
 // ---------------------------------------------------------
-using clock_t = std::chrono::high_resolution_clock;
+using clock_t = std::chrono::system_clock;
 using duration_t = std::chrono::nanoseconds;
 using time_point_t = std::chrono::time_point<clock_t>;
 
