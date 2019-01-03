@@ -214,8 +214,6 @@ FIND_PACKAGE(Boost ${BOOST_VERSION} COMPONENTS
 	filesystem
 	program_options
 	system
-	log
-	log_setup
 
 	REQUIRED
 )
@@ -230,8 +228,6 @@ SET(BOOST_LIBS
 	${Boost_CHRONO_LIBRARY}
 	${Boost_FILESYSTEM_LIBRARY}
 	${Boost_REGEX_LIBRARY}
-	${Boost_LOG_LIBRARY}
-	${Boost_LOG_SETUP_LIBRARY}
 	${Boost_DATE_TIME_LIBRARY}
 	${Boost_SYSTEM_LIBRARY}
 	${Boost_THREAD_LIBRARY}
@@ -249,20 +245,6 @@ IF(LINUX)
 		${ICU_LIBRARIES}
 	)
 ENDIF(LINUX)
-
-
-IF(WIN32)
-	IF(MSVC)
-		# if Boost log fail to link, you probaly need to compile your boost with
-		# the same BOOST_USE_WINAPI_VERSION as here. You must also use
-		# BOOST_ALL_DYN_LINK=1
-		SET(BOOST_LOG_API "BOOST_WINAPI_VERSION_WIN7" CACHE STRING "Boost Log Backend API")
-		SET_PROPERTY(CACHE BOOST_LOG_API PROPERTY STRINGS BOOST_WINAPI_VERSION_WINXP BOOST_WINAPI_VERSION_WIN7)
-
-		ADD_DEFINITIONS(-DBOOST_USE_WINAPI_VERSION=${BOOST_LOG_API})
-		ADD_DEFINITIONS(-D${Boost_LIB_DIAGNOSTICDEFINITIONS})
-	ENDIF(MSVC)
-ENDIF(WIN32)
 
 ############################################################################
 # Combine the CXX Libs

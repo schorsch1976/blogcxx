@@ -5,11 +5,18 @@
 
 #pragma once
 
-#include <boost/log/trivial.hpp>
-
 namespace Log
 {
-using Level = boost::log::trivial::severity_level;
+
+enum class Level
+{
+	trace = 0,
+	debug,
+	info,
+	warning,
+	error,
+	fatal
+};
 
 // ----------------------------------------------------------------------------
 // this exception is used to indicate that it was printed by THROW_xxxx
