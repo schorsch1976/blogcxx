@@ -242,7 +242,7 @@ LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 IF(LINUX)
 	# on Linux, the locale backend is ICU
 	FIND_PACKAGE(ICU COMPONENTS
-		uc i18n io lx tu
+		uc i18n io tu
 		REQUIRED
 	)
 	SET(BOOST_LIBS    ${BOOST_LIBS}
