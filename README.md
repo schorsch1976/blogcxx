@@ -4,7 +4,7 @@ A static blog generator, written in ``C++17``. It is a fork of [blogcpp](https:/
 
 ## First things first: How can I get it?
 
-> git clone https://bitbucket.org/schorsch_76/blogcxx.
+> git clone https://github.com/schorsch1976/blogcxx.
 
 This is my public (but not main repository). It is used to publish released versions and
 for bug/issue tracking.
