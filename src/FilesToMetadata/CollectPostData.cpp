@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "CollectPostData.h"
 
@@ -8,12 +8,47 @@
 #include "Shared/Helpers.h"
 #include "Shared/constants.h"
 
-#include "SharedHTML-RSS/Slug.h"
+#include "Shared/Slug.h"
 
-#include <regex>
+#include "Shared/regex.h"
 
 namespace
 {
+
+std::vector<std::string> vectorSplit(std::string inputstring,
+									 std::string divider = ";")
+{
+	// Returns a vector of elements in the <inputstring>.
+	std::vector<std::string> ret;
+
+	if (inputstring.size() == 0)
+	{
+		// Skip empty strings.
+		return ret;
+	}
+
+	rx::regex re(divider); // Tokenize.
+	rx::sregex_token_iterator it(inputstring.begin(), inputstring.end(), re,
+								  -1);
+	rx::sregex_token_iterator reg_end;
+
+	for (; it != reg_end; ++it)
+	{
+		std::string toadd = trim(it->str());
+		if (toadd.empty())
+		{
+			// Empty elements could happen if the user writes ";;" or
+			// if we have a page which only has tags, no categories. In
+			// this case, we should not try to add an "empty item" as
+			// that would not make any sense, would it?
+			continue;
+		}
+		ret.push_back(trim(it->str()));
+	}
+
+	return ret;
+}
+
 template <typename T>
 void MakeUnique(std::vector<T> &v)
 {
@@ -24,7 +59,7 @@ void MakeUnique(std::vector<T> &v)
 void DetectSeries(Metadata &merged)
 {
 	LOG_DEBUG("DetectSeries: Collecting series...");
-	for (auto &si : merged.all_items)
+	for (auto &si : merged.all_posts)
 	{
 		if (si->s_series.empty() || si->type != ItemType::Post)
 		{
@@ -51,18 +86,19 @@ void DetectArchives(Metadata &merged, const ConfigCollection &cfgs)
 	LOG_DEBUG("DetectArchives...");
 
 	std::map<int, Archive> years;
-	std::map<std::pair<int, int>, Archive> years_months;
+	std::map<std::pair<year_t, month_t>, Archive> years_months;
 
 	std::map<std::string, Archive> cats;
 	std::map<std::string, Archive> tags;
 
 	std::map<std::string, Archive> authors;
 
-	for (auto &si : merged.all_items)
+	for (auto &si : merged.all_posts)
 	{
-		years[si->time.tm_year].push_back(si);
-		years_months[std::make_pair(si->time.tm_year, si->time.tm_mon)]
-			.push_back(si);
+		auto y = si->time.date().year();
+		auto m = si->time.date().month();
+		years[y].push_back(si);
+		years_months[std::make_pair(y, m)].push_back(si);
 
 		for (auto &c : si->cats)
 		{
@@ -215,15 +251,15 @@ void Slugify(Metadata &merged)
 	std::vector<std::string> all_slug_names;
 	std::map<std::string, int> count_doublicate_slugs;
 
-	if (merged.all_items.empty())
+	if (merged.all_posts.empty())
 	{
-		LOG_WARN("No items found.");
+		LOG_WARN("No posts found.");
 		return;
 	}
 
 	// count the slug names and collect them
 	{
-		for (auto &si : merged.all_items)
+		for (auto &si : merged.all_posts)
 		{
 			if (si->type != ItemType::Post)
 			{
@@ -232,7 +268,7 @@ void Slugify(Metadata &merged)
 
 			if (si->s_slug.empty())
 			{
-				si->s_slug = createBasicSlug(si->s_filename.string());
+				si->s_slug = createBasicSlug(*si);
 			}
 			count_doublicate_slugs[si->s_slug] += 1;
 			all_slug_names.push_back(si->s_slug);
@@ -267,7 +303,7 @@ void Slugify(Metadata &merged)
 
 		// this is a doublicate. fetch the SingleItems
 		std::vector<SingleItem::Ptr> doublicates;
-		for (auto &si : merged.all_items)
+		for (auto &si : merged.all_posts)
 		{
 			if (si->s_slug == c.first)
 			{
@@ -304,10 +340,14 @@ void CheckArchive(const std::string msg, const Metadata &merged,
 		}
 		for (SingleItem::ConstPtr si : a.second)
 		{
-			auto pos = std::find_if(
-				std::begin(merged.all_items), std::end(merged.all_items),
+			auto pos_posts = std::find_if(
+				std::begin(merged.all_posts), std::end(merged.all_posts),
 				[si](SingleItem::ConstPtr item) -> bool { return si == item; });
-			if (pos == std::end(merged.all_items))
+			auto pos_pages = std::find_if(
+				std::begin(merged.all_pages), std::end(merged.all_pages),
+				[si](SingleItem::ConstPtr item) -> bool { return si == item; });
+			if (pos_posts == std::end(merged.all_posts) &&
+				pos_pages == std::end(merged.all_pages))
 			{
 				THROW_ERROR("This is a bug.\n'%1%' points outside of "
 							"all_items. Please report at %2%",
@@ -317,12 +357,10 @@ void CheckArchive(const std::string msg, const Metadata &merged,
 	}
 }
 
-void CheckMetadata(const Metadata &merged)
+void CheckArchive(const Archive &archive)
 {
-	PRINT("Checking the collected Metadata for consistency.");
-
 	// check items
-	for (const auto &si : merged.all_items)
+	for (const auto &si : archive)
 	{
 		if (si->s_author.empty())
 		{
@@ -356,21 +394,24 @@ void CheckMetadata(const Metadata &merged)
 						si->s_filename.string(), BUGTRACKER);
 		}
 
-		if (si->time.tm_hour > 23 || si->time.tm_hour < 0 ||
-			si->time.tm_min > 59 || si->time.tm_hour < 0 ||
-			si->time.tm_sec > 60 || si->time.tm_sec < 0 ||
-
-			si->time.tm_wday > 6 || si->time.tm_wday < 0 ||
-
-			si->time.tm_mday > 31 || si->time.tm_mday < 0 ||
-			si->time.tm_mon > 11 || si->time.tm_mon < 0 ||
-			si->time.tm_yday > 365 || si->time.tm_yday < 0 ||
-			si->time.tm_year < 0)
+		if (si->time.is_special())
 		{
 			THROW_ERROR("File '%1%' has an invalid time set.",
 						si->s_filename.string());
 		}
+		if (si->changetime.is_special())
+		{
+			THROW_ERROR("File '%1%' has an invalid changetime set.",
+						si->s_filename.string());
+		}
 	}
+}
+void CheckMetadata(const Metadata &merged)
+{
+	PRINT("Checking the collected Metadata for consistency.");
+
+	CheckArchive(merged.all_posts);
+	CheckArchive(merged.all_pages);
 
 	// check for empty string in metadata
 	LOG_INFO("Checking authors list.");
@@ -399,13 +440,13 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 	// entirely.
 	std::stringstream ss_output;
 	std::string s_cats, s_tags, s_datetime, s_change_datetime, s_author,
-		s_title, s_slug, s_markdown, s_emoji, s_sticky, s_comments, s_ogimage,
-		s_series;
+		s_title, s_slug, s_markdown, s_hardbreaks, s_emoji, s_sticky,
+		s_comments, s_ogimage, s_series;
 	int i_position = 0;
 #ifdef WITH_PLUGINS
 	std::string s_plugins;
 #endif
-	tm tm_t = {}, change_tm_t = {};
+	pt::ptime time = {}, changetime = {};
 
 	LOG_DEBUG("Gathering categories and tags from the %1% from '%2%'", type,
 			  inputfile);
@@ -419,45 +460,43 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 	std::string line;
 	std::istringstream ss_contents(file_contents);
 
-	std::regex re_author("^Author\\s*:[\\s\\t]*(.*?)$",
-						 std::regex_constants::icase);
-	std::regex re_title("^Title\\s*:[\\s\\t]*(.*?)$",
-						std::regex_constants::icase);
-	std::regex re_slug("^Slug\\s*:[\\s\\t]*(.*?)$",
-					   std::regex_constants::icase);
-	std::regex re_datetime("^Date\\s*:[\\s\\t]*(\\d{4}\\-\\d{2}\\-\\d{2} "
+	rx::regex re_author("^Author\\s*:[\\s\\t]*(.*?)$",
+						 rx::regex_constants::icase);
+	rx::regex re_title("^Title\\s*:[\\s\\t]*(.*?)$",
+						rx::regex_constants::icase);
+	rx::regex re_slug("^Slug\\s*:[\\s\\t]*(.*?)$",
+					   rx::regex_constants::icase);
+	rx::regex re_datetime("^Date\\s*:[\\s\\t]*(\\d{4}\\-\\d{2}\\-\\d{2} "
 						   "\\d{2}:\\d{2}:\\d{2}?)$",
-						   std::regex_constants::icase);
-	std::regex re_change_datetime("^Changed\\s*:[\\s\\t]*(\\d{4}\\-\\d{2}"
+						   rx::regex_constants::icase);
+	rx::regex re_change_datetime("^Changed\\s*:[\\s\\t]*(\\d{4}\\-\\d{2}"
 								  "\\-\\d{2} \\d{2}:\\d{2}:\\d{2}?)$",
-								  std::regex_constants::icase);
-	std::regex re_cats("^Categories\\s*:[\\s\\t]*(.*?)$",
-					   std::regex_constants::icase);
-	std::regex re_tags("^Tags\\s*:[\\s\\t]*(.*?)$",
-					   std::regex_constants::icase);
-	std::regex re_markdown("^Markdown\\s*:[\\s\\t]*(.*?)$",
-						   std::regex_constants::icase);
-	std::regex re_emoji("^Emoji\\s*:[\\s\\t]*(.*?)$",
-						std::regex_constants::icase);
-	std::regex re_sticky("^Sticky\\s*:[\\s\\t]*(.*?)$",
-						 std::regex_constants::icase);
-	std::regex re_comments("^Comments\\s*:[\\s\\t]*(.*?)$",
-						   std::regex_constants::icase);
-	std::regex re_ogimage("^OpenGraphImage\\s*:[\\s\\t]*(.*?)$",
-						  std::regex_constants::icase);
-#ifdef WITH_PLUGINS
-	std::regex re_plugins("^Plugins\\s*:[\\s\\t]*(.*?)$",
-						  std::regex_constants::icase);
-#endif
-	std::regex re_series("^Series\\s*:[\\s\\t]*(.*?)$",
-						 std::regex_constants::icase);
-	std::regex re_position("^Position\\s*:[\\s\\t]*(\\d*?)$",
-						   std::regex_constants::icase);
+								  rx::regex_constants::icase);
+	rx::regex re_cats("^Categories\\s*:[\\s\\t]*(.*?)$",
+					   rx::regex_constants::icase);
+	rx::regex re_tags("^Tags\\s*:[\\s\\t]*(.*?)$",
+					   rx::regex_constants::icase);
+	rx::regex re_markdown("^Markdown\\s*:[\\s\\t]*(.*?)$",
+						   rx::regex_constants::icase);
+	rx::regex re_hardbreaks("^Hardbreaks\\s*:[\\s\\t]*(.*?)$",
+							 rx::regex_constants::icase);
+	rx::regex re_emoji("^Emoji\\s*:[\\s\\t]*(.*?)$",
+						rx::regex_constants::icase);
+	rx::regex re_sticky("^Sticky\\s*:[\\s\\t]*(.*?)$",
+						 rx::regex_constants::icase);
+	rx::regex re_comments("^Comments\\s*:[\\s\\t]*(.*?)$",
+						   rx::regex_constants::icase);
+	rx::regex re_ogimage("^OpenGraphImage\\s*:[\\s\\t]*(.*?)$",
+						  rx::regex_constants::icase);
+	rx::regex re_series("^Series\\s*:[\\s\\t]*(.*?)$",
+						 rx::regex_constants::icase);
+	rx::regex re_position("^Position\\s*:[\\s\\t]*(\\d*?)$",
+						   rx::regex_constants::icase);
 
-	std::regex re_url("https?://",
-					  std::regex_constants::icase); // Avoid stupidities
+	rx::regex re_url("https?://",
+					  rx::regex_constants::icase); // Avoid stupidities
 
-	std::smatch match;
+	rx::smatch match;
 
 	while (getline(ss_contents, line))
 	{
@@ -467,7 +506,7 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 			break;
 		}
 
-		using std::regex_match;
+		using rx::regex_match;
 
 		try
 		{
@@ -486,14 +525,13 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 			else if (regex_match(line, match, re_datetime) && match.size() > 1)
 			{
 				// Get the tm from the date/time in the file.
-				parseDatestringToTm(match.str(1), inputfile.string(), tm_t);
+				time = pt::time_from_string(match.str(1));
 			}
 			else if (regex_match(line, match, re_change_datetime) &&
 					 match.size() > 1)
 			{
 				// Get the tm from the "latest change" date/time in the file.
-				parseDatestringToTm(match.str(1), inputfile.string(),
-									change_tm_t);
+				changetime = pt::time_from_string(match.str(1));
 			}
 			else if (type != ItemType::Page &&
 					 regex_match(line, match, re_cats) && match.size() > 1)
@@ -508,6 +546,11 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 			else if (regex_match(line, match, re_markdown) && match.size() > 1)
 			{
 				s_markdown = match.str(1);
+			}
+			else if (regex_match(line, match, re_hardbreaks) &&
+					 match.size() > 1)
+			{
+				s_hardbreaks = match.str(1);
 			}
 			else if (regex_match(line, match, re_emoji) && match.size() > 1)
 			{
@@ -528,12 +571,6 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 				// Add only valid URLs
 				s_ogimage = match.str(1);
 			}
-#ifdef WITH_PLUGINS
-			else if (regex_match(line, match, re_plugins) && match.size() > 1)
-			{
-				s_plugins = match.str(1);
-			}
-#endif
 			else if (regex_match(line, match, re_series) && match.size() > 1)
 			{
 				s_series = match.str(1);
@@ -543,13 +580,13 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 				i_position = stoi(match.str(1));
 			}
 		}
-		catch (const std::regex_error &e)
+		catch (const rx::regex_error &e)
 		{
 			// Syntax error in the regular expression.
 			LOG_FATAL("An error occurred while trying to match a regular "
 					  "expression: %1%",
 					  e.what());
-			LOG_FATAL("Please file a blogcpp bug so we can investigate and "
+			LOG_FATAL("Please file a blogcxx bug so we can investigate and "
 					  "fix it for you.");
 			LOG_FATAL(" --> %1%", BUGTRACKER);
 			throw;
@@ -596,16 +633,35 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 
 	si.s_filename = inputfile;
 
-	si.time = tm_t;
-	si.changetime = change_tm_t;
+	si.time = time;
+	if (changetime.is_special())
+	{
+		si.changetime = time;
+	}
+	else
+	{
+		si.changetime = changetime;
+	}
 	si.s_title = s_title;
 	si.s_slug = s_slug;
 	si.s_author = s_author;
 	si.s_text = ss_output.str();
+
+	// markdown: default on
 	si.b_markdown = (lowercase(s_markdown) != "off");
-	si.b_emoji = cfgs.emojis() && (lowercase(s_emoji) != "off");
-	si.b_sticky = (lowercase(s_sticky) != "off");
-	si.b_comments = (lowercase(s_comments) != "off");
+
+	// hardbreaks: default off
+	si.b_hardbreaks = (lowercase(s_hardbreaks) == "on");
+
+	// emojis: Default on
+	si.b_emoji =
+		cfgs.emojis() && (lowercase(s_emoji) != "off") && cfgs.emojis();
+
+	// sticky: default: off
+	si.b_sticky = (lowercase(s_sticky) == "on");
+
+	// comments: default on
+	si.b_comments = (lowercase(s_comments) != "off") && cfgs.commenttype();
 	si.s_ogimage = s_ogimage;
 	if (cfgs.series() && type != ItemType::Page)
 	{
@@ -648,41 +704,41 @@ Metadata CollectPostData(const ConfigCollection &cfgs,
 	{
 		if (isFutureDate(c.second->time))
 		{
-			LOG_WARN("Skipping item with future date. %1%", c.second->s_filename.string());
+			LOG_WARN("Skipping item with future date. %1%",
+					 c.second->s_filename.string());
 			continue;
 		}
-		merged.all_items.push_back(c.second);
-
-		// !!! find the si name in the all_items to prevent dangling pointer
-		auto pos = std::find_if(
-			std::begin(merged.all_items), std::end(merged.all_items),
-			[&c](SingleItem::ConstPtr item) -> bool {
-				return c.second->s_filename == item->s_filename;
-			});
-		if (pos == std::end(merged.all_items))
+		switch (c.second->type)
 		{
-			THROW_FATAL("Could not fimd item '%1%' in all items. This is a "
-						"Bug. Please report it at %2%",
-						c.second->s_filename.string(), BUGTRACKER);
+			case ItemType::Post:
+				merged.all_posts.push_back(c.second);
+				break;
+			case ItemType::Page:
+				merged.all_pages.push_back(c.second);
+				break;
+			default:
+				THROW_FATAL("CollectPostData: Got unknown itemtype: THis is a "
+							"bug. Please report it at %1%",
+							BUGTRACKER);
 		}
 
-		// !!si points to the item in the all_items!!!
-		SingleItem::Ptr si = *pos;
+		// !!si points to the item in all_(pages|posts)!!!
+		SingleItem::Ptr si = c.second;
 
-		merged.authors[si->s_author].push_back(si);
-
-		for (const auto &cat : si->cats)
+		// just posts get handled with tags, cats and the author
+		// as pages are most for information like
+		// download, impressum and so on
+		if (si->type == ItemType::Post)
 		{
-			merged.categories[cat].push_back(si);
-		}
-		for (const auto &tag : si->tags)
-		{
-			merged.tags[tag].push_back(si);
-		}
-
-		if (si->type == ItemType::Page && si->s_series.size())
-		{
-			merged.series[si->s_series].push_back(si);
+			merged.authors[si->s_author].push_back(si);
+			for (const auto &cat : si->cats)
+			{
+				merged.categories[cat].push_back(si);
+			}
+			for (const auto &tag : si->tags)
+			{
+				merged.tags[tag].push_back(si);
+			}
 		}
 	}
 
@@ -695,6 +751,15 @@ Metadata CollectPostData(const ConfigCollection &cfgs,
 
 	LOG_DEBUG("DetectArchives.");
 	DetectArchives(merged, cfgs);
+
+	PRINT("Sorting pages.");
+	std::sort(std::begin(merged.all_pages), std::end(merged.all_pages),
+			  [](const SingleItem::ConstPtr lhs, const SingleItem::ConstPtr rhs)
+				  -> bool { return lhs->i_position < rhs->i_position; });
+
+	PRINT("Sorting posts.");
+	std::sort(std::begin(merged.all_posts), std::end(merged.all_posts),
+			  time_greater);
 
 	CheckMetadata(merged);
 

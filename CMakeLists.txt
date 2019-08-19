@@ -1,12 +1,18 @@
 IF(WIN32)
-	cmake_minimum_required(VERSION 3.13) # because MSVC and C++17
-	SET(CMAKE_CXX_STANDARD 17)
-	SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+	IF(MSVC)
+		cmake_minimum_required(VERSION 3.13) # because MSVC and C++17
+	ENDIF(MSVC)
+	IF(MSYS)
+		cmake_minimum_required(VERSION 3.12)
+	ENDIF(MSYS)
 ELSE(WIN32)
 	cmake_minimum_required(VERSION 3.7)
 ENDIF(WIN32)
 
-PROJECT(blogcpp C CXX)
+SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+PROJECT(blogcxx C CXX)
 
 #######################################################################
 # Include needed Macros
@@ -14,15 +20,13 @@ PROJECT(blogcpp C CXX)
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/CMake)
 INCLUDE (ConfigureMSVCRuntime)
 INCLUDE (GENERATE_CXX)
+INCLUDE (ExternalProject)
 
 ######################################################################
 # OS
 ######################################################################
 IF (UNIX)
-	SET(CMAKE_CXX_STANDARD 17)
-	SET(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-	MESSAGE(STATUS "This is UNIX (including OS X and CygWin)")
+	MESSAGE(STATUS "This is UNIX")
 	ADD_DEFINITIONS(-DUNIX)
 
 	############################################################################
@@ -90,7 +94,6 @@ IF (MSVC)
 	############################################################################
 	# CPP FLAGS
 	############################################################################
-	#SET(CMAKE_CXX_FLAGS   "--std=c++14 -Wall -Wno-deprecated-declarations ${CMAKE_CXX_FLAGS} -Werror=switch")
 	SET(LIB_CXX_FLAGS "")
 
 	ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
@@ -101,125 +104,145 @@ IF (MSVC)
 	SET(TARGET_BIN_PATH "${CMAKE_INSTALL_PREFIX}/")
 	SET(TARGET_LIB_PATH "${CMAKE_INSTALL_PREFIX}/")
 ENDIF (MSVC)
+IF(MSYS)
+	MESSAGE(STATUS "This is Windows: MSYS")
+	SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations)
+ENDIF(MSYS)
 ENDIF (WIN32)
-
-############################################################################
-# Test on older compilers
-############################################################################
-OPTION(TEST_OLDER_COMPILERS "Test on older compilers" OFF)
-IF (TEST_OLDER_COMPILERS)
-	ADD_DEFINITIONS(-DTEST_OLDER_COMPILERS)
-ENDIF (TEST_OLDER_COMPILERS)
-
-############################################################################
-# markdown
-############################################################################
-SET(MARKDOWN_API "blogcpp" CACHE STRING "Use this markdown implementation")
-SET_PROPERTY(CACHE MARKDOWN_API PROPERTY STRINGS "blogcpp" "libcmark")
-
-IF (MARKDOWN_API STREQUAL "blogcpp")
-	SET(MARKDOWN_BLOGCPP ON)
-	SET(MARKDOWN_CMARK OFF)
-ENDIF (MARKDOWN_API STREQUAL "blogcpp")
-
-IF (MARKDOWN_API STREQUAL "libcmark")
-	SET(MARKDOWN_BLOGCPP OFF)
-	SET(MARKDOWN_CMARK ON)
-ENDIF (MARKDOWN_API STREQUAL "libcmark")
-
-############################################################################
-# variant
-############################################################################
-SET(VARIANT_API "std::variant" CACHE STRING "Use this variant API")
-SET_PROPERTY(CACHE VARIANT_API PROPERTY STRINGS "std::variant" "boost::variant")
-
-IF (VARIANT_API STREQUAL "std::variant")
-	ADD_DEFINITIONS(-DUSE_VARIANT_API=1)
-ENDIF (VARIANT_API STREQUAL "std::variant")
-
-IF (VARIANT_API STREQUAL "boost::variant")
-	ADD_DEFINITIONS(-DUSE_VARIANT_API=2)
-ENDIF (VARIANT_API STREQUAL "boost::variant")
-
-############################################################################
-# filesystem
-############################################################################
-SET(FILESYSTEM_API "std::filesystem" CACHE STRING "Use this filesystem API")
-SET_PROPERTY(CACHE FILESYSTEM_API PROPERTY STRINGS "std::filesystem" "std::experimental::filesystem" "boost::filesystem")
-
-IF (FILESYSTEM_API STREQUAL "std::filesystem")
-	ADD_DEFINITIONS(-DUSE_FILESYSTEM_API=1)
-	SET(STD_FILESYSTEM ON)
-	SET(STD_EX_FILESYSTEM OFF)
-	SET(BOOST_FILESYSTEM OFF)
-ENDIF (FILESYSTEM_API STREQUAL "std::filesystem")
-
-IF (FILESYSTEM_API STREQUAL "std::experimental::filesystem")
-	ADD_DEFINITIONS(-DUSE_FILESYSTEM_API=2)
-	SET(STD_FILESYSTEM OFF)
-	SET(STD_EX_FILESYSTEM ON)
-	SET(BOOST_FILESYSTEM OFF)
-ENDIF (FILESYSTEM_API STREQUAL "std::experimental::filesystem")
-
-IF (FILESYSTEM_API STREQUAL "boost::filesystem")
-	ADD_DEFINITIONS(-DUSE_FILESYSTEM_API=3)
-	SET(STD_FILESYSTEM OFF)
-	SET(STD_EX_FILESYSTEM OFF)
-	SET(BOOST_FILESYSTEM ON)
-ENDIF (FILESYSTEM_API STREQUAL "boost::filesystem")
 
 ############################################################################
 # Linkage
 ############################################################################
-OPTION(STATIC_LINKING "Link everything static" OFF)
-IF (STATIC_LINKING)
+OPTION(API_STATIC_LINKING "Link everything static" OFF)
+IF (API_STATIC_LINKING)
 	ConfigureMSVCRuntime(static)
 
 	SET(Boost_USE_STATIC_LIBS		ON)
 	SET(Boost_USE_STATIC_RUNTIME	ON)
-ELSE (STATIC_LINKING)
+ELSE (API_STATIC_LINKING)
 	ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK=1)
-ENDIF (STATIC_LINKING)
+ENDIF (API_STATIC_LINKING)
+
+############################################################################
+# markdown
+############################################################################
+SET(API_MARKDOWN "libcmark-gfm" CACHE STRING "Use this markdown implementation")
+SET_PROPERTY(CACHE API_MARKDOWN PROPERTY STRINGS "blogcpp" "libcmark-gfm")
+
+IF (API_MARKDOWN STREQUAL "blogcpp")
+	SET(MARKDOWN_BLOGCPP ON)
+	SET(MARKDOWN_CMARK_GFM OFF)
+ENDIF (API_MARKDOWN STREQUAL "blogcpp")
+
+# libcmark-gfm
+IF (API_MARKDOWN STREQUAL "libcmark-gfm")
+	SET(MARKDOWN_BLOGCPP OFF)
+	SET(MARKDOWN_CMARK_GFM ON)
+ENDIF (API_MARKDOWN STREQUAL "libcmark-gfm")
+
+############################################################################
+# variant
+############################################################################
+SET(API_VARIANT "boost::variant" CACHE STRING "Use this variant API")
+SET_PROPERTY(CACHE API_VARIANT PROPERTY STRINGS "std::variant" "boost::variant")
+
+IF (API_VARIANT STREQUAL "std::variant")
+	ADD_DEFINITIONS(-DUSE_VARIANT_API=1)
+ENDIF (API_VARIANT STREQUAL "std::variant")
+
+IF (API_VARIANT STREQUAL "boost::variant")
+	ADD_DEFINITIONS(-DUSE_VARIANT_API=2)
+ENDIF (API_VARIANT STREQUAL "boost::variant")
+
+############################################################################
+# regex because of this bug
+# https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=233994
+############################################################################
+IF(NOT FREEBSD)
+	# everywhere use std::regex
+	ADD_DEFINITIONS(-DUSE_REGEX_API=1)
+	SET(STD_REGEX ON)
+	SET(BOOST_REGEX OFF)
+ELSE(NOT FREEBSD)
+	# except on Freebsd: use::boost regex
+	ADD_DEFINITIONS(-DUSE_REGEX_API=2)
+	SET(STD_REGEX OFF)
+	SET(BOOST_REGEX ON)
+ENDIF(NOT FREEBSD)
+
+############################################################################
+# filesystem
+############################################################################
+SET(API_FILESYSTEM "boost::filesystem" CACHE STRING "Use this filesystem API")
+SET_PROPERTY(CACHE API_FILESYSTEM PROPERTY STRINGS "std::filesystem" "boost::filesystem")
+
+IF (API_FILESYSTEM STREQUAL "std::filesystem")
+	ADD_DEFINITIONS(-DUSE_FILESYSTEM_API=1)
+	SET(STD_FILESYSTEM ON)
+	SET(BOOST_FILESYSTEM OFF)
+ENDIF (API_FILESYSTEM STREQUAL "std::filesystem")
+
+IF (API_FILESYSTEM STREQUAL "boost::filesystem")
+	ADD_DEFINITIONS(-DUSE_FILESYSTEM_API=2)
+	SET(STD_FILESYSTEM OFF)
+	SET(BOOST_FILESYSTEM ON)
+ENDIF (API_FILESYSTEM STREQUAL "boost::filesystem")
 
 ############################################################################
 # Use as much boost as we can to reduce the 3rdparty library count
 ############################################################################
+SET(BOOST_VERSION "1.62.0")
+
 SET(Boost_USE_MULTITHREADED		ON)
-FIND_PACKAGE(Boost "1.62.0" COMPONENTS
+FIND_PACKAGE(Boost ${BOOST_VERSION} COMPONENTS
 	date_time
 	locale
 	program_options
-	filesystem
 	system
-	log
-	log_setup
 
 	REQUIRED
 )
+
+SET(BOOST_LIBS
+	${Boost_DATE_TIME_LIBRARY}
+	${Boost_SYSTEM_LIBRARY}
+	${Boost_LOCALE_LIBRARY}
+	${Boost_PROGRAM_OPTIONS_LIBRARY}
+)
+
+IF (BOOST_FILESYSTEM)
+	FIND_PACKAGE(Boost ${BOOST_VERSION} COMPONENTS
+		filesystem
+
+		REQUIRED
+	)
+	SET(BOOST_LIBS
+		${Boost_FILESYSTEM_LIBRARY}
+		${BOOST_LIBS}
+	)
+ENDIF (BOOST_FILESYSTEM)
+
+IF(BOOST_REGEX)
+	FIND_PACKAGE(Boost ${BOOST_VERSION} COMPONENTS
+		regex
+
+		REQUIRED
+	)
+	SET(BOOST_LIBS
+		${Boost_REGEX_LIBRARY}
+		${BOOST_LIBS}
+	)
+ENDIF(BOOST_REGEX)
 
 ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB)
 
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 
-SET(BOOST_LIBS
-	${Boost_ATOMIC_LIBRARY}
-	${Boost_CHRONO_LIBRARY}
-	${Boost_REGEX_LIBRARY}
-	${Boost_LOG_LIBRARY}
-	${Boost_LOG_SETUP_LIBRARY}
-	${Boost_DATE_TIME_LIBRARY}
-	${Boost_FILESYSTEM_LIBRARY}
-	${Boost_SYSTEM_LIBRARY}
-	${Boost_THREAD_LIBRARY}
-	${Boost_LOCALE_LIBRARY}
-	${Boost_PROGRAM_OPTIONS_LIBRARY}
-)
-
 IF(LINUX)
 	# on Linux, the locale backend is ICU
 	FIND_PACKAGE(ICU COMPONENTS
-		uc i18n io lx tu
+		uc i18n io tu
 		REQUIRED
 	)
 	SET(BOOST_LIBS    ${BOOST_LIBS}
@@ -227,34 +250,15 @@ IF(LINUX)
 	)
 ENDIF(LINUX)
 
-
-# if Boost log fail to link, you probaly need to compile your boost with
-# the same BOOST_USE_WINAPI_VERSION as here. You must also use
-# BOOST_ALL_DYN_LINK=1
-IF(WIN32)
-	SET(BOOST_LOG_API "BOOST_WINAPI_VERSION_WIN7" CACHE STRING "Boost Log Backend API")
-	SET_PROPERTY(CACHE BOOST_LOG_API PROPERTY STRINGS BOOST_WINAPI_VERSION_WINXP BOOST_WINAPI_VERSION_WIN7)
-
-	ADD_DEFINITIONS(-DBOOST_USE_WINAPI_VERSION=${BOOST_LOG_API})
-	ADD_DEFINITIONS(-D${Boost_LIB_DIAGNOSTICDEFINITIONS})
-ENDIF(WIN32)
-
-############################################################################
-# Options
-############################################################################
-OPTION(WITH_DEBUG_LOG "Use the Debug Log" ON)
-if (WITH_DEBUG_LOG)
-	ADD_DEFINITIONS(-DWITH_DEBUGLOG)
-endif (WITH_DEBUG_LOG)
-
 ############################################################################
 # Combine the CXX Libs
 ############################################################################
-IF(MARKDOWN_CMARK)
-	SET(BLOG_CXX_LIBS ${BLOG_CXX_LIBS}
-		cmark
+IF(MARKDOWN_CMARK_GFM)
+	SET(BLOG_CXX_LIBS    ${BLOG_CXX_LIBS}
+		cmark-gfm-extensions
+		cmark-gfm
 	)
-ENDIF(MARKDOWN_CMARK)
+ENDIF(MARKDOWN_CMARK_GFM)
 
 IF(UNIX)
 	IF (LINUX)
@@ -300,6 +304,26 @@ IF(UNIX)
 
 ENDIF(UNIX)
 
+IF(WIN32)
+	IF(MSVC)
+		SET(BLOG_CXX_LIBS    ${BLOG_CXX_LIBS}
+			${BOOST_LIBS}
+		)
+	ENDIF(MSVC)
+
+IF(MSYS)
+		FIND_PACKAGE(Iconv REQUIRED)
+		SET(BLOG_CXX_LIBS    ${BLOG_CXX_LIBS}
+			${BOOST_LIBS}
+			${Iconv_LIBRARIES}
+		)
+ENDIF(MSYS)
+
+ENDIF(WIN32)
+
 
 ADD_SUBDIRECTORY(3rdparty)
+
+INCLUDE_DIRECTORIES(${CMARK_INCLUDE_DIR})
+
 ADD_SUBDIRECTORY(src)

@@ -1,5 +1,5 @@
 /*
- * blogcpp :: https://www.blogcpp.org
+ * blogcxx :: https://www.blogcxx.de
  * Collection of configuration entries to pass around.
  */
 
@@ -9,7 +9,8 @@
 #include <boost/optional.hpp>
 #include <string>
 
-#include "Debug.h"
+#include "Log/Log.h"
+#include "Metadata.h"
 #include "filesystem.h"
 
 #if 0
@@ -22,7 +23,8 @@ struct ConfigCollectionFile
 {
 	std::string executable;
 	int num_threads;
-	int verbosity;
+	int file_verbosity;
+	int console_verbosity;
 
 	std::string cfg_sitetitle;
 	boost::optional<std::string> cfg_subtitle;
@@ -30,10 +32,6 @@ struct ConfigCollectionFile
 	std::string cfg_author;
 	std::string cfg_indir;
 	std::string cfg_outdir;
-#ifdef WITH_PLUGINS
-	bool cfg_plugins;
-	std::string cfg_plugindir;
-#endif
 	std::string cfg_permalinks;
 	std::string cfg_article_subdir;
 	std::string cfg_page_subdir;
@@ -70,7 +68,8 @@ public:
 	std::string sitetitle() const;
 	const boost::optional<std::string> subtitle() const;
 
-	Debug::Level verbosity() const;
+	Log::Level file_verbosity() const;
+	Log::Level console_verbosity() const;
 
 	std::string author() const;
 
@@ -102,6 +101,7 @@ public:
 	fs::path tpl_archiv() const;
 	fs::path tpl_post() const;
 	fs::path tpl_page() const;
+	fs::path tpl_RSS() const;
 
 	fs::path indir() const;
 	fs::path indir_posts() const;
@@ -109,9 +109,11 @@ public:
 
 	fs::path outdir_root() const;
 
+	fs::path commentdir() const;
+
 	fs::path rel_path_archive() const;
-	fs::path rel_path_archive_year(const tm &time) const;
-	fs::path rel_path_archive_year_month(const tm &time) const;
+	fs::path rel_path_archive_year(const pt::ptime& time) const;
+	fs::path rel_path_archive_year_month(const pt::ptime& time) const;
 	fs::path rel_path_posts(const std::string &slug) const;
 	fs::path rel_path_pages(const std::string &slug) const;
 	fs::path rel_path_authors(const std::string &author) const;
@@ -119,14 +121,16 @@ public:
 	fs::path rel_path_tags(const std::string &cat) const;
 	fs::path rel_path_static() const;
 	fs::path rel_path_series(const std::string &series) const;
+	fs::path rel_path_media() const;
+	fs::path rel_path_feed() const;
+
+	fs::path feed_file(const ArchiveData &ad) const;
 
 	// index: -1 -> no index.html added
 	// indes:  0 -> relpath/index.html
 	// indes:  n -> relpath/index-n.html
 	// url("", int index = -1) -> returns the base url
 	std::string url(const fs::path rel_path, int index = -1) const;
-
-	fs::path feeddir() const;
 
 private:
 	const ConfigCollectionFile &m_file;

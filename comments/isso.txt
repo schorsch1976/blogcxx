@@ -1,0 +1,14 @@
+{% if exists("header") %}
+
+{% endif %}
+
+{% if exists("body") %}
+
+		<div class="comments">
+        <section id="isso-thread"></section>
+        <script data-isso=" {% commentdata %} /"
+                src="{% commentdata %}/js/embed.min.js>
+		</script>
+       </div>
+
+{% endif %}

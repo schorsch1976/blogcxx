@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #pragma once
 
@@ -13,33 +13,30 @@
 std::string trim(std::string inputstring);
 std::string hyphenise(std::string input);
 
-bool strEndsWith(const std::string &s, const std::string &ending);
-
 std::string lowercase(std::string input);
 std::string translate(std::string input);
 
 void openWithEditor(fs::path filename);
 std::string read_file(fs::path filename);
-void write_file(fs::path filename, const unsigned char* data, size_t len);
+void write_file(fs::path filename, const unsigned char *data, size_t len);
 void write_file(fs::path filename, const std::string &data);
-
-std::vector<std::string> vectorSplit(std::string inputstring,
-									 std::string divider = ";");
-bool vectorSort(std::string a, std::string b);
 
 // -----------------------------
 // Date/Time Helpers
 // -----------------------------
 
-std::string timeNow(const char *format = "%a, %d %b %Y %T %z");
+enum class time_fmt
+{
+	locale_short,
+	locale_date_time,
+	iso_short,
+	iso_date_time,
+	rss_date_time
+};
 
-void parseDatestringToTm(std::string in_datetime, std::string inputfile,
-						 tm &input_tm);
-std::string dateToPrint(const tm &tm_t, bool shortdate = false);
+std::string dateToPrint(const pt::ptime& time, time_fmt fmt = time_fmt::locale_date_time);
 
-bool isFutureDate(tm tm_im);
-
-std::string parseTmToPath(tm tm_t, std::string cfg_permalinks);
+bool isFutureDate(pt::ptime time);
 
 bool time_smaller(SingleItem::ConstPtr left, SingleItem::ConstPtr right);
 bool time_equal(SingleItem::ConstPtr left, SingleItem::ConstPtr right);

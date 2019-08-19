@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "Helpers.h"
 
@@ -9,12 +9,13 @@
 #include <iomanip>
 #include <iterator>
 
-#include <regex>
+#include "Shared/regex.h"
 #include <sstream>
 
 #include <boost/locale.hpp>
+#include <boost/locale/date_time.hpp>
 
-#include "Debug.h"
+#include "Log/Log.h"
 
 // clang-format off
 #ifdef _WIN32
@@ -39,9 +40,10 @@ std::string trim(std::string inputstring)
 	// Removes leading and trailing whitespaces from <inputstring>.
 	auto wsfront = std::find_if_not(inputstring.begin(), inputstring.end(),
 									[](int c) { return isspace(c); });
-	auto wsback = find_if_not(inputstring.rbegin(), inputstring.rend(),
-							  [](int c) { return isspace(c); })
-					  .base();
+	auto wsback =
+		find_if_not(inputstring.rbegin(), inputstring.rend(), [](int c) {
+			return isspace(c);
+		}).base();
 	return (wsback <= wsfront ? std::string() : std::string(wsfront, wsback));
 }
 
@@ -56,13 +58,6 @@ std::string hyphenise(std::string input)
 		});
 
 	return input;
-}
-
-bool strEndsWith(const std::string &s, const std::string &ending)
-{
-	// true if <s> ends with <ending>.
-	return (s.size() >= ending.size()) &&
-		   equal(ending.rbegin(), ending.rend(), s.rbegin());
 }
 
 std::string lowercase(std::string input)
@@ -145,12 +140,13 @@ std::string read_file(fs::path filename)
 	}
 
 	// remove any "\r"
-	std::remove(std::begin(file_contents), std::end(file_contents), '\r');
+	file_contents.erase(
+		std::remove(std::begin(file_contents), std::end(file_contents), '\r'), file_contents.end());
 
 	return file_contents;
 }
 
-void write_file(fs::path filename, const unsigned char* data, size_t len)
+void write_file(fs::path filename, const unsigned char *data, size_t len)
 {
 	std::ofstream ofs(filename.string(), std::ios::binary);
 	if (!ofs.is_open())
@@ -158,7 +154,7 @@ void write_file(fs::path filename, const unsigned char* data, size_t len)
 		THROW_FATAL("Could not open file for writing: %1%", filename.string());
 	}
 
-	ofs.write(reinterpret_cast<const char*>(data), len);
+	ofs.write(reinterpret_cast<const char *>(data), len);
 }
 
 void write_file(fs::path filename, const std::string &data)
@@ -173,148 +169,64 @@ void write_file(fs::path filename, const std::string &data)
 	std::copy(data.begin(), data.end(), osi);
 }
 
-std::vector<std::string> vectorSplit(std::string inputstring,
-									 std::string divider)
-{
-	// Returns a vector of elements in the <inputstring>.
-	std::vector<std::string> ret;
-
-	if (inputstring.size() == 0)
-	{
-		// Skip empty strings.
-		return ret;
-	}
-
-	std::regex re(divider); // Tokenize.
-	std::sregex_token_iterator it(inputstring.begin(), inputstring.end(), re,
-								  -1);
-	std::sregex_token_iterator reg_end;
-
-	for (; it != reg_end; ++it)
-	{
-		std::string toadd = trim(it->str());
-		if (toadd.empty())
-		{
-			// Empty elements could happen if the user writes ";;" or
-			// if we have a page which only has tags, no categories. In
-			// this case, we should not try to add an "empty item" as
-			// that would not make any sense, would it?
-			continue;
-		}
-		ret.push_back(trim(it->str()));
-	}
-
-	return ret;
-}
-
-bool vectorSort(std::string a, std::string b)
-{
-	// Sorting helper for string vectors (alphabetically).
-	return a < b;
-}
-
 // -----------------------------
 // Date/Time Helpers
 // -----------------------------
-std::string timeNow(const char *format)
+std::string dateToPrint(const pt::ptime &time, time_fmt fmt)
 {
-	// Returns a formatted "now()" string. The output format defaults to ISO
-	// time.
-	std::stringstream ss_time;
-	time_t t = time(0);
-#if (defined(_WIN32) && !__INTEL_COMPILER)
-	// Microsoft wants to have localtime_s here.
-	tm now;
-	localtime_s(&now, &t);
-#else
-	tm *now = localtime(&t);
-#endif
-#ifdef _WIN32
-	ss_time << std::put_time(&now, format);
-#else
-	ss_time << std::put_time(now, format);
-#endif
-	return ss_time.str();
-}
+	using namespace boost::locale;
 
-void parseDatestringToTm(std::string in_datetime, std::string inputfile,
-						 tm &input_tm)
-{
-	// Converts the in_datetime from a post or page into a struct tm.
-	std::istringstream ss_inputdate(in_datetime);
+	tm tm_t = pt::to_tm(time);
+	date_time_period_set s;
+	s.add(period::year(tm_t.tm_year + 1900));
+	s.add(period::month(tm_t.tm_mon));
+	s.add(period::hour(tm_t.tm_hour));
+	s.add(period::minute(tm_t.tm_min));
+	s.add(period::second(tm_t.tm_sec));
 
-	// Fill the tm:
-	ss_inputdate >> std::get_time(&input_tm, "%Y-%m-%d %H:%M:%S");
+	date_time dt(s);
 
-	if (ss_inputdate.fail())
-	{
-		std::cout << "Failed to parse the date from the file " << inputfile
-				  << "." << std::endl;
-		std::cout << "Please check it before you continue." << std::endl;
-	}
-}
-
-std::string dateToPrint(const tm &tm_t, bool shortdate /*= false*/)
-{
-	// we got a global locale
-#if 0
-	// Formats the in-date <tm_t> into a localized time string.
-	std::string s_localeFromConfig = cfgs.cfg_locale;
-#if _MSC_VER && !__INTEL_COMPILER
-	// Oh, Microsoft. :-(
-	// We need to use "en-US" instead of "en_US.utf8" here ...
-	// ref.: https://msdn.microsoft.com/en-us/library/hzz3tw78.aspx
-	s_localeFromConfig = s_localeFromConfig.substr(0, 5);
-	s_localeFromConfig = regex_replace(s_localeFromConfig, regex("_"), "-");
-#endif
-	locale locdate(s_localeFromConfig);
-	ostringstream ss_ret;
-	ss_ret.imbue(locdate);
-#endif
 	std::ostringstream oss;
-	oss << std::put_time(&tm_t, shortdate ? "%x" : "%c");
+	switch (fmt)
+	{
+		case time_fmt::locale_short:
+			oss << as::date_short << dt;
+			break;
+		case time_fmt::locale_date_time:
+			oss << as::date_full << dt;
+			break;
+		case time_fmt::iso_short:
+			oss << std::put_time(&tm_t, "%Y-%m-%d");
+			break;
+		default:
+		case time_fmt::iso_date_time:
+			oss << std::put_time(&tm_t, "%Y-%m-%d %H:%M:%S");
+			break;
+		case time_fmt::rss_date_time:
+			oss << std::put_time(&tm_t, "%a, %d %b %Y %T %z");
+			break;
+	};
 
 	return oss.str();
 }
 
-bool isFutureDate(tm tm_im)
+bool isFutureDate(pt::ptime time)
 {
-	// Returns true is <datestring> is in the future; else, false.
-	time_t time_now = time(0);
-
-	time_t time_in = mktime(&tm_im);
-
-	double difference = difftime(time_now, time_in) / (60 * 60 * 24);
-
-	return (difference < 0);
-}
-
-std::string parseTmToPath(tm tm_t, std::string cfg_permalinks)
-{
-	// Converts the tm_t from a post or page to a correct path structure (see
-	// above).
-	std::ostringstream ss_outputdate;
-
-	const char *const cstr_permalinks = cfg_permalinks.c_str();
-	ss_outputdate << std::put_time(&tm_t, cstr_permalinks);
-
-	return ss_outputdate.str();
+	// Returns true is time is in the future; else, false.
+	return time > pt::second_clock::local_time();
 }
 
 bool time_smaller(SingleItem::ConstPtr left, SingleItem::ConstPtr right)
 {
-	return difftime(mktime(const_cast<struct tm *>(&left->time)),
-					mktime(const_cast<struct tm *>(&right->time))) < 0;
+	return left->time < right->time;
 };
 
 bool time_equal(SingleItem::ConstPtr left, SingleItem::ConstPtr right)
 {
-	return difftime(mktime(const_cast<struct tm *>(&left->time)),
-					mktime(const_cast<struct tm *>(&right->time))) == 0;
+	return left->time == right->time;
 };
 
 bool time_greater(SingleItem::ConstPtr left, SingleItem::ConstPtr right)
 {
-	return difftime(mktime(const_cast<struct tm *>(&left->time)),
-					mktime(const_cast<struct tm *>(&right->time))) > 0;
+	return left->time > right->time;
 };

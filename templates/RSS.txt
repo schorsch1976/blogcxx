@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>[TMPL_VAR title ]</title>
+        <link>[TMPL_VAR link ]</link>
+        <description>[TMPL_VAR description ]</description>
+        <lastBuildDate>[TMPL_VAR lastBuildDate ]</lastBuildDate>
+		[TMPL_FOR items]
+        <item>
+            <title>[TMPL_VAR title]</title>
+            <description>[TMPL_VAR description]</description>
+            <link>[TMPL_VAR link]</link>
+            <pubDate>[TMPL_VAR pubDate]</pubDate>
+        </item>
+		[/TMPL_FOR]
+    </channel>
+</rss>

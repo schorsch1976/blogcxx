@@ -1,6 +1,6 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #pragma once
 
@@ -33,7 +33,7 @@ struct ArchiveData
 {
 	fs::path path;
 	ArchiveType type;
-	tm time;
+	pt::ptime time;
 
 	inline bool operator<(const ArchiveData &rhs) const
 	{
@@ -52,7 +52,8 @@ struct ArchiveData
 struct Metadata
 {
 	// all pointers point into this container
-	Archive all_items;
+	Archive all_pages;
+	Archive all_posts;
 
 	// these are the cross references
 	std::map<std::string, Archive> authors;
@@ -81,7 +82,8 @@ struct ConstMetadata
 	ConstMetadata &operator=(ConstMetadata &&) = delete;
 
 	// all pointers point into this container
-	const ConstArchive all_items;
+	const ConstArchive all_pages;
+	const ConstArchive all_posts;
 
 	// these are the cross references
 	const std::map<std::string, const ConstArchive> authors;

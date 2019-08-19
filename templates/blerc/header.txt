@@ -22,7 +22,7 @@
 				</script>
 			{% endfor %}
 		{% endif %}
-
+		{{ default(comments-header, "") }}
         {{ default(headscripts, "") }}
     </head>
     <body>

@@ -1,15 +1,15 @@
 /*
-* blogcpp :: https://www.blogcpp.org
-*/
+ * blogcxx :: https://www.blogcxx.de
+ */
 
 #include "ConfigCollection.h"
 
-#include "Debug.h"
+#include "Helpers.h"
 #include "SingleItem.h"
 #include "constants.h"
 
 #include <iomanip>
-#include <regex>
+#include "Shared/regex.h"
 #include <sstream>
 #include <thread>
 
@@ -17,19 +17,32 @@ ConfigCollection::ConfigCollection(const ConfigCollectionFile &file)
 	: m_file(file)
 {
 	// check the verbosity
-	if (m_file.verbosity > static_cast<int>(Debug::Level::fatal) ||
-		m_file.verbosity < static_cast<int>(Debug::Level::trace))
+	if (m_file.file_verbosity > static_cast<int>(Log::Level::fatal) ||
+		m_file.file_verbosity < static_cast<int>(Log::Level::trace))
 	{
-		THROW_FATAL("Verbosity set to an unsupported value %1%. [Quiet(%2%) - "
+		THROW_FATAL("File verbosity set to an unsupported value %1%. [Quiet(%2%) - "
 					"Verbose(%3%)]",
-					m_file.verbosity, static_cast<int>(Debug::Level::trace),
-					static_cast<int>(Debug::Level::fatal));
+					m_file.file_verbosity, static_cast<int>(Log::Level::trace),
+					static_cast<int>(Log::Level::fatal));
+	}
+
+	if (m_file.console_verbosity > static_cast<int>(Log::Level::fatal) ||
+		m_file.console_verbosity < static_cast<int>(Log::Level::trace))
+	{
+		THROW_FATAL("Console verbosity set to an unsupported value %1%. [Quiet(%2%) - "
+			"Verbose(%3%)]",
+			m_file.console_verbosity, static_cast<int>(Log::Level::trace),
+			static_cast<int>(Log::Level::fatal));
 	}
 
 	if (m_file.cfg_siteurl.empty())
 	{
-		m_url = "file:///" + fs::current_path().string();
-		m_url += "/" + m_file.cfg_outdir + "/";
+		m_url = "file://" + fs::current_path().string();
+		m_url += "/" + m_file.cfg_outdir ;
+	}
+	else
+	{
+		m_url = m_file.cfg_siteurl;
 	}
 	// TODO check the pathes if they are unique
 }
@@ -47,12 +60,14 @@ const boost::optional<std::string> ConfigCollection::subtitle() const
 	return m_file.cfg_subtitle;
 }
 
-Debug::Level ConfigCollection::verbosity() const
+Log::Level ConfigCollection::file_verbosity() const
 {
-
-	return static_cast<Debug::Level>(m_file.verbosity);
+	return static_cast<Log::Level>(m_file.file_verbosity);
 }
-
+Log::Level ConfigCollection::console_verbosity() const
+{
+	return static_cast<Log::Level>(m_file.console_verbosity);
+}
 std::string ConfigCollection::author() const { return m_file.cfg_author; }
 
 std::string ConfigCollection::permalink_format() const
@@ -134,6 +149,10 @@ fs::path ConfigCollection::tpl_archiv() const
 }
 fs::path ConfigCollection::tpl_post() const { return tpldir() / "post.txt"; }
 fs::path ConfigCollection::tpl_page() const { return tpldir() / "page.txt"; }
+fs::path ConfigCollection::tpl_RSS() const
+{
+	return fs::path("templates") / "RSS.txt";
+}
 
 fs::path ConfigCollection::indir() const
 {
@@ -156,25 +175,31 @@ fs::path ConfigCollection::outdir_root() const
 	return ret;
 }
 
+fs::path ConfigCollection::commentdir() const
+{
+	fs::path ret = {"comments"};
+	return ret;
+}
+
 fs::path ConfigCollection::rel_path_archive() const
 {
 	return fs::path("archives");
 }
 
-fs::path ConfigCollection::rel_path_archive_year(const tm &time) const
+fs::path ConfigCollection::rel_path_archive_year(const pt::ptime& time) const
 {
 	std::ostringstream oss_year;
-	oss_year << std::setw(4) << std::setfill('0') << time.tm_year + 1900;
+	oss_year << std::setw(4) << std::setfill('0') << time.date().year();
 
 	fs::path ret{rel_path_archive()};
 	ret /= oss_year.str();
 	return ret;
 }
-fs::path ConfigCollection::rel_path_archive_year_month(const tm &time) const
+fs::path ConfigCollection::rel_path_archive_year_month(const pt::ptime& time) const
 {
 	std::ostringstream oss_year, oss_month;
-	oss_year << std::setw(4) << std::setfill('0') << time.tm_year + 1900;
-	oss_month << std::setw(2) << std::setfill('0') << time.tm_mon + 1;
+	oss_year << std::setw(4) << std::setfill('0') << time.date().year();
+	oss_month << std::setw(2) << std::setfill('0') << time.date().month();
 
 	fs::path ret{rel_path_archive()};
 	ret /= oss_year.str();
@@ -225,6 +250,18 @@ fs::path ConfigCollection::rel_path_series(const std::string &series) const
 	return p;
 }
 
+fs::path ConfigCollection::rel_path_media() const
+{
+	fs::path ret{"media"};
+	return ret;
+}
+
+fs::path ConfigCollection::rel_path_feed() const
+{
+	fs::path ret{m_file.cfg_feeddir};
+	return ret;
+}
+
 // index: -1 -> no index.html added
 // indes:  0 -> relpath/index.html
 // indes:  n -> relpath/index-n.html
@@ -258,15 +295,42 @@ std::string ConfigCollection::url(const fs::path rel_path, int index) const
 		}
 	}
 
+	if (*ret.rbegin() == '/')
+	{
+		ret.pop_back();
+	}
+
 	// Makes "a/b/c" out of "a//b//////c".
-	std::regex slash("([^:])/+"); // Do not replace "https://".
-	std::string out = std::regex_replace(ret, slash, "$1/");
-	return out;
+	//rx::regex slash("([^:])/+"); // Do not replace "https://".
+	//std::string out = rx::regex_replace(ret, slash, "$1/");
+	return ret;
 }
 
-fs::path ConfigCollection::feeddir() const
+fs::path ConfigCollection::feed_file(const ArchiveData &ad) const
 {
-	fs::path ret{outdir_root()};
-	ret /= m_file.cfg_feeddir;
-	return ret;
+	fs::path outfile;
+
+	switch (ad.type)
+	{
+		case ArchiveType::Author:
+			outfile = "author-";
+			outfile += lowercase(ad.path.stem().string()) + ".xml";
+			break;
+		case ArchiveType::Categories:
+			outfile = "category-";
+			outfile += lowercase(ad.path.stem().string()) + ".xml";
+			break;
+		case ArchiveType::Tags:
+			outfile = "tag-";
+			outfile += lowercase(ad.path.stem().string()) + ".xml";
+			break;
+		case ArchiveType::Series:
+			outfile = "series-";
+			outfile += lowercase(ad.path.stem().string()) + ".xml";
+			break;
+		default:
+			outfile = "RSS.xml";
+	}
+
+	return outfile;
 }

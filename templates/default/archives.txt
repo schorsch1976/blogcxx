@@ -1,10 +1,11 @@
-{% include "header.txt" %}
-{% include "sidebar.txt" %}
+[TMPL_INCLUDE header.txt]
+[TMPL_INCLUDE sidebar.txt]
 
-<h1>Archive for {{ what }}</h1>
+<h1>Archive for [TMPL_VAR what]</h1>
 
-<ul id="archivelist">{% for entry in entries %}
-  <li><a href="{{ entry/URL }}">{{ entry/item }}</a> <span class="archivemeta">({{ entry/metadata }})</span></li>
-{% endfor %}</ul>
+<ul id="archivelist">
+[TMPL_FOR entries]
+  <li><a href="[TMPL_VAR URL]">[TMPL_VAR item]</a> <span class="archivemeta">([TMPL_VAR metadata])</span></li>
+[/TMPL_FOR]</ul>
 
-{% include "footer.txt" %}
+[TMPL_INCLUDE footer.txt]
