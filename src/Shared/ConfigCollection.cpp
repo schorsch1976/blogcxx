@@ -337,7 +337,11 @@ std::string ConfigCollection::url_encode(std::string in) const
 			escaped << c;
 			continue;
 		}
-
+		else if (c == ' ')
+		{
+			escaped << '+';
+			continue;
+		}
 		// Any other characters are percent-encoded
 		escaped << std::uppercase;
 		escaped << '%' << std::setw(2) << int((unsigned char)c);
