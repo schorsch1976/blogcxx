@@ -10,7 +10,6 @@
 #include "Shared/CleanupDirectory.h"
 #include "Shared/CopyDirectory.h"
 #include "Shared/Helpers.h"
-#include "Shared/constants.h"
 #include "Shared/filesystem.h"
 
 #include <algorithm>
@@ -77,7 +76,7 @@ TemplateData GenerateCommonTemplateData(const TemplateWrapper &engine,
 	for (auto &si : latest_posts)
 	{
 		ret.Set({"latestposts", i, "title"}, si->s_title);
-		ret.Set({ "latestposts", i, "date" }, dateToPrint(si->time));
+		ret.Set({"latestposts", i, "date"}, dateToPrint(si->time));
 		ret.Set({"latestposts", i, "link"},
 				cfgs.url(cfgs.rel_path_posts(si->s_slug)));
 		++i;
@@ -373,7 +372,7 @@ void CreateHTMLAndRSS(const ConstMetadata &merged, const ConfigCollection &cfgs)
 			fs::create_directories(cfgs.outdir_root() / cfgs.rel_path_media());
 
 			CopyDirectory(cfgs.indir() / cfgs.rel_path_media(),
-				cfgs.outdir_root() / cfgs.rel_path_media());
+						  cfgs.outdir_root() / cfgs.rel_path_media());
 		}
 	});
 

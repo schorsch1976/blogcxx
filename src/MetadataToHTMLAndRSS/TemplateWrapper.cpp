@@ -5,7 +5,6 @@
 
 #include "TemplateWrapper.h"
 #include "Log/Log.h"
-#include "Shared/constants.h"
 
 #include "html-template++/html.h"
 

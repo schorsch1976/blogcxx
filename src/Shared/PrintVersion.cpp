@@ -1,7 +1,6 @@
 #include "PrintVersion.h"
 
 #include "Log/Log.h"
-#include "constants.h"
 
 void PrintVersion(const std::string app)
 {
@@ -11,5 +10,5 @@ void PrintVersion(const std::string app)
 		  "Licensed under the terms of the GPL-3.0.\n"
 		  "See https://www.gnu.org/licenses/gpl-3.0.txt for relevant "
 		  "information.\n\n",
-		  app, APP_VERSION, APP_URL);
+		  app, GIT_VERSION, APP_URL);
 }

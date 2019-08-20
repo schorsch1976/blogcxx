@@ -8,14 +8,13 @@
 #include "Shared/Helpers.h"
 #include "Shared/Metadata.h"
 #include "Shared/SingleItem.h"
-#include "Shared/constants.h"
 #include "Shared/filesystem.h"
 
+#include "Shared/regex.h"
 #include <algorithm>
 #include <fstream>
 #include <functional>
 #include <iterator>
-#include "Shared/regex.h"
 #include <sstream>
 #include <string>
 

@@ -1,5 +1,4 @@
 SET(SRCS
-	constants.h
 	AsyncWorker.h
 
 	ConfigCollection.cpp

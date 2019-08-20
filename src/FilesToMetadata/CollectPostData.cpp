@@ -6,7 +6,6 @@
 
 #include "Shared/AsyncWorker.h"
 #include "Shared/Helpers.h"
-#include "Shared/constants.h"
 
 #include "Shared/Slug.h"
 
@@ -29,7 +28,7 @@ std::vector<std::string> vectorSplit(std::string inputstring,
 
 	rx::regex re(divider); // Tokenize.
 	rx::sregex_token_iterator it(inputstring.begin(), inputstring.end(), re,
-								  -1);
+								 -1);
 	rx::sregex_token_iterator reg_end;
 
 	for (; it != reg_end; ++it)
@@ -461,40 +460,38 @@ SingleItem::Ptr CollectPostDataHelper(ItemType type,
 	std::istringstream ss_contents(file_contents);
 
 	rx::regex re_author("^Author\\s*:[\\s\\t]*(.*?)$",
-						 rx::regex_constants::icase);
+						rx::regex_constants::icase);
 	rx::regex re_title("^Title\\s*:[\\s\\t]*(.*?)$",
-						rx::regex_constants::icase);
-	rx::regex re_slug("^Slug\\s*:[\\s\\t]*(.*?)$",
 					   rx::regex_constants::icase);
+	rx::regex re_slug("^Slug\\s*:[\\s\\t]*(.*?)$", rx::regex_constants::icase);
 	rx::regex re_datetime("^Date\\s*:[\\s\\t]*(\\d{4}\\-\\d{2}\\-\\d{2} "
-						   "\\d{2}:\\d{2}:\\d{2}?)$",
-						   rx::regex_constants::icase);
-	rx::regex re_change_datetime("^Changed\\s*:[\\s\\t]*(\\d{4}\\-\\d{2}"
-								  "\\-\\d{2} \\d{2}:\\d{2}:\\d{2}?)$",
-								  rx::regex_constants::icase);
-	rx::regex re_cats("^Categories\\s*:[\\s\\t]*(.*?)$",
-					   rx::regex_constants::icase);
-	rx::regex re_tags("^Tags\\s*:[\\s\\t]*(.*?)$",
-					   rx::regex_constants::icase);
-	rx::regex re_markdown("^Markdown\\s*:[\\s\\t]*(.*?)$",
-						   rx::regex_constants::icase);
-	rx::regex re_hardbreaks("^Hardbreaks\\s*:[\\s\\t]*(.*?)$",
-							 rx::regex_constants::icase);
-	rx::regex re_emoji("^Emoji\\s*:[\\s\\t]*(.*?)$",
-						rx::regex_constants::icase);
-	rx::regex re_sticky("^Sticky\\s*:[\\s\\t]*(.*?)$",
-						 rx::regex_constants::icase);
-	rx::regex re_comments("^Comments\\s*:[\\s\\t]*(.*?)$",
-						   rx::regex_constants::icase);
-	rx::regex re_ogimage("^OpenGraphImage\\s*:[\\s\\t]*(.*?)$",
+						  "\\d{2}:\\d{2}:\\d{2}?)$",
 						  rx::regex_constants::icase);
-	rx::regex re_series("^Series\\s*:[\\s\\t]*(.*?)$",
+	rx::regex re_change_datetime("^Changed\\s*:[\\s\\t]*(\\d{4}\\-\\d{2}"
+								 "\\-\\d{2} \\d{2}:\\d{2}:\\d{2}?)$",
+								 rx::regex_constants::icase);
+	rx::regex re_cats("^Categories\\s*:[\\s\\t]*(.*?)$",
+					  rx::regex_constants::icase);
+	rx::regex re_tags("^Tags\\s*:[\\s\\t]*(.*?)$", rx::regex_constants::icase);
+	rx::regex re_markdown("^Markdown\\s*:[\\s\\t]*(.*?)$",
+						  rx::regex_constants::icase);
+	rx::regex re_hardbreaks("^Hardbreaks\\s*:[\\s\\t]*(.*?)$",
+							rx::regex_constants::icase);
+	rx::regex re_emoji("^Emoji\\s*:[\\s\\t]*(.*?)$",
+					   rx::regex_constants::icase);
+	rx::regex re_sticky("^Sticky\\s*:[\\s\\t]*(.*?)$",
+						rx::regex_constants::icase);
+	rx::regex re_comments("^Comments\\s*:[\\s\\t]*(.*?)$",
+						  rx::regex_constants::icase);
+	rx::regex re_ogimage("^OpenGraphImage\\s*:[\\s\\t]*(.*?)$",
 						 rx::regex_constants::icase);
+	rx::regex re_series("^Series\\s*:[\\s\\t]*(.*?)$",
+						rx::regex_constants::icase);
 	rx::regex re_position("^Position\\s*:[\\s\\t]*(\\d*?)$",
-						   rx::regex_constants::icase);
+						  rx::regex_constants::icase);
 
 	rx::regex re_url("https?://",
-					  rx::regex_constants::icase); // Avoid stupidities
+					 rx::regex_constants::icase); // Avoid stupidities
 
 	rx::smatch match;
 

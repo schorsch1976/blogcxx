@@ -10,7 +10,6 @@ namespace po = boost::program_options;
 
 #include "Log/Log.h"
 #include "Shared/PrintVersion.h"
-#include "Shared/constants.h"
 #include "Shared/filesystem.h"
 
 #include <fstream>

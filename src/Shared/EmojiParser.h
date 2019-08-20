@@ -9,6 +9,6 @@
 
 namespace EmojiParser
 {
-	std::string clear(const std::string text);
-	std::string parse(const std::string text);
+std::string clear(const std::string text);
+std::string parse(const std::string text);
 };

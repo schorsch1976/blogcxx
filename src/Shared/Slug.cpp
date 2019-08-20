@@ -10,8 +10,8 @@
 #include "Log/Log.h"
 #include "Shared/Helpers.h"
 
-#include <iomanip>
 #include "Shared/regex.h"
+#include <iomanip>
 
 std::string createBasicSlug(const SingleItem &si)
 {

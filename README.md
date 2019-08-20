@@ -101,7 +101,7 @@ The latest released version is 1-alpha. master branch is always the latest versi
   whatever.
 - comments
 - download the highlight.js into the static folder
-- config colletion: check the pathes if they are unique
+- config collection: check the pathes if they are unique
 
 ---
 
@@ -152,7 +152,7 @@ The latest released version is 1-alpha. master branch is always the latest versi
 - cxxopts replaced by boost::program_options (users dont care)
 - icu replaced by boost::locale (but still used as a backend on Linux) (users dont care)
 - Configurable article permalinks.
-- template engine got replaced by htmltemplate, like perl [HTML::template](https://metacpan.org/pod/HTML::Template)
+- template engine got replaced by htmltemplate++, like perl [HTML::template](https://metacpan.org/pod/HTML::Template)
   but it is a straight forward simple implementation to get rid of json and inja because
   inja didn't work on freebsd
 
@@ -171,6 +171,8 @@ The latest released version is 1-alpha. master branch is always the latest versi
   This pluginsystem would have a js plugin that loads your js plugins.
 - google+ comment system: google+ [closes soon](https://en.wikipedia.org/wiki/Google%2B#Shutdown_of_consumer_version)
 - OEmbed support
+- maybe i will remove the comment system (why use a static web page and then
+  hand the data of the users to others?)
 
 ---
 
@@ -221,7 +223,6 @@ Now it is typesafe and without sstream everywhere
 ---
 
 ### What stayed the same between blogcpp and blogcxx?
-- Template design
 - Markdown Parser (but exchangeable with libcmark-gfm)
 - Emoji Parser (clear(), but parse got reimplemented)
 - Excerpt Extractor
@@ -246,7 +247,7 @@ Not in 3rdparty directory because it is to big.
 
 - cmake
 - a ``c++17`` compiler. known to work
-  * Visual Studio 2017 Community Edition
+  * Visual Studio 2019 Community Edition
   * gcc 8.2
   * clang 6
 
@@ -338,10 +339,10 @@ Boost API is most suitable for 'older' compilers like gcc 6.3 and will build on 
 
   OS      | Compiler   | Status | filesystem | variant | tested
  ---------|------------|--------|------------|---------|-------------
-  Windows | MSVC 2017  | OK     | std        | std     | 1-alpha
-  Windows | MSVC 2017  | OK     | boost      | std     | 1-alpha
-  Windows | MSVC 2017  | OK     | std        | boost   | 1-alpha
-  Windows | MSVC 2017  | OK     | boost      | boost   | 1-alpha
+  Windows | MSVC 2019  | OK     | std        | std     | 1-alpha
+  Windows | MSVC 2019  | OK     | boost      | std     | 1-alpha
+  Windows | MSVC 2019  | OK     | std        | boost   | 1-alpha
+  Windows | MSVC 2019  | OK     | boost      | boost   | 1-alpha
   Windows | MSYS  8.2  |        | std        | std     |
   Windows | MSYS  8.2  |        | boost      | std     |
   Windows | MSYS  8.2  |        | std        | boost   |
@@ -364,14 +365,14 @@ Boost API is most suitable for 'older' compilers like gcc 6.3 and will build on 
 
 ###  Build on Windows:
 Requirements:
-* Visual Studio 2017
+* Visual Studio 2019
 * cmake 3.13
 * Boost 1.68.0
 
 Manual compilation instructions:
 - Get boost from https://www.boost.org/ and unzip it to your build directory.
 - Start a Commandline prompt from
-  ``Visualstudio VS2017 x64 Native Tools-Commandprompt``
+  ``Visualstudio VS2019 x64 Native Tools-Commandprompt``
 - cd into .../boost-1.68.0
 - bootstrap.bat
 - ``b2 -j8 --build-type=complete address-model=64 --stagedir=stage64 stage``

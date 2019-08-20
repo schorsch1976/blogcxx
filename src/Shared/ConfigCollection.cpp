@@ -6,10 +6,9 @@
 
 #include "Helpers.h"
 #include "SingleItem.h"
-#include "constants.h"
 
-#include <iomanip>
 #include "Shared/regex.h"
+#include <iomanip>
 #include <sstream>
 #include <thread>
 
@@ -20,16 +19,18 @@ ConfigCollection::ConfigCollection(const ConfigCollectionFile &file)
 	if (m_file.file_verbosity > static_cast<int>(Log::Level::fatal) ||
 		m_file.file_verbosity < static_cast<int>(Log::Level::trace))
 	{
-		THROW_FATAL("File verbosity set to an unsupported value %1%. [Quiet(%2%) - "
-					"Verbose(%3%)]",
-					m_file.file_verbosity, static_cast<int>(Log::Level::trace),
-					static_cast<int>(Log::Level::fatal));
+		THROW_FATAL(
+			"File verbosity set to an unsupported value %1%. [Quiet(%2%) - "
+			"Verbose(%3%)]",
+			m_file.file_verbosity, static_cast<int>(Log::Level::trace),
+			static_cast<int>(Log::Level::fatal));
 	}
 
 	if (m_file.console_verbosity > static_cast<int>(Log::Level::fatal) ||
 		m_file.console_verbosity < static_cast<int>(Log::Level::trace))
 	{
-		THROW_FATAL("Console verbosity set to an unsupported value %1%. [Quiet(%2%) - "
+		THROW_FATAL(
+			"Console verbosity set to an unsupported value %1%. [Quiet(%2%) - "
 			"Verbose(%3%)]",
 			m_file.console_verbosity, static_cast<int>(Log::Level::trace),
 			static_cast<int>(Log::Level::fatal));
@@ -38,7 +39,7 @@ ConfigCollection::ConfigCollection(const ConfigCollectionFile &file)
 	if (m_file.cfg_siteurl.empty())
 	{
 		m_url = "file://" + fs::current_path().string();
-		m_url += "/" + m_file.cfg_outdir ;
+		m_url += "/" + m_file.cfg_outdir;
 	}
 	else
 	{
@@ -186,7 +187,7 @@ fs::path ConfigCollection::rel_path_archive() const
 	return fs::path("archives");
 }
 
-fs::path ConfigCollection::rel_path_archive_year(const pt::ptime& time) const
+fs::path ConfigCollection::rel_path_archive_year(const pt::ptime &time) const
 {
 	std::ostringstream oss_year;
 	oss_year << std::setw(4) << std::setfill('0') << time.date().year();
@@ -195,7 +196,8 @@ fs::path ConfigCollection::rel_path_archive_year(const pt::ptime& time) const
 	ret /= oss_year.str();
 	return ret;
 }
-fs::path ConfigCollection::rel_path_archive_year_month(const pt::ptime& time) const
+fs::path
+ConfigCollection::rel_path_archive_year_month(const pt::ptime &time) const
 {
 	std::ostringstream oss_year, oss_month;
 	oss_year << std::setw(4) << std::setfill('0') << time.date().year();
@@ -301,8 +303,8 @@ std::string ConfigCollection::url(const fs::path rel_path, int index) const
 	}
 
 	// Makes "a/b/c" out of "a//b//////c".
-	//rx::regex slash("([^:])/+"); // Do not replace "https://".
-	//std::string out = rx::regex_replace(ret, slash, "$1/");
+	// rx::regex slash("([^:])/+"); // Do not replace "https://".
+	// std::string out = rx::regex_replace(ret, slash, "$1/");
 	return ret;
 }
 

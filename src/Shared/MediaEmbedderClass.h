@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <iomanip>
 #include "Shared/regex.h"
+#include <iomanip>
 #include <sstream>
 #include <string>
 
@@ -16,5 +16,4 @@ public:
 	bool addEmbeds(std::string &inputline);
 
 	MediaEmbedder();
-
 };

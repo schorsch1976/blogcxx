@@ -9,7 +9,6 @@
 #include <VersionHelpers.h> // getversion for color output
 #endif
 
-
 namespace Log
 {
 namespace impl
@@ -44,12 +43,9 @@ std::string to_iso_extended_string(time_point_t tp)
 	return result;
 }
 
-Backend::Backend()
-	:	m_color_available(true),
-		m_ofs("debug.txt"),
-		m_run(true)
+Backend::Backend() : m_color_available(true), m_ofs("debug.txt"), m_run(true)
 {
-	// https://docs.microsoft.com/de-de/windows/desktop/SysInfo/version-helper-apis
+// https://docs.microsoft.com/de-de/windows/desktop/SysInfo/version-helper-apis
 #ifdef _WIN32
 	// just on Win10 is color available
 	m_color_available = IsWindowsVersionOrGreater(10, 0, 0);
@@ -93,7 +89,7 @@ void Backend::Add(Level lvl, std::string msg)
 // the thread function
 void Backend::Execute()
 {
-	while(m_run)
+	while (m_run)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
@@ -104,7 +100,7 @@ void Backend::Execute()
 			std::swap(work, m_queue);
 		}
 
-		for (auto& e : work)
+		for (auto &e : work)
 		{
 			SendToConsole(e);
 			SendToFile(e);
@@ -112,11 +108,11 @@ void Backend::Execute()
 	}
 }
 
-void Backend::SendToConsole(const Entry& e)
+void Backend::SendToConsole(const Entry &e)
 {
-	// ----------------------------------------------------------------------------
-	// enum for colorizing the output on the consoloe
-	// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// enum for colorizing the output on the consoloe
+// ----------------------------------------------------------------------------
 #ifdef UNIX
 	// https://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
 	static const char *strings[] = {
@@ -146,18 +142,18 @@ void Backend::SendToConsole(const Entry& e)
 	} color;
 	switch (e.lvl)
 	{
-	case Level::fatal:
-		color = Color::cyan;
-		break;
-	case Level::error:
-		color = Color::red;
-		break;
-	case Level::warning:
-		color = Color::yellow;
-		break;
-	default:
-		color = Color::std;
-		break;
+		case Level::fatal:
+			color = Color::cyan;
+			break;
+		case Level::error:
+			color = Color::red;
+			break;
+		case Level::warning:
+			color = Color::yellow;
+			break;
+		default:
+			color = Color::std;
+			break;
 	}
 
 	// warning, error and fatal must be seen by the user
@@ -172,21 +168,15 @@ void Backend::SendToConsole(const Entry& e)
 	}
 	std::cout << e.msg << std::endl;
 }
-void Backend::SendToFile(const Entry& e)
+void Backend::SendToFile(const Entry &e)
 {
 	if (e.lvl < m_file_verbosity)
 	{
 		return;
 	}
 
-	static const char *strings[] = {
-		"trace  ",
-		"debug  ",
-		"info   ",
-		"warning",
-		"error  ",
-		"fatal   "
-	};
+	static const char *strings[] = {"trace  ", "debug  ", "info   ",
+									"warning", "error  ", "fatal   "};
 
 	int idx = static_cast<int>(e.lvl);
 	if (idx < 0)
@@ -197,9 +187,9 @@ void Backend::SendToFile(const Entry& e)
 	{
 		idx = sizeof(strings) / sizeof(*strings) - 1;
 	}
-	m_ofs	<< "[" << to_iso_extended_string(e.time)   << "]"
-			<< "[" << strings[idx] << "] "
-			<< e.msg << std::endl << std::flush;
+	m_ofs << "[" << to_iso_extended_string(e.time) << "]"
+		  << "[" << strings[idx] << "] " << e.msg << std::endl
+		  << std::flush;
 }
 
 } // ns impl

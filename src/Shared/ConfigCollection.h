@@ -112,8 +112,8 @@ public:
 	fs::path commentdir() const;
 
 	fs::path rel_path_archive() const;
-	fs::path rel_path_archive_year(const pt::ptime& time) const;
-	fs::path rel_path_archive_year_month(const pt::ptime& time) const;
+	fs::path rel_path_archive_year(const pt::ptime &time) const;
+	fs::path rel_path_archive_year_month(const pt::ptime &time) const;
 	fs::path rel_path_posts(const std::string &slug) const;
 	fs::path rel_path_pages(const std::string &slug) const;
 	fs::path rel_path_authors(const std::string &author) const;

@@ -8,6 +8,9 @@
 
 #include "Shared/EmojiParser.h"
 
+// just used here
+#define NEWLINE "\n"
+
 ContentsGenerator::ContentsGenerator(ItemType type, fs::path input_folder,
 									 std::string author, std::string title,
 									 std::string slug, std::string first_text)

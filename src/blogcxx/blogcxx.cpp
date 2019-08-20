@@ -59,7 +59,6 @@ namespace po = boost::program_options;
 
 #include "Shared/ConfigCollection.h"
 #include "Shared/Helpers.h"
-#include "Shared/constants.h"
 #include "Shared/PrintVersion.h"
 
 #include "CmdGenerateMetadata.h"
@@ -161,7 +160,8 @@ bool CreateHowtoPost(const ConfigCollection &cfgs)
 			  fs::current_path().string());
 
 		std::cin >> answer;
-		if (lowercase(answer) != translate("y") && lowercase(answer) != translate("n"))
+		if (lowercase(answer) != translate("y") &&
+			lowercase(answer) != translate("n"))
 		{
 			continue;
 		}
@@ -402,14 +402,14 @@ int main(int argc, char **argv)
 			("link0_title",		po::value<boost::optional<std::string>>(&cfgs.link_title[0])->default_value(std::string("Just another blog software.")))
 
 
-			("link1_url",		po::value<boost::optional<std::string>>(&cfgs.link_url[1])->default_value(std::string("https://bitbucket.org/schorsch_76/blogcxx")),
+			("link1_url",		po::value<boost::optional<std::string>>(&cfgs.link_url[1])->default_value(std::string(APP_URL)),
 								"URLs for your sidebar can be specified as follows. "
 								"(blogcxx supports optional hover titles, too.) "
 								"Note that currently max. 100 URLs are supported, but "
 								"I guess you can live with that. :-)")
 
-			("link1_text",		po::value<boost::optional<std::string>>(&cfgs.link_text[1])->default_value(std::string("blogcxx on Bitbucket")))
-			("link1_title",		po::value<boost::optional<std::string>>(&cfgs.link_title[1])->default_value(std::string("")))
+			("link1_text",		po::value<boost::optional<std::string>>(&cfgs.link_text[1])->default_value(std::string("Source code")))
+			("link1_title",		po::value<boost::optional<std::string>>(&cfgs.link_title[1])->default_value(std::string("Source code")))
 
 			;
 
@@ -533,7 +533,8 @@ int main(int argc, char **argv)
 
 		// Set global localization backend
 		using namespace boost::locale;
-		localization_backend_manager my = localization_backend_manager::global();
+		localization_backend_manager my =
+			localization_backend_manager::global();
 #ifdef _WIN32
 		my.select("winapi");
 #else
@@ -552,7 +553,7 @@ int main(int argc, char **argv)
 		// cout.imbue(locale());
 
 		boost::locale::generator gen;
-		std::locale loc{ gen(work_cfg.locale()) };
+		std::locale loc{gen(work_cfg.locale())};
 		std::locale::global(loc);
 
 		// now the "real commands"
@@ -574,10 +575,9 @@ int main(int argc, char **argv)
 			auto end_time = std::chrono::steady_clock::now();
 
 			LOG_INFO("Generation of all data took %1% milliseconds.",
-					std::chrono::duration_cast<std::chrono::milliseconds>(end_time -
-																		start_time)
-						.count());
-
+					 std::chrono::duration_cast<std::chrono::milliseconds>(
+						 end_time - start_time)
+						 .count());
 		}
 		return EXIT_SUCCESS;
 	}

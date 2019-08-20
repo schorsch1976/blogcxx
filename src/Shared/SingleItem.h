@@ -11,8 +11,8 @@
 #include <vector>
 
 // we use modern c++ and avoid the old struct tm_t
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 namespace pt = boost::posix_time;
 using year_t = boost::gregorian::greg_year;
 using month_t = boost::gregorian::greg_month;

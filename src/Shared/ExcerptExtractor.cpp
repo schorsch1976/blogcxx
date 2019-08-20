@@ -9,7 +9,8 @@
 namespace Excerpt
 {
 
-std::pair<std::string, bool> extract(std::string string_to_extract, int max_sentences)
+std::pair<std::string, bool> extract(std::string string_to_extract,
+									 int max_sentences)
 {
 	// Returns the excerpt and sets the "shortened" bool to "true" if
 	// applicable. If <max_sentences> is 0, this method will only check for

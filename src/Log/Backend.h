@@ -5,14 +5,14 @@
 
 #pragma once
 
-#include <string>
-#include <chrono>
-#include <thread>
 #include <atomic>
-#include <mutex>
-#include <vector>
+#include <chrono>
 #include <fstream>
 #include <iostream>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <vector>
 
 #include "Log.h"
 
@@ -57,8 +57,8 @@ public:
 private:
 	// the thread function
 	void Execute();
-	void SendToConsole(const Entry& e);
-	void SendToFile(const Entry& e);
+	void SendToConsole(const Entry &e);
+	void SendToFile(const Entry &e);
 
 	std::vector<Entry> m_queue;
 	bool m_color_available;

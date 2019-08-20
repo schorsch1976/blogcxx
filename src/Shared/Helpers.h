@@ -34,7 +34,8 @@ enum class time_fmt
 	rss_date_time
 };
 
-std::string dateToPrint(const pt::ptime& time, time_fmt fmt = time_fmt::locale_date_time);
+std::string dateToPrint(const pt::ptime &time,
+						time_fmt fmt = time_fmt::locale_date_time);
 
 bool isFutureDate(pt::ptime time);
 

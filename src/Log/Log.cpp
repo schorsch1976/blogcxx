@@ -3,13 +3,13 @@
  * Debug logging functionality class [header].
  */
 
+#include <chrono>
 #include <iomanip>
 #include <mutex> // once flag
 #include <vector>
-#include <chrono>
 
-#include "Log.h"
 #include "Backend.h"
+#include "Log.h"
 
 namespace
 {
@@ -26,9 +26,8 @@ namespace Log
 {
 Status::Status()
 {
-	std::call_once(s_once_backend, [=]() {
-		sp_backend = std::make_shared<impl::Backend>();
-	});
+	std::call_once(s_once_backend,
+				   [=]() { sp_backend = std::make_shared<impl::Backend>(); });
 }
 Status::~Status()
 {

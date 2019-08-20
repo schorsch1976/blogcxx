@@ -171,12 +171,11 @@ void MarkdownParser::parse(const std::string inputline)
 					if (!in_code)
 					{
 						in_code = true;
-						ret = regex_replace(ret, code,
-											ss_codelang.str().empty()
-												? "<pre><code>$1"
-												: "<pre><code lang=\"" +
-													  ss_codelang.str() +
-													  "\">$1");
+						ret = regex_replace(
+							ret, code, ss_codelang.str().empty()
+										   ? "<pre><code>$1"
+										   : "<pre><code lang=\"" +
+												 ss_codelang.str() + "\">$1");
 					}
 					else
 					{

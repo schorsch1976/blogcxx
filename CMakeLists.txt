@@ -14,17 +14,58 @@ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 PROJECT(blogcxx C CXX)
 
-#######################################################################
+###############################################################################
+# CMake Policies used
+###############################################################################
+IF(COMMAND cmake_policy)
+	CMAKE_POLICY(SET CMP0005 NEW)
+ENDIF(COMMAND cmake_policy)
+
+###############################################################################
+# Git is required for build (Version info)
+###############################################################################
+FIND_PACKAGE(Git REQUIRED)
+IF (GIT_FOUND)
+	MESSAGE(STATUS "Git: ${GIT_EXECUTABLE}")
+ELSE (GIT_FOUND)
+	MESSAGE(FATAL_ERROR "Git not found")
+ENDIF (GIT_FOUND)
+
+###############################################################################
+# version info
+# a repackaged version could set the version string differently like a fixed one
+###############################################################################
+EXECUTE_PROCESS(
+	COMMAND ${GIT_EXECUTABLE} describe --tags --dirty
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+	OUTPUT_VARIABLE GIT_VERSION
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+ADD_DEFINITIONS(-DGIT_VERSION="${GIT_VERSION}")
+MESSAGE(STATUS "Git Version: ${GIT_VERSION}")
+
+###############################################################################
+# Other constants
+###############################################################################
+ADD_DEFINITIONS(-DAPP_URL="https://github.com/schorsch1976/blogcxx")
+ADD_DEFINITIONS(-DBUGTRACKER="https://github.com/schorsch1976/blogcxx/issues")
+
+ADD_DEFINITIONS(-DHIGHLIGHT_VER="9.13.1")
+ADD_DEFINITIONS(-DHEADER_DIVIDER="----------")
+# ADD_DEFINITIONS(-DNEWLINE="\n")
+
+###############################################################################
 # Include needed Macros
-#######################################################################
+###############################################################################
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/CMake)
 INCLUDE (ConfigureMSVCRuntime)
 INCLUDE (GENERATE_CXX)
 INCLUDE (ExternalProject)
 
-######################################################################
+###############################################################################
 # OS
-######################################################################
+###############################################################################
 IF (UNIX)
 	MESSAGE(STATUS "This is UNIX")
 	ADD_DEFINITIONS(-DUNIX)
@@ -110,9 +151,9 @@ IF(MSYS)
 ENDIF(MSYS)
 ENDIF (WIN32)
 
-############################################################################
+###############################################################################
 # Linkage
-############################################################################
+###############################################################################
 OPTION(API_STATIC_LINKING "Link everything static" OFF)
 IF (API_STATIC_LINKING)
 	ConfigureMSVCRuntime(static)
@@ -123,9 +164,9 @@ ELSE (API_STATIC_LINKING)
 	ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK=1)
 ENDIF (API_STATIC_LINKING)
 
-############################################################################
+###############################################################################
 # markdown
-############################################################################
+###############################################################################
 SET(API_MARKDOWN "libcmark-gfm" CACHE STRING "Use this markdown implementation")
 SET_PROPERTY(CACHE API_MARKDOWN PROPERTY STRINGS "blogcpp" "libcmark-gfm")
 
@@ -140,9 +181,9 @@ IF (API_MARKDOWN STREQUAL "libcmark-gfm")
 	SET(MARKDOWN_CMARK_GFM ON)
 ENDIF (API_MARKDOWN STREQUAL "libcmark-gfm")
 
-############################################################################
+###############################################################################
 # variant
-############################################################################
+###############################################################################
 SET(API_VARIANT "boost::variant" CACHE STRING "Use this variant API")
 SET_PROPERTY(CACHE API_VARIANT PROPERTY STRINGS "std::variant" "boost::variant")
 
@@ -154,10 +195,10 @@ IF (API_VARIANT STREQUAL "boost::variant")
 	ADD_DEFINITIONS(-DUSE_VARIANT_API=2)
 ENDIF (API_VARIANT STREQUAL "boost::variant")
 
-############################################################################
+###############################################################################
 # regex because of this bug
 # https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=233994
-############################################################################
+###############################################################################
 IF(NOT FREEBSD)
 	# everywhere use std::regex
 	ADD_DEFINITIONS(-DUSE_REGEX_API=1)
