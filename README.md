@@ -26,7 +26,7 @@ the repo the post-update hook runs and updates the blog.
 and crashed repeatedly.
 
 ## Fork
-As blogcpp is licenced under WTFPL2, i fork it and do what
+As blogcpp is licenced under [WTFPL2](https://bitbucket.org/tux_/blogcpp/src/default/LICENSE), i fork it and do what
 the f*ck i want. As i rewrote so big chunks, i licence blogcxx
 under [GPLv3](https://www.gnu.org/licenses/gpl-3.0.txt).
 I think GPL has done much more good than harm
@@ -83,28 +83,23 @@ to heavy for the author of blogcpp.
 
 ## Current version
 
-The latest released version is 1-alpha
+The latest released version is 1-alpha. master branch is always the latest version.
 
 ---
 
 ### what i am not sure if it works
 - highlight programming languages. The generated code looks correct.
-- comments (create an own template that gets loaded and parsed instead of
-  poluting the source code with html. The job ob the template engine is
-  separation of html and control.)
 - colorize output for warn/error/fatal messages. (on windows, linux works)
 - ExcerptParser seems confused
 
 ---
 
-### What is not yet working
+### TODO list + What is not yet working
 - metadata in the HTML (opengraphimg, feedmeta)
 - spawn $EDITOR on UNIX
 - OpenGraph support if you feel like sharing stuff on Facebook or
   whatever.
-- blerc template
-
-### TODO list
+- comments
 - download the highlight.js into the static folder
 - config colletion: check the pathes if they are unique
 
@@ -204,7 +199,7 @@ raw threads. use std::future() and std::async(launch::async,...)
 - Restructure the whole src folder. Split the tasks into manageable
   files that are grouped accordig to their function in the process.
 - use boost::format for logging.
-- RSS (replaced tinyxml2 with inja. we already have a templating engine)
+- RSS (replaced tinyxml2 with htmltemplate++. we already have a templating engine)
 
 No more
 
