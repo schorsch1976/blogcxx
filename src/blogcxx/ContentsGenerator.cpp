@@ -35,7 +35,7 @@ void ContentsGenerator::generate()
 	{
 		case ItemType::Post:
 			filename /= dateToPrint(pt::second_clock::local_time(),
-									time_fmt::iso_short) +
+									time_fmt::iso_short) + " " +
 						trim(hyphenise(EmojiParser::clear(title))) + ".txt";
 			contents << createDummyArticle() << first_text;
 			break;
