@@ -133,6 +133,7 @@ public:
 	std::string url(const fs::path rel_path, int index = -1) const;
 
 private:
+	std::string url_encode(std::string in) const;
 	const ConfigCollectionFile &m_file;
 	std::string m_url;
 };

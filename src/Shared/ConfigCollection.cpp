@@ -305,7 +305,46 @@ std::string ConfigCollection::url(const fs::path rel_path, int index) const
 	// Makes "a/b/c" out of "a//b//////c".
 	// rx::regex slash("([^:])/+"); // Do not replace "https://".
 	// std::string out = rx::regex_replace(ret, slash, "$1/");
-	return ret;
+	return url_encode(ret);
+}
+
+std::string ConfigCollection::url_encode(std::string in) const
+{
+	// find the protocol
+	const std::string protocol_delimeter = "://";
+	auto pos = std::search(std::begin(in), std::end(in),
+						   std::begin(protocol_delimeter),
+						   std::end(protocol_delimeter));
+	std::string protocol =
+		std::string(std::begin(in), pos + protocol_delimeter.size());
+
+	std::string value(pos + protocol_delimeter.size(), std::end(in));
+
+	std::ostringstream escaped;
+	escaped.fill('0');
+	escaped << std::hex;
+
+	const std::string keep = "-._~/";
+
+	for (std::string::const_iterator i = value.begin(), n = value.end(); i != n;
+		 ++i)
+	{
+		std::string::value_type c = (*i);
+
+		// Keep alphanumeric and other accepted characters intact
+		if (isalnum(c) || keep.find(c) != std::string::npos)
+		{
+			escaped << c;
+			continue;
+		}
+
+		// Any other characters are percent-encoded
+		escaped << std::uppercase;
+		escaped << '%' << std::setw(2) << int((unsigned char)c);
+		escaped << std::nouppercase;
+	}
+
+	return protocol + escaped.str();
 }
 
 fs::path ConfigCollection::feed_file(const ArchiveData &ad) const
