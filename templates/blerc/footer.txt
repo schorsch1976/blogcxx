@@ -1,7 +1,0 @@
-    </div>
-	{% if exists("blogcxx") %}
-    <div id="footer">made with love and <a href={{ blogcxx }}>blogcxx</a></div>
-	{% endif %}
-    {{ default(footscripts, "") }}
-  </body>
-</html>
