@@ -8,6 +8,7 @@
 #include <future>
 #include <map>
 #include <set>
+#include <thread>
 #include <type_traits>
 
 #include "Log/Log.h"

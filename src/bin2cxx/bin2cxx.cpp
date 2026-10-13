@@ -14,6 +14,7 @@ namespace po = boost::program_options;
 
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 #include <iterator>
 
 std::string to_array_name(fs::path filename)
