@@ -2,7 +2,7 @@
   <b>Latest posts:</b>
   <ul class="latestposts">
     [TMPL_FOR latestposts]
-    <li><a href="[TMPL_VAR link]" title="[TMPL_VAR title]">[TMPL_VAR title]</a> ([TMPL_VAR date])</li>
+    <li><a href="[TMPL_VAR link]" title="[TMPL_VAR title]">[TMPL_VAR title]</a><span class="date">[TMPL_VAR date]</span></li>
     [/TMPL_FOR]
   </ul>
 

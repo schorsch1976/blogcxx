@@ -1,11 +1,12 @@
 <!doctype html>
-<html>
+<html lang="de">
     <head>
         <title>[TMPL_VAR pagetitle]</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="manifest" href="[TMPL_VAR baseurl]/static/manifest.json" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#eef1f6" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#11151c" media="(prefers-color-scheme: dark)" />
         [TMPL_VAR feedmeta]
         [TMPL_VAR opengraphmeta]
         <link rel="stylesheet" href="[TMPL_VAR baseurl]/static/styles.css" />
@@ -15,7 +16,8 @@
         [TMPL_VAR nextmeta]
         [TMPL_VAR keywordsmeta]
 		[TMPL_IF has_highlightdata]
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/[TMPL_VAR hljsver]/styles/default.min.css" />
+		<link rel="stylesheet" media="(prefers-color-scheme: light)" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/[TMPL_VAR hljsver]/styles/default.min.css" />
+		<link rel="stylesheet" media="(prefers-color-scheme: dark)" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/[TMPL_VAR hljsver]/styles/atom-one-dark.min.css" />
 			 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/[TMPL_VAR hljsver]/highlight.min.js"></script>
 			[TMPL_FOR highlightdata]
 				<script type="text/javascript"
